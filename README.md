@@ -21,6 +21,8 @@ where `n` is the number of cells per side.
 * handle observation directly over jammer
 * implement particle filters
 * implement centroid, variance functions
+* rigorously test centroid functions
+* allow user to specify degree discretization in discrete filter (also particle filter?)
 * draw uav instead of star
 * allow interpolations in plotting (instead of "none")
 
