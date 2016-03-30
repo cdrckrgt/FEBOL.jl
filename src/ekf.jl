@@ -3,12 +3,27 @@
 # handles kalman filter stuff
 ######################################################################
 
-type Gaussian <: Belief
-	mean::Vector{Float64}
-	Sigma::Matrix{Float64}
-end
+#type Gaussian <: Belief
+#	mean::Vector{Float64}
+#	Sigma::Matrix{Float64}
+#end
 
-type EKF
+# length is size of one side of search domain
+type EKF <: AbstractFilter
+
+	# belief
+	mu::Vector{Float64}
+	Sigma::Matrix{Float64}
+
+	# extras
+	theta::NTuple{2,Float64}
+	length::Float64	
+
+	function EKF(m::SearchDomain)
+		mu = m.length/2 * ones(2)
+		S = 1e9 * eye(2)
+		return new(mu, S, m.theta, m.length)
+	end
 end
 
 function initial_belief(kf::EKF)
@@ -18,15 +33,16 @@ end
 # have to include search domain because jammer location factors in
 # Really, I should just fold that into the state
 # TODO: just subtracting is not ok, need circle distance (can be negative)
-function update!(m::SearchDomain,b::Gaussian, df::EKF, x::Vehicle, o::Obs)
-	xr = m.theta[1] - x.x
-	yr = m.theta[2] - x.y
+# I'm not sure this is correct....
+function update!(ekf::EKF, x::Vehicle, o::Obs)
+	xr = ekf.theta[1] - x.x
+	yr = ekf.theta[2] - x.y
 	Ht = [yr, -xr]' * (180.0 / pi) / (xr^2 + yr^2)
-	Kt = b.Sigma * Ht' * inv(Ht * b.Sigma * Ht' + 100.)
+	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + 100.)
 
-	mu_t = b.mean + Kt * (o - true_bearing((x.x,x.y), m.theta) )
-	Sigma_t = (eye(2)  - Kt * Ht) * b.Sigma
+	mu_t = ekf.mu + Kt * (o - true_bearing((x.x,x.y), ekf.theta) )
+	Sigma_t = (eye(2)  - Kt * Ht) * ekf.Sigma
 
-	b.mean = vec(mu_t)
-	b.Sigma = Sigma_t
+	ekf.mu = vec(mu_t)
+	ekf.Sigma = Sigma_t
 end
