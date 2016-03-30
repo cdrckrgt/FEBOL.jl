@@ -16,7 +16,7 @@ Arguments:
 
 Returns probability of observing `o` from `(xp, theta)` in domain `m`.
 """
-function O(x::Vehicle, theta::NTuple{2,Float64}, o::Obs)
+function O(x::Vehicle, theta::LocTuple, o::Obs)
 
 	# Calculate true bearing, and find distance to bin edges
 	xp = (x.x, x.y)
@@ -43,6 +43,15 @@ function O(m::SearchDomain, xv::Float64, yv::Float64, theta, o::Obs)
 	return p
 end
 
+
+# Steps:
+#  1. compute the true bearing
+#  2. sample the error
+function observe(m::SearchDomain, x::Vehicle)
+	truth = true_bearing(x, m.theta)
+	noise = x.noise_sigma * randn()
+	return mod(truth + noise, 360.0)
+end
 
 #"""
 #`observe(m::SearchDomain, X::VehicleSet)`
@@ -110,8 +119,11 @@ end
 #  theta - location of jammer
 #
 # Returns true angle, measured from north, in degrees.
-function true_bearing(xp, theta)
-
+function true_bearing(xp::LocTuple, theta::Vector{Float64})
+	return true_bearing(xp, (theta[1], theta[2]))
+end
+true_bearing(x::Vehicle, theta) = true_bearing( (x.x, x.y), theta)
+function true_bearing(xp::LocTuple, theta::LocTuple)
 	xr = theta[1] - xp[1]
 	yr = theta[2] - xp[2]
 	return mod(rad2deg(atan2(xr,yr)), 360)

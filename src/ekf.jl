@@ -10,39 +10,36 @@
 
 # length is size of one side of search domain
 type EKF <: AbstractFilter
-
-	# belief
-	mu::Vector{Float64}
-	Sigma::Matrix{Float64}
-
-	# extras
-	theta::NTuple{2,Float64}
+	mu::Vector{Float64}			# belief
+	Sigma::Matrix{Float64}		# belief
 	length::Float64	
 
 	function EKF(m::SearchDomain)
 		mu = m.length/2 * ones(2)
 		S = 1e9 * eye(2)
-		return new(mu, S, m.theta, m.length)
+		return new(mu, S, m.length)
 	end
-end
-
-function initial_belief(kf::EKF)
-	return Gaussian([5.,5.], [100000. 0; 0 100000.0])
 end
 
 # have to include search domain because jammer location factors in
 # Really, I should just fold that into the state
 # TODO: just subtracting is not ok, need circle distance (can be negative)
-# I'm not sure this is correct....
 function update!(ekf::EKF, x::Vehicle, o::Obs)
-	xr = ekf.theta[1] - x.x
-	yr = ekf.theta[2] - x.y
+	xr = ekf.mu[1] - x.x
+	yr = ekf.mu[2] - x.y
+	if xr == 0.0 && yr === 0.0
+		xr = 1e-6
+		yr = 1e-6
+	end
 	Ht = [yr, -xr]' * (180.0 / pi) / (xr^2 + yr^2)
 	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + 100.)
+	println("Kt = ", Kt)
 
-	mu_t = ekf.mu + Kt * (o - true_bearing((x.x,x.y), ekf.theta) )
+	o_predict = true_bearing(x, ekf.mu) 
+	mu_t = ekf.mu + Kt * (o - o_predict)
 	Sigma_t = (eye(2)  - Kt * Ht) * ekf.Sigma
 
+	# TODO: use copy here
 	ekf.mu = vec(mu_t)
 	ekf.Sigma = Sigma_t
 end
