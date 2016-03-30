@@ -3,11 +3,6 @@
 # handles kalman filter stuff
 ######################################################################
 
-#type Gaussian <: Belief
-#	mean::Vector{Float64}
-#	Sigma::Matrix{Float64}
-#end
-
 # length is size of one side of search domain
 type EKF <: AbstractFilter
 	mu::Vector{Float64}			# belief
@@ -24,7 +19,7 @@ end
 # have to include search domain because jammer location factors in
 # Really, I should just fold that into the state
 # TODO: just subtracting is not ok, need circle distance (can be negative)
-function update!(ekf::EKF, x::Vehicle, o::Obs)
+function update!(ekf::EKF, x::Vehicle, o::Float64)
 	xr = ekf.mu[1] - x.x
 	yr = ekf.mu[2] - x.y
 	if xr == 0.0 && yr === 0.0
@@ -33,7 +28,6 @@ function update!(ekf::EKF, x::Vehicle, o::Obs)
 	end
 	Ht = [yr, -xr]' * (180.0 / pi) / (xr^2 + yr^2)
 	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + 100.)
-	println("Kt = ", Kt)
 
 	o_predict = true_bearing(x, ekf.mu) 
 	mu_t = ekf.mu + Kt * (o - o_predict)

@@ -12,10 +12,11 @@ export update!
 export centroid
 export plot
 export InfoMatrix, EIF
-export step!
+export step!, steps!
 
+typealias Action   NTuple{2, Float64}
 typealias LocTuple NTuple{2, Float64}
-typealias Obs Int64
+typealias Obs      Int64
 
 # Assume these are square
 type SearchDomain
@@ -37,6 +38,9 @@ include("filters.jl")
 #include("df.jl")
 #include("ekf.jl")
 #include("eif.jl")
+
+# policies
+include("policy.jl")
 
 # Simulation and Plotting
 include("simulations.jl")

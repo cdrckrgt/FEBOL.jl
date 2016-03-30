@@ -10,6 +10,7 @@ Plots the belief, jammer, and vehicles.
 """
 function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle)
 	plot_theta(m)
+	hold(true)
 	plot_vehicle(x)
 	plot(m, f)
 	return # so it doesn't spit out result of axis
