@@ -38,3 +38,18 @@ function update!(b::DiscreteBelief, df::DF, x::Vehicle, o::Obs)
 		end
 	end
 end
+
+# returns x, y value
+function centroid(b::Matrix{Float64}, df::DF)
+	x_val = 0.0; y_val = 0.0
+	x_sum = 0.0; y_sum = 0.0
+	for x = 1:df.n
+		for y = 1:df.n
+			x_val += (x-.5) * b[x,y]
+			x_sum += b[x,y]
+			y_val += (y-.5) * b[x,y]
+			y_sum += b[x,y]
+		end
+	end
+	return x_val*df.cell_size / x_sum, y_val*df.cell_size / y_sum
+end

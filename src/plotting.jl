@@ -8,17 +8,76 @@
 
 Plots the belief, jammer, and vehicles.
 """
-function plot_b(m::SearchDomain, b, x::Vehicle)
+function plot_b(m::SearchDomain, b::Matrix{Float64}, x::Vehicle)
 	#hold(true)
 	#plot_b(m.b, X, m.theta)
 	plot_theta(m)
 	plot_vehicle(x)
-	#imshow(b', interpolation="none", cmap="Greys", origin="lower")
 	a = [0,m.length,0,m.length]
 	imshow(b', interpolation="none", cmap="Greys", origin="lower", extent=a)
 	labels()
 	axis(a)
 	return # so it doesn't spit out result 
+end
+
+function plot_b(m::SearchDomain, b::Gaussian, x::Vehicle)
+	#hold(true)
+	#plot_b(m.b, X, m.theta)
+	plot_theta(m)
+	plot_vehicle(x)
+	a = [0,m.length,0,m.length]
+
+	# Plot it out...
+	step_val = 0.1
+	xvals = collect(0.:step_val:m.length)
+	yvals = collect(0.:step_val:m.length)
+	n = length(xvals)
+	gaussian_arr = zeros(n, n)
+	d = MvNormal(b.mean, sqrt(b.Sigma))
+	for x = 1:n
+		for y = 1:n
+			gaussian_arr[x,y] = pdf(d, [xvals[x],yvals[y]])
+		end
+	end
+	#imshow(gaussian_arr', interpolation="none", cmap="Greys", origin="lower", extent=a)
+	plot_contour(m, gaussian_arr)
+
+	labels()
+	axis(a)
+	return # so it doesn't spit out result 
+end
+
+function plot_b(m::SearchDomain, b::InfoMatrix, x::Vehicle)
+	#hold(true)
+	#plot_b(m.b, X, m.theta)
+	plot_theta(m)
+	plot_vehicle(x)
+	a = [0,m.length,0,m.length]
+
+	# Plot it out...
+	step_val = 0.1
+	xvals = collect(0.:step_val:m.length)
+	yvals = collect(0.:step_val:m.length)
+	n = length(xvals)
+	if b.Omega == zeros(2,2)
+		return
+	end
+	Sigma = inv(b.Omega)
+	mu = Sigma * b.eta
+	gaussian_arr = zeros(n, n)
+	d = MvNormal(mu, sqrt(Sigma))
+	for x = 1:n
+		for y = 1:n
+			gaussian_arr[x,y] = pdf(d, [xvals[x],yvals[y]])
+		end
+	end
+	#imshow(gaussian_arr', interpolation="none", cmap="Greys", origin="lower", extent=a)
+	#plot_contour(m, gaussian_arr)
+
+	labels()
+	axis(a)
+	#return # so it doesn't spit out result 
+	return gaussian_arr
 end
 
 # This is needed for plot_sim
@@ -92,8 +151,8 @@ function plot_theta(m::SearchDomain)
 end
 
 # Plots contours of some distribution `d` (a matrix).
-function plot_contour(m::SearchDomain, d)
-	X,Y = meshgrid(0:m.num_cells-1, 0:m.num_cells-1)
+function plot_contour(m::SearchDomain, d::Matrix{Float64})
+	X,Y = meshgrid(0:.1:m.length, 0:.1:m.length)
 	contour(X, Y, d')
 end
 
