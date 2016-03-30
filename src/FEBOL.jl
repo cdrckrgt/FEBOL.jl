@@ -40,6 +40,7 @@ include("filters.jl")
 #include("eif.jl")
 
 # policies
+include("infotheoretic.jl")
 include("policy.jl")
 
 # Simulation and Plotting

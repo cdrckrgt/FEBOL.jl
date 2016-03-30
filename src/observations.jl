@@ -39,7 +39,8 @@ function O(m::SearchDomain, xv::Float64, yv::Float64, theta, o::Obs)
 
 	# now look at probability
 	#p = cdf(m.d, deg2rad(rel_end)) - cdf(m.d, deg2rad(rel_start))
-	p = cdf(m.d, rel_end) - cdf(m.d, rel_start)
+	d = Normal(0, 10.0)
+	p = cdf(d, rel_end) - cdf(d, rel_start)
 	return p
 end
 

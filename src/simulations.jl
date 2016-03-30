@@ -17,6 +17,8 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter; video=false)
 
 	# update vehicle position
 	p = RandomPolicy()
+	p = GreedyPolicy(x, 8)
+
 	a = action(m, x, f, p)
 	act!(m,x,a)
 
