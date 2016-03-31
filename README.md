@@ -19,17 +19,35 @@ where `n` is the number of cells per side.
 ## Policies
 
 #### RandomPolicy
+A `RandomPolicy` simply moves the vehicle in a random direction.
 ```
 RandomPolicy()
 ```
 
 #### GreedyPolicy
+A `GreedyPolicy` moves
 ```
 GreedyPolicy(x::Vehicle, n::Int)
 ```
 
-### OrthoPolicy
+#### OrthoPolicy
+The constructor is as follows:
+```
+OrthoPolicy()
+```
 
+#### Custom Policy
+You can create your own policies by extending the abstract `Policy` class and implementing the `action` function.
+To implement a policy named `PolicyName`
+```
+type CustomPolicy <: Policy
+end
+
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::CustomPolicy)
+	# your policy code
+	# must return action (2-tuple of Float64s)
+end
+```
 
 ## Simulations
 
