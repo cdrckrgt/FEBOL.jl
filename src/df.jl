@@ -71,3 +71,7 @@ function centroid(df::DF)
 	end
 	return x_val*df.cell_size / x_sum, y_val*df.cell_size / y_sum
 end
+
+# Returns the entropy of the distribution.
+function entropy(df::DF)
+end

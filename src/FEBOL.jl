@@ -8,8 +8,7 @@ export SearchDomain
 export Belief, Gaussian, ParticleSet, DiscreteBelief
 export DF, EKF
 export Vehicle
-export update!
-export centroid
+export update!, centroid, entropy
 export plot
 export InfoMatrix, EIF
 export step!, steps!
