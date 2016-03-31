@@ -8,13 +8,44 @@ m = SearchDomain(10.0, 9.5, 9.5)
 The jammer must be within 0 and the length of one side of the domain.
 
 ## Filters
+A filter is something that maintains a belief over the search space and updates it given new observations and vehicle locations.
 
-### Discrete Filters
+Note that each filter maintains a belief, which is a questionable design decision.
+In reality, a belief is something separate, fed into a filter to be updated.
+However, the belief representation (discrete, Gaussian, etc) depends heavily on the filtering being applied.
+In short, it just seems easier to maintain a single filter type rather than worry about a separate belief.
+
+#### Discrete Filter
 The constructor for a discrete filter is
 ```
 DF(m::SearchDomain, n::Int)
 ```
 where `n` is the number of cells per side.
+
+#### Extended Kalman Fiter
+```
+EKF(m::SearchDomain)
+```
+
+#### Particle Filter
+
+#### Custom Filters
+```
+type CustomFilter <: AbstractFilter
+end
+
+function update!(f::CustomFilter, x::Vehicle, o::Float64)
+	# update the belief in the filter.
+end
+
+function centroid(f::CustomFilter)
+	# return the centroid of the filter's belief
+end
+
+function entropy(f::CustomFilter)
+	# return the entropy of the filter's belief
+end
+```
 
 ## Policies
 
