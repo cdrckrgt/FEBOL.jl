@@ -1,32 +1,31 @@
 ######################################################################
 # policy.jl
 # Does basic policy stuff.
+# Policy's don't need to remember vehicle's max_step,
+#  as the action function ensures the step is normalized to max_step.
 ######################################################################
 
 abstract Policy
 
-function action(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy)
+# Default action returns an error
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::Policy)
 	return error("$(typeof(p)) does not yet implement action.")
+end
+
+function normalize(a::Action, x::Vehicle)
+	ax = a[1]; ay = a[2]
+	den = sqrt(ax*ax + ay*ay)
+	return x.max_step * ax / den, x.max_step * ay / den
 end
 
 
 # Random policy
-type RandomPolicy <: Policy
-	max_step::Float64
+type RandomPolicy <: Policy end
 
-	RandomPolicy(ms::Float64) = new(ms)
-	Randomlicy(x::Vehicle) = new(x.max_step)
-	RandomPolicy() = new(2.0)
-end
-
-function action(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::RandomPolicy)
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::RandomPolicy)
 	ax = rand() - 0.5
 	ay = rand() - 0.5
-
-	den = sqrt(ax*ax + ay*ay)
-	ax = x.max_step * ax / den
-	ay = x.max_step * ay / den
-	return ax, ay
+	return normalize((ax,ay), x)
 end
 
 
@@ -35,7 +34,6 @@ end
 type GreedyPolicy <: Policy
 	n::Int
 	actions::Vector{Action}
-	max_step::Float64
 
 	function GreedyPolicy(x::Vehicle, n::Int)
 		angles = linspace(0.0, 360 - 360/n, n)
@@ -48,13 +46,13 @@ type GreedyPolicy <: Policy
 			actions[i] = (ax, ay)
 		end
 
-		return new(n, actions, x.max_step)
+		return new(n, actions)
 	end
 end
 
 # loop over all actions.
 # The one with smallest expected entropy is best
-function action(m::SearchDomain, x::Vehicle, f::DF, p::GreedyPolicy)
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::GreedyPolicy)
 	best_mi = -Inf
 	best_a = (0.0, 0.0)
 	for a in p.actions
@@ -68,4 +66,54 @@ function action(m::SearchDomain, x::Vehicle, f::DF, p::GreedyPolicy)
 		end
 	end
 	return best_a
+end
+
+
+# Move orthogonally to last measurement
+type OrthoPolicy <: Policy 
+	last::Action
+
+	OrthoPolicy() = new( (0.0, 0.0) )
+end
+
+# Remembers last action to ensure we follow same direction around circle
+# Otherwise, it will "chatter" back and forth
+# TODO: take into account distance from edge
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::OrthoPolicy)
+	ax = -1.0 / sind(o)
+	ay = 1.0 / cosd(o)
+
+	if ax*p.last[1] + ay*p.last[2] < 0.
+		ax = -ax
+		ay = -ay
+	end
+
+	p.last = (ax, ay)
+
+	return normalize((ax,ay), x)
+end
+
+
+# Move orthogonally to last measurement
+type SpiralPolicy <: Policy 
+	last::Action
+
+	SpiralPolicy() = new( (0.0, 0.0) )
+end
+
+# Remembers last action to ensure we follow same direction around circle
+# Otherwise, it will "chatter" back and forth
+# TODO: take into account distance from edge
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::SpiralPolicy)
+	ax = -1.0 / sind(o)
+	ay = 1.0 / cosd(o)
+
+	if ax*p.last[1] + ay*p.last[2] < 0.
+		ax = -ax
+		ay = -ay
+	end
+
+	p.last = (ax, ay)
+
+	return normalize((ax,ay), x)
 end

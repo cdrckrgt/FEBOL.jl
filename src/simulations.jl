@@ -19,7 +19,7 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video:
 	#p = RandomPolicy()
 	#p = GreedyPolicy(x, 16)
 
-	a = action(m, x, f, p)
+	a = action(m, x, o, f, p)
 	act!(m,x,a)
 
 	if video

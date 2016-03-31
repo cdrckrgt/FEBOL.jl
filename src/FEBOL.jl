@@ -13,7 +13,7 @@ export centroid
 export plot
 export InfoMatrix, EIF
 export step!, steps!
-export Policy, RandomPolicy, GreedyPolicy
+export Policy, RandomPolicy, GreedyPolicy, OrthoPolicy
 
 typealias Action   NTuple{2, Float64}
 typealias LocTuple NTuple{2, Float64}

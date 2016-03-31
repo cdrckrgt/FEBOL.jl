@@ -37,3 +37,5 @@ function update!(ekf::EKF, x::Vehicle, o::Float64)
 	ekf.mu = vec(mu_t)
 	ekf.Sigma = Sigma_t
 end
+
+centroid(ekf::EKF) = (ekf.mu[1], ekf.mu[2])
