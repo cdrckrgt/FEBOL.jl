@@ -25,10 +25,12 @@ RandomPolicy()
 ```
 
 #### GreedyPolicy
-A `GreedyPolicy` moves
+A `GreedyPolicy` moves the agent in the direction that minimizes the expected entropy after moving.
 ```
 GreedyPolicy(x::Vehicle, n::Int)
 ```
+The integer `n` denotes how many actions should be considered.
+If `n=6`, then the agent considers the expected entropy given 6 different directions, spaced and even 60 degrees apart.
 
 #### OrthoPolicy
 The constructor is as follows:
@@ -37,8 +39,7 @@ OrthoPolicy()
 ```
 
 #### Custom Policy
-You can create your own policies by extending the abstract `Policy` class and implementing the `action` function.
-To implement a policy named `PolicyName`
+You can create your own policies by extending the abstract `Policy` class and implementing the `action` function. Below is an example:
 ```
 type CustomPolicy <: Policy
 end
@@ -47,6 +48,10 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::C
 	# your policy code
 	# must return action (2-tuple of Float64s)
 end
+```
+Feel free to take advantage of the `normalize` function to ensure your action's norm is equal to the maximum distance the vehicle can take per time step:
+```
+normalize(a::Action, x::Vehicle)
 ```
 
 ## Simulations
