@@ -16,6 +16,23 @@ DF(m::SearchDomain, n::Int)
 ```
 where `n` is the number of cells per side.
 
+## Policies
+
+#### RandomPolicy
+```
+RandomPolicy()
+```
+
+#### GreedyPolicy
+```
+GreedyPolicy(x::Vehicle, n::Int)
+```
+
+### OrthoPolicy
+
+
+## Simulations
+
 ## TODO:
 
 * handle observation directly over jammer
