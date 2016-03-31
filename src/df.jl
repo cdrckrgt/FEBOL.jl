@@ -15,7 +15,6 @@ type DF <: AbstractFilter
 		return new(b, n, m.length/n)
 	end
 end
-initial_belief(df::DF) = ones(df.n, df.n) / (df.n * df.n)
 
 # This is really just a Matrix....
 typealias DiscreteBelief Matrix{Float64}

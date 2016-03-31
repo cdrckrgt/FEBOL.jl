@@ -3,11 +3,6 @@
 # Extended information filter
 ######################################################################
 
-#type InfoMatrix <: Belief
-#	eta::Vector{Float64}
-#	Omega::Matrix{Float64}
-#end
-
 type EIF
 	eta::Vector{Float64}
 	Omega::Matrix{Float64}
@@ -21,12 +16,6 @@ type EIF
 	end
 end
 
-#function initial_belief(eif::EIF)
-#	#return InfoMatrix([0.,0.], [0.0 0.0; 0 0.0])
-#	Omega = [1e-8 0; 0 1e-8]
-#	eta = inv(Omega) * [5.,5]
-#	return InfoMatrix(eta, Omega)
-#end
 
 # have to include search domain because jammer location factors in
 # Really, I should just fold that into the state

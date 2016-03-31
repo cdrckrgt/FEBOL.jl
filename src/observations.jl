@@ -19,12 +19,10 @@ Returns probability of observing `o` from `(xp, theta)` in domain `m`.
 function O(x::Vehicle, theta::LocTuple, o::Obs)
 
 	# Calculate true bearing, and find distance to bin edges
-	xp = (x.x, x.y)
-	ang_deg = true_bearing(xp, theta)
+	ang_deg = true_bearing(x, theta)
 	rel_start, rel_end = rel_bin_edges(ang_deg, o)
 
 	# now look at probability
-	#p = cdf(m.d, deg2rad(rel_end)) - cdf(m.d, deg2rad(rel_start))
 	d = Normal(0, x.noise_sigma)
 	p = cdf(d, rel_end) - cdf(d, rel_start)
 	return p
@@ -75,6 +73,7 @@ end
 
 
 # Find the relative offset
+# TODO: must account for different discretizations
 function rel_bin_edges(bearing_deg, o::Obs)
 
 	# calculate start, end degrees of bin

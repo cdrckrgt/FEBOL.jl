@@ -6,16 +6,18 @@
 # sum over all possible jammer locations
 function p_obs(m::SearchDomain, df::DF, xv::Float64, yv::Float64, o::Obs)
 	prob = 0.0
-	for xj = 1:df.n
-		for yj = 1:df.n
-			#prob += df.b[xj,yj] * O(m, xv, yv, (xj-1,yj-1), o)
-			prob += df.b[xj,yj] * O(m, xv, yv, (xj-.5,yj-.5), o)
+	for theta_x = 1:df.n
+		for theta_y = 1:df.n
+			xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
+			yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
+			prob += df.b[theta_x, theta_y] * O(m, xv, yv, (xj, yj), o)
 		end
 	end
 	return prob
 end
 
 # computes mutual information for a specific vehicle location
+# TODO: handle different discretization levels
 function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 	H_o = 0.0
 	H_o_t = 0.0
@@ -26,12 +28,14 @@ function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 		end
 
 		# sum over theta
-		for xj = 1:df.n
-			for yj = 1:df.n
-				#pot = O(m, xv, yv, (xj-1,yj-1), o)
-				pot = O(m, xv, yv, (xj-.5,yj-.5), o)
+		for theta_x = 1:df.n
+			for theta_y = 1:df.n
+				xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
+				yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
+
+				pot = O(m, xv, yv, (xj, yj), o)
 				if pot > 0.0
-					H_o_t -= pot * df.b[xj,yj] * log(pot)
+					H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
 				end
 			end
 		end

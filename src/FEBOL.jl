@@ -13,6 +13,7 @@ export centroid
 export plot
 export InfoMatrix, EIF
 export step!, steps!
+export Policy, RandomPolicy, GreedyPolicy
 
 typealias Action   NTuple{2, Float64}
 typealias LocTuple NTuple{2, Float64}
@@ -35,9 +36,6 @@ include("observations.jl")
 
 # Filters
 include("filters.jl")
-#include("df.jl")
-#include("ekf.jl")
-#include("eif.jl")
 
 # policies
 include("infotheoretic.jl")
