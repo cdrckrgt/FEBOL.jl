@@ -1,5 +1,7 @@
 # FEBOL
 
+This code is rapidly changing. I make no guarantees about its correctness or usability at any time.
+
 ## SearchDomain
 To create a 10m by 10m search domain with a jammer located at 9.5, 9.5 you can do the following:
 ```
@@ -86,6 +88,14 @@ normalize(a::Action, x::Vehicle)
 ```
 
 ## Simulations
+```
+steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int)
+```
+Alternatively, you can just call `steps!()`.
+This will run a simulation for 10 steps. 
+It assumes you have a model `m`, a Vehicle `x`, a filter `f`, and a policy `p` in the main module (with those names).
+If you've named your objects that way, you don't have to remember the arguments required for `steps!`.
+Alternatively, you can specify a number of steps: `steps!(30)`.
 
 ## TODO:
 
