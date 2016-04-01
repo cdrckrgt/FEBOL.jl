@@ -13,9 +13,9 @@ type Vehicle
 	noise_sigma::Float64
 	max_step::Float64
 
-	Vehicle(x::Float64, y::Float64,ns::Float64,mv::Float64) = new(x,y,ns,mv)
-	Vehicle(x::Float64, y::Float64, ns::Float64) = new(x,y,ns,2.0)
-	Vehicle(x::Float64, y::Float64) = new(x,y,10.0,2.0)
+	Vehicle(x::Real,y::Real,ns::Real,ms::Real) = new(float(x),float(y),float(ns),float(ms))
+	Vehicle(x::Real,y::Real,ns::Real) = new(float(x),float(y),float(ns),2.0)
+	Vehicle(x::Real, y::Real) = new(float(x), float(y), 15.0, 2.0)
 end
 
 function new_location(m::SearchDomain, x::Vehicle, a::Action)
