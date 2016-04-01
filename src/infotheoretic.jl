@@ -10,7 +10,7 @@ function p_obs(m::SearchDomain, df::DF, xv::Float64, yv::Float64, o::Obs)
 		for theta_y = 1:df.n
 			xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
 			yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
-			prob += df.b[theta_x, theta_y] * O(m, xv, yv, (xj, yj), o)
+			prob += df.b[theta_x, theta_y] * O(xv, yv, (xj, yj), o, df)
 		end
 	end
 	return prob
@@ -21,7 +21,7 @@ end
 function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 	H_o = 0.0
 	H_o_t = 0.0
-	for o = 0:35
+	for o = 0:df.num_bins
 		po = p_obs(m, df, xv, yv, o)
 		if po > 0.0
 			H_o -= po * log(po)
@@ -33,7 +33,7 @@ function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 				xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
 				yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
 
-				pot = O(m, xv, yv, (xj, yj), o)
+				pot = O(xv, yv, (xj, yj), o, df)
 				if pot > 0.0
 					H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
 				end
@@ -44,6 +44,7 @@ function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 end
 
 # computes mutual information for all locations
+# TODO: update for the FEBOL package
 function mutual_information(m::SearchDomain)
 	mut_info = zeros(m.num_cells, m.num_cells)
 	for xv = 1:m.num_cells

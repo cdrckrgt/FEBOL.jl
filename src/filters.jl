@@ -28,7 +28,6 @@ function centroid(f::AbstractFilter)
 end
 
 
-
 """
 `entropy(f::AbstractFilter)`
 
@@ -36,6 +35,16 @@ Returns the entropy of the filter's belief.
 """
 function entropy(f::AbstractFilter)
 	error(typeof(f), " does not yet implement entropy(f).")
+end
+
+
+"""
+`reset!(f::AbstractFilter)`
+
+Resets the belief of filter `f`.
+"""
+function reset!(f::AbstractFilter)
+	error(typeof(f), " does not yet implement reset!(f).")
 end
 
 

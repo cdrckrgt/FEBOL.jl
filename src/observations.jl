@@ -29,31 +29,3 @@ function observe(m::SearchDomain, x::Vehicle)
 	noise = x.noise_sigma * randn()
 	return mod(truth + noise, 360.0)
 end
-
-
-
-function O(m::SearchDomain, xv::Float64, yv::Float64, theta, o::Obs)
-
-	# Calculate true bearing, and find distance to bin edges
-	xp = (xv, yv)
-	ang_deg = true_bearing(xp, theta)
-	rel_start, rel_end = rel_bin_edges(ang_deg, o)
-
-	# now look at probability
-	#p = cdf(m.d, deg2rad(rel_end)) - cdf(m.d, deg2rad(rel_start))
-	d = Normal(0, 10.0)
-	p = cdf(d, rel_end) - cdf(d, rel_start)
-	return p
-end
-
-
-# Fits an angle into -180 to 180
-# Assume the angle is within -360 to 360
-function fit_180(angle)
-	if angle > 180
-		angle = 360 - angle
-	elseif angle < -180
-		angle += 360
-	end
-	return angle
-end

@@ -17,6 +17,7 @@ type DF <: AbstractFilter
 	end
 end
 
+# TODO: I think this can be made faster by checking that df.b[xj,yj] > 0
 function update!(df::DF, x::Vehicle, o::Float64)
 	od = deg2bin(o, df)
 	num_cells = df.n
@@ -25,9 +26,9 @@ function update!(df::DF, x::Vehicle, o::Float64)
 	for theta_x = 1:num_cells
 		for theta_y = 1:num_cells
 			# convert grid cell number to actual location
-			tx = (theta_x - 1) * df.cell_size + df.cell_size/2.0
-			ty = (theta_y - 1) * df.cell_size + df.cell_size/2.0
-			df.b[theta_x, theta_y] *= O(x, (tx, ty), od)
+			tx = (theta_x-1) * df.cell_size + df.cell_size/2.0
+			ty = (theta_y-1) * df.cell_size + df.cell_size/2.0
+			df.b[theta_x, theta_y] *= O(x, (tx, ty), od, df)
 			bp_sum += df.b[theta_x, theta_y]
 		end
 	end
@@ -73,6 +74,9 @@ function entropy(df::DF)
 end
 
 
+reset!(f::DF) = fill!(f.b, 1.0/(f.n*f.n))
+
+
 ######################################################################
 # Functions required for O()
 ######################################################################
@@ -89,11 +93,11 @@ Arguments:
 
 Returns probability of observing `o` from `(xp, theta)` in domain `m`.
 """
-function O(x::Vehicle, theta::LocTuple, o::Obs)
+function O(x::Vehicle, theta::LocTuple, o::Obs, df::DF)
 
 	# Calculate true bearing, and find distance to bin edges
 	ang_deg = true_bearing(x, theta)
-	rel_start, rel_end = rel_bin_edges(ang_deg, o)
+	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
 
 	# now look at probability
 	d = Normal(0, x.noise_sigma)
@@ -101,19 +105,21 @@ function O(x::Vehicle, theta::LocTuple, o::Obs)
 	return p
 end
 
+# TODO: don't jut assume noise here
+function O(xv::Float64, yv::Float64, theta, o::Obs, df::DF)
 
-# TODO: use level of discretization provided by df
-# Assume observation is within [0,360)
-# 355-5 = 0
-# 5 -15 = 1
-# 15-25 = 2
-function old_discretize_obs(o::Float64, df::DF)
-	od = round(Int, o/10.0, RoundNearestTiesUp)
-	if od == 36
-		od = 0
-	end
-	return od
+	# Calculate true bearing, and find distance to bin edges
+	xp = (xv, yv)
+	ang_deg = true_bearing(xp, theta)
+	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
+
+	# now look at probability
+	#p = cdf(m.d, deg2rad(rel_end)) - cdf(m.d, deg2rad(rel_start))
+	d = Normal(0, 10.0)
+	p = cdf(d, rel_end) - cdf(d, rel_start)
+	return p
 end
+
 
 # 355 - 4.9999 = 0
 # 5 - 14.9999 = 1
@@ -131,27 +137,32 @@ end
 
 # returns (start_deg, end_deg) integer tuple
 # TODO: Modify for variable discretization
-function bin2deg(bin_deg::Int64)
+function bin2deg(bin_deg::Int, df::DF)
+	full_bin = 360.0 / df.num_bins
+	half_bin = full_bin / 2.0
 	if bin_deg == 0
-		start_val = -5
-		end_val = 5
+		start_val = -half_bin
+		end_val = half_bin
 	else
-		start_val = 10bin_deg - 5
-		end_val  = 10bin_deg + 5
+		start_val = full_bin * bin_deg - half_bin
+		end_val  = full_bin * bin_deg + half_bin
 	end
-	return (start_val, end_val)
+	return start_val, end_val
 end
 
 # Find the relative offset
 # TODO: must account for different discretizations
-function rel_bin_edges(bearing_deg, o::Obs)
+function rel_bin_edges(bearing_deg, o::Obs, df::DF)
 
 	# calculate start, end degrees of bin
-	start_deg, end_deg = bin2deg(o)
+	start_deg, end_deg = bin2deg(o, df)
 
 	# compute relative distance to true bearing
 	rel_start = fit_180(bearing_deg - start_deg)
 	rel_end = fit_180(bearing_deg - end_deg)
+
+	#rel_start = min(abs(rel_start), abs(rel_end))
+	#rel_end = rel_start + 360.0 / df.num_bins
 
 	# Make sure start is further left on number line
 	if rel_end < rel_start
@@ -160,11 +171,26 @@ function rel_bin_edges(bearing_deg, o::Obs)
 		rel_end = temp
 	end
 
-	# Handle odd case where we stradle 180 degrees off
-	if (rel_start < 0) && (rel_end > 100)
+	# If we straddle the wrong point
+	# Say df.num_bins = 10, and rel_start = -175, rel_end = 175
+	# rel_end - rel_start would be 350 degrees, but this should be 10
+	# so set rel_start to 175 and rel_end to 185
+	# TODO: I'm pretty sure this doesn't work for df.num_bins = 2
+	if (rel_end - rel_start) - 1e-3 > (360.0/df.num_bins)
 		rel_start = rel_end
-		rel_end += 10
+		rel_end += 360.0/df.num_bins
 	end
 
 	return rel_start, rel_end
+end
+
+# Fits an angle into -180 to 180
+# Assume the angle is within -360 to 360
+function fit_180(angle::Float64)
+	if angle > 180.0
+		angle = 360.0 - angle
+	elseif angle < -180.0
+		angle += 360.0
+	end
+	return angle
 end

@@ -45,5 +45,9 @@ function steps!()
 	steps!(10)
 end
 function steps!(num_steps::Int64)
-	steps!(Main.m,Main.x,Main.f,Main.p,num_steps)
+	steps!(Main.m, Main.x, Main.f, Main.p, num_steps)
+end
+
+# Really, we want a vector of AbstractFilters
+function batch_sim(m::SearchDomain, f::AbstractFilter, p::Policy)
 end
