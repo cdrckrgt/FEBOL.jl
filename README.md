@@ -1,5 +1,8 @@
 # FEBOL
 
+This package allows the testing of various filters and belief representations for a single UAV performing bearing-only localization of a single, stationary jammer.
+The main question I want to answer is: what effects do the various filters and approximations have on localization time and computational time?
+
 This code is rapidly changing. I make no guarantees about its correctness or usability at any time.
 
 ## SearchDomain
@@ -96,6 +99,18 @@ This will run a simulation for 10 steps.
 It assumes you have a model `m`, a Vehicle `x`, a filter `f`, and a policy `p` in the main module (with those names).
 If you've named your objects that way, you don't have to remember the arguments required for `steps!`.
 Alternatively, you can specify a number of steps: `steps!(30)`.
+
+
+## Example
+The code below creates a search domain 100 meters by 100 meters, with a jammer located at (85,45).
+A discrete filter with 50 bins is used for the belief representation.
+A vehicle starts at (45,45) is and uses a greedy entropy-minimizing policy with 16 different directions.
+```
+m = SearchDomain(100, 5, 85)
+f = DF(m, 50)
+x = Vehicle(50, 50)
+p = GreedyPolicy(x, 16)
+```
 
 ## TODO:
 
