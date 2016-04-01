@@ -4,7 +4,8 @@ using Distributions: Normal, cdf, MvNormal, pdf
 using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title
 import PyPlot.plot
 
-export SearchDomain, Vehicle
+export SearchDomain, theta!
+export Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
 export DF, EKF, EIF
 export update!, centroid, entropy, reset!
