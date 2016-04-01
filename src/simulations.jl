@@ -37,6 +37,7 @@ function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_s
 	for i = 1:num_steps
 		pause(.5)
 		step!(m,x,f,p; video=true)
+		#title("e = $(round(entropy(f),2))")
 	end
 end
 

@@ -1,16 +1,15 @@
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title
 import PyPlot.plot
 
-export SearchDomain
+export SearchDomain, Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
-export DF, EKF
-export Vehicle
+export DF, EKF, EIF
 export update!, centroid, entropy
+export observe
 export plot
-export InfoMatrix, EIF
 export step!, steps!
 export Policy, RandomPolicy, GreedyPolicy, OrthoPolicy
 

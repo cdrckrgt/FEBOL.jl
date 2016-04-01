@@ -9,7 +9,7 @@ abstract Policy
 
 # Default action returns an error
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::Policy)
-	return error("$(typeof(p)) does not yet implement action.")
+	return error(typeof(p), " does not yet implement action.")
 end
 
 function normalize(a::Action, x::Vehicle)
