@@ -102,9 +102,9 @@ Alternatively, you can specify a number of steps: `steps!(30)`.
 
 
 ## Example
-The code below creates a search domain 100 meters by 100 meters, with a jammer located at (85,45).
+The code below creates a search domain 100 meters by 100 meters, with a jammer located at (5,85).
 A discrete filter with 50 bins is used for the belief representation.
-A vehicle starts at (45,45) is and uses a greedy entropy-minimizing policy with 16 different directions.
+A vehicle starts at (50,50) is and uses a greedy entropy-minimizing policy with 16 different directions.
 ```
 m = SearchDomain(100, 5, 85)
 f = DF(m, 50)
