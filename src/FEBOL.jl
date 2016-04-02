@@ -11,14 +11,12 @@ export DF, EKF, EIF
 export update!, centroid, entropy, reset!
 export observe
 export plot
-export step!, steps!
+export step!, steps!, batchsim
 export Policy, RandomPolicy, GreedyPolicy, OrthoPolicy
 
 typealias Action   NTuple{2, Float64}
 typealias LocTuple NTuple{2, Float64}
 typealias Obs      Int64
-
-# Assume these are square
 
 include("searchdomain.jl")
 include("vehicle.jl")

@@ -28,15 +28,17 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video:
 	end
 end
 
-function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int)
+function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int; video=true)
 	# Show current step first
-	hold(false)
-	plot(m,f,x)
+	if video
+		hold(false)
+		plot(m,f,x)
+	end
 
 	# Then go through steps
 	for i = 1:num_steps
-		pause(.5)
-		step!(m,x,f,p; video=true)
+		if video; pause(.5); end
+		step!(m,x,f,p; video=video)
 		#title("e = $(round(entropy(f),2))")
 	end
 end
@@ -49,5 +51,25 @@ function steps!(num_steps::Int64)
 end
 
 # Really, we want a vector of AbstractFilters
-function batch_sim(m::SearchDomain, f::AbstractFilter, p::Policy)
+"""
+`batchsim(m,x,f,p,num_sims)`
+"""
+function batchsim(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_sims::Int)
+	results = zeros(num_sims)
+	for i = 1:num_sims
+		# Set new jammer location
+
+		# run the simulation for all policies
+		x.x = m.length / 2.0
+		x.y = m.length / 2.0
+		steps!(m, x, f, p, 10; video=false)
+
+		# calculate the error
+		c = centroid(f)
+		results[i] = norm2(c, m.theta)
+		reset!(f)
+	end
+	return results
 end
+
+norm2(x::LocTuple, y::LocTuple) = sqrt( (x[1]-y[1])^2 + (x[2]-y[2])^2 )
