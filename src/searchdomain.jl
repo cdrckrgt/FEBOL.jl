@@ -27,7 +27,7 @@ function theta!(m::SearchDomain, xj::Real, yj::Real)
 	theta!( m, (float(xj), float(yj)) )
 end
 function theta!(m::SearchDomain, theta::LocTuple)
-	@assert theta[1] <= length
-	@assert theta[2] <= length
+	@assert theta[1] <= m.length
+	@assert theta[2] <= m.length
 	m.theta = theta
 end

@@ -16,9 +16,6 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video:
 	update!(f, x, o)
 
 	# update vehicle position
-	#p = RandomPolicy()
-	#p = GreedyPolicy(x, 16)
-
 	a = action(m, x, o, f, p)
 	act!(m,x,a)
 
@@ -51,23 +48,44 @@ function steps!(num_steps::Int64)
 end
 
 # Really, we want a vector of AbstractFilters
+# TODO: vector of abstract filters
 """
 `batchsim(m,x,f,p,num_sims)`
+
+Currently:
+
+* starts vehicle at center of search domain
+* runs each simulation for 10 steps
+* results is num_sims by num_filters array
+
 """
 function batchsim(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_sims::Int)
-	results = zeros(num_sims)
+	batchsim(m, x, [f], p, num_sims)
+end
+function batchsim{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int)
+	num_filters = length(farr)
+	results = zeros(num_sims, num_filters)
 	for i = 1:num_sims
+		println()
+		print("Starting sims ", i, ": ")
 		# Set new jammer location
+		jx = m.length * rand()
+		jy = m.length * rand()
+		theta!(m, jx, jy)
 
-		# run the simulation for all policies
-		x.x = m.length / 2.0
-		x.y = m.length / 2.0
-		steps!(m, x, f, p, 10; video=false)
+		# run the simulation for all filters/policies
+		for fi = 1:num_filters 
+			print("f", fi, " ")
+			f = farr[fi]
+			x.x = m.length / 2.0
+			x.y = m.length / 2.0
+			steps!(m, x, f, p, 10; video=false)
 
-		# calculate the error
-		c = centroid(f)
-		results[i] = norm2(c, m.theta)
-		reset!(f)
+			# calculate the error
+			c = centroid(f)
+			results[i, fi] = norm2(c, m.theta)
+			reset!(f)
+		end
 	end
 	return results
 end
