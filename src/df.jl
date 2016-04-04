@@ -26,10 +26,12 @@ function update!(df::DF, x::Vehicle, o::Float64)
 	for theta_x = 1:num_cells
 		for theta_y = 1:num_cells
 			# convert grid cell number to actual location
-			tx = (theta_x-1) * df.cell_size + df.cell_size/2.0
-			ty = (theta_y-1) * df.cell_size + df.cell_size/2.0
-			df.b[theta_x, theta_y] *= O(x, (tx, ty), od, df)
-			bp_sum += df.b[theta_x, theta_y]
+			if df.b[theta_x, theta_y] > 0.0
+				tx = (theta_x-1) * df.cell_size + df.cell_size/2.0
+				ty = (theta_y-1) * df.cell_size + df.cell_size/2.0
+				df.b[theta_x, theta_y] *= O(x, (tx, ty), od, df)
+				bp_sum += df.b[theta_x, theta_y]
+			end
 		end
 	end
 

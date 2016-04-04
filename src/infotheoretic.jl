@@ -8,9 +8,11 @@ function p_obs(m::SearchDomain, df::DF, xv::Float64, yv::Float64, o::Obs)
 	prob = 0.0
 	for theta_x = 1:df.n
 		for theta_y = 1:df.n
-			xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
-			yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
-			prob += df.b[theta_x, theta_y] * O(xv, yv, (xj, yj), o, df)
+			if df.b[theta_x,theta_y] > 0.0
+				xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
+				yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
+				prob += df.b[theta_x, theta_y] * O(xv, yv, (xj, yj), o, df)
+			end
 		end
 	end
 	return prob
@@ -33,9 +35,11 @@ function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 				xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
 				yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
 
-				pot = O(xv, yv, (xj, yj), o, df)
-				if pot > 0.0
-					H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
+				if df.b[theta_x, theta_y] > 0.0
+					pot = O(xv, yv, (xj, yj), o, df)
+					if pot > 0.0
+						H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
+					end
 				end
 			end
 		end
