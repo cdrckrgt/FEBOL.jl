@@ -11,7 +11,7 @@ export DF, EKF, EIF
 export update!, centroid, entropy, reset!
 export observe
 export plot
-export step!, steps!, batchsim
+export step!, steps!, batchsim, batchsim2
 export Policy, RandomPolicy, GreedyPolicy, OrthoPolicy, action
 
 typealias Action   NTuple{2, Float64}

@@ -62,7 +62,7 @@ Currently:
 function batchsim(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_sims::Int)
 	batchsim(m, x, [f], p, num_sims)
 end
-function batchsim{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int)
+function batchsim{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int, num_steps::Int)
 	num_filters = length(farr)
 	results = zeros(num_sims, num_filters)
 	for i = 1:num_sims
@@ -79,10 +79,53 @@ function batchsim{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{
 			f = farr[fi]
 			x.x = m.length / 2.0
 			x.y = m.length / 2.0
-			steps!(m, x, f, p, 40; video=false)
+			steps!(m, x, f, p, num_steps; video=false)
 			print("d ")
 
 			# calculate the error
+			c = centroid(f)
+			results[i, fi] = norm2(c, m.theta)
+			reset!(f)
+		end
+	end
+	return results
+end
+# This is for testing with a dumb policy that we can apply to all filters
+function batchsim2{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int, num_steps::Int)
+	num_filters = length(farr)
+	results = zeros(num_sims, num_filters)
+	f1 = farr[1]
+	for i = 1:num_sims
+		println()
+		print("Starting sims ", i, ": ")
+		# Set new jammer location
+		jx = m.length * rand()
+		jy = m.length * rand()
+		theta!(m, jx, jy)
+		# Reset vehicle to zero
+		x.x = m.length / 2.0
+		x.y = m.length / 2.0
+
+		# n is total steps per simulation
+		for j = 1:num_steps
+			# receive an observation
+			o = observe(m,x)
+
+			# update belief of all filters
+			#for fi = 1:num_filters
+			#	f = farr[fi]
+			#	update!(f, x, o)
+			#end
+			for f in farr
+				update!(f, x, o)
+			end
+			a = action(m, x, o, f1, p)
+			act!(m,x,a)
+
+		end
+		# compute the centroid and results
+		for fi = 1:num_filters
+			f = farr[fi]
 			c = centroid(f)
 			results[i, fi] = norm2(c, m.theta)
 			reset!(f)
