@@ -45,6 +45,17 @@ function plot(m::SearchDomain, f::EKF)
 	axis(a)
 end
 
+function plot(m::SearchDomain, f::PF)
+	mark_size = 12
+	a = [0,m.length,0,m.length]
+	#imshow(f.b', interpolation="none",cmap="Greys",origin="lower",extent=a)
+	for i = 1:f.n
+		plot(f.X[i][1], f.X[i][2], "k.", markersize=mark_size)
+	end
+	labels()
+	axis(a)
+end
+
 
 
 # This is needed for plot_sim

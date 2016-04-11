@@ -3,11 +3,12 @@ module FEBOL
 using Distributions: Normal, cdf, MvNormal, pdf
 using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title
 import PyPlot.plot
+using StatsBase: sample, WeightVec
 
 export SearchDomain, theta!
 export Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
-export DF, EKF, EIF
+export DF, EKF, EIF, PF
 export update!, centroid, entropy, reset!
 export observe
 export plot
