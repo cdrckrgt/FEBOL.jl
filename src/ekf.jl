@@ -27,10 +27,14 @@ function update!(ekf::EKF, x::Vehicle, o::Float64)
 		yr = 1e-6
 	end
 	Ht = [yr, -xr]' * (180.0 / pi) / (xr^2 + yr^2)
-	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + 100.)
+	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + x.noise_sigma^2)
 
 	o_predict = true_bearing(x, ekf.mu) 
-	mu_t = ekf.mu + Kt * (o - o_predict)
+	# Computing o - o_predict... both will be in range 0 to 360
+	# Make sure this value is within -180,180
+	o_diff = fit_180(o - o_predict)
+	#mu_t = ekf.mu + Kt * (o - o_predict)
+	mu_t = ekf.mu + Kt * o_diff
 	Sigma_t = (eye(2)  - Kt * Ht) * ekf.Sigma
 
 	# TODO: use copy here
@@ -39,3 +43,7 @@ function update!(ekf::EKF, x::Vehicle, o::Float64)
 end
 
 centroid(ekf::EKF) = (ekf.mu[1], ekf.mu[2])
+function reset!(f::EKF)
+	f.mu = f.length/2 * ones(2)
+	f.Sigma = 1e9 * eye(2)
+end
