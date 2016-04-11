@@ -32,7 +32,8 @@ function plot(m::SearchDomain, f::EKF)
 	yvals = collect(0.:step_val:m.length)
 	n = length(xvals)
 	gaussian_arr = zeros(n, n)
-	d = MvNormal(f.mu, sqrt(f.Sigma))
+	#d = MvNormal(f.mu, sqrt(f.Sigma))
+	d = MvNormal(f.mu, f.Sigma)
 	for x = 1:n
 		for y = 1:n
 			gaussian_arr[x,y] = pdf(d, [xvals[x],yvals[y]])
