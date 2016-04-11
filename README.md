@@ -68,10 +68,10 @@ GreedyPolicy(x::Vehicle, n::Int)
 The integer `n` denotes how many actions should be considered.
 If `n=6`, then the agent considers the expected entropy given 6 different directions, spaced and even 60 degrees apart.
 
-#### OrthoPolicy
+#### CirclePolicy
 The constructor is as follows:
 ```
-OrthoPolicy()
+CirclePolicy()
 ```
 
 #### Custom Policy

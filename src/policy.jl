@@ -70,16 +70,16 @@ end
 
 
 # Move orthogonally to last measurement
-type OrthoPolicy <: Policy 
+type CirclePolicy <: Policy 
 	last::Action
 
-	OrthoPolicy() = new( (0.0, 0.0) )
+	CirclePolicy() = new( (0.0, 0.0) )
 end
 
 # Remembers last action to ensure we follow same direction around circle
 # Otherwise, it will "chatter" back and forth
 # TODO: take into account distance from edge
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::OrthoPolicy)
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::CirclePolicy)
 	ax = -1.0 / sind(o)
 	ay = 1.0 / cosd(o)
 
