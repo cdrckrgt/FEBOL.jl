@@ -29,3 +29,14 @@ function observe(m::SearchDomain, x::Vehicle)
 	noise = x.noise_sigma * randn()
 	return mod(truth + noise, 360.0)
 end
+
+# Fits an angle into -180 to 180
+# Assume the angle is within -360 to 360
+function fit_180(angle::Float64)
+	if angle > 180.0
+		angle = 360.0 - angle
+	elseif angle < -180.0
+		angle += 360.0
+	end
+	return angle
+end

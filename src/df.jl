@@ -185,14 +185,3 @@ function rel_bin_edges(bearing_deg, o::Obs, df::DF)
 
 	return rel_start, rel_end
 end
-
-# Fits an angle into -180 to 180
-# Assume the angle is within -360 to 360
-function fit_180(angle::Float64)
-	if angle > 180.0
-		angle = 360.0 - angle
-	elseif angle < -180.0
-		angle += 360.0
-	end
-	return angle
-end
