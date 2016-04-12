@@ -24,7 +24,7 @@ include("vehicle.jl")
 include("observations.jl")
 
 # Filters
-include("filters.jl")
+include("filters/filters.jl")
 
 # policies
 include("infotheoretic.jl")

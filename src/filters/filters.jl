@@ -49,7 +49,6 @@ end
 
 
 # Include the different filters
-include("observations.jl")		# helper needed for discrete. ugly
 include("df.jl")
 include("ekf.jl")
 include("eif.jl")
