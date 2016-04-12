@@ -27,9 +27,8 @@ function plot(m::SearchDomain, f::EKF)
 	a = [0,m.length,0,m.length]
 
 	# Plot it out...
-	step_val = 0.1
-	xvals = collect(0.:step_val:m.length)
-	yvals = collect(0.:step_val:m.length)
+	xvals = linspace(0.,m.length,100)
+	yvals = linspace(0.,m.length,100)
 	n = length(xvals)
 	gaussian_arr = zeros(n, n)
 	#d = MvNormal(f.mu, sqrt(f.Sigma))
@@ -48,10 +47,13 @@ end
 function plot(m::SearchDomain, f::PF)
 	mark_size = 12
 	a = [0,m.length,0,m.length]
-	#imshow(f.b', interpolation="none",cmap="Greys",origin="lower",extent=a)
+	x = zeros(f.n)
+	y = zeros(f.n)
 	for i = 1:f.n
-		plot(f.X[i][1], f.X[i][2], "k.", markersize=mark_size)
+		x[i] = f.X[i][1]
+		y[i] = f.X[i][2]
 	end
+	scatter(x,y,c=f.W,cmap="Greys")
 	labels()
 	axis(a)
 end
@@ -130,7 +132,7 @@ end
 
 # Plots contours of some distribution `d` (a matrix).
 function plot_contour(m::SearchDomain, d::Matrix{Float64})
-	X,Y = meshgrid(0:.1:m.length, 0:.1:m.length)
+	X,Y = meshgrid(linspace(0.,m.length,100), linspace(0.,m.length,100))
 	contour(X, Y, d')
 end
 

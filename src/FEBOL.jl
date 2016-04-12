@@ -1,7 +1,7 @@
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter
 import PyPlot.plot
 using StatsBase: sample, WeightVec
 
