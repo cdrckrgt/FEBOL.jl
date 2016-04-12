@@ -34,10 +34,11 @@ function update!(pf::PF, x::Vehicle, o::Float64)
 		 w_sum = pf.W[i]
 	end
 
+	wvec = WeightVec(pf.W)
 	for i = 1:pf.n
 		# draw with probability
 		#pf.Xnew[i] = sample(pf.X, WeightVec(pf.W))
-		j = sample(WeightVec(pf.W))
+		j = sample(wvec)
 		pf.Xnew[i] = pf.X[j]
 		pf.Wnew[i] = pf.W[j]
 	end
