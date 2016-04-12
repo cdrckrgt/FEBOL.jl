@@ -54,6 +54,9 @@ function plot(m::SearchDomain, f::PF)
 		y[i] = f.X[i][2]
 	end
 	scatter(x,y,c=f.W,cmap="Greys",vmin=0)
+	#scatter(x,y,c=f.W,cmap="Blues",vmin=0)
+	xmean, ymean = centroid(f)
+	plot(xmean, ymean, "gx", ms=10, mew=2)
 	labels()
 	axis("square")
 	axis(a)

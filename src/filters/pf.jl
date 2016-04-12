@@ -45,6 +45,19 @@ function update!(pf::PF, x::Vehicle, o::Float64)
 	copy!(pf.W, pf.Wnew)
 end
 
+function centroid(f::PF)
+	wsum = 0.0
+	xmean = 0.0
+	ymean = 0.0
+	for i = 1:f.n
+		wval = f.W[i]
+		xmean += f.X[i][1] * wval
+		ymean += f.X[i][2] * wval
+		wsum += wval
+	end
+	return xmean/wsum, ymean/wsum
+end
+
 function reset!(f::PF)
 	for i = 1:f.n
 		xi = f.length*rand()
