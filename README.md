@@ -33,6 +33,10 @@ EKF(m::SearchDomain)
 ```
 
 #### Particle Filter
+To create a particle filter, you must provide the search domain `m` and desired number of particles `n`:
+```
+PF(m::SearchDomain, n::Int)
+```
 
 #### Custom Filters
 ```
