@@ -11,14 +11,14 @@ Plots the belief, jammer, and vehicles.
 function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle)
 	plot_theta(m)
 	hold(true)
-	plot_vehicle(x)
+	plot_vehicle(m,x)
 	plot(m, f)
 	return # so it doesn't spit out result of axis
 end
 
 function plot(m::SearchDomain, f::DF)
 	a = [0,m.length,0,m.length]
-	imshow(f.b', interpolation="none",cmap="Greys",origin="lower",extent=a)
+	imshow(f.b', interpolation="none",cmap="Greys",origin="lower",extent=a,vmin=0)
 	labels()
 	axis(a)
 end
@@ -53,8 +53,9 @@ function plot(m::SearchDomain, f::PF)
 		x[i] = f.X[i][1]
 		y[i] = f.X[i][2]
 	end
-	scatter(x,y,c=f.W,cmap="Greys")
+	scatter(x,y,c=f.W,cmap="Greys",vmin=0)
 	labels()
+	axis("square")
 	axis(a)
 end
 
@@ -119,9 +120,15 @@ end
 # Helper functions
 ######################################################################
 # Plots locations of the vehicles
-function plot_vehicle(x::Vehicle)
-	mark_size = 12
-	plot(x.x, x.y, "b*", markersize=mark_size)
+function plot_vehicle(m::SearchDomain, x::Vehicle)
+	dx = 0.01 * m.length
+	mark_size = 10
+	rotor_size = 5
+	plot(x.x, x.y, "bx", markersize=mark_size, mew=2)
+	plot(x.x+dx, x.y+dx, "bo", markersize=rotor_size)
+	plot(x.x-dx, x.y+dx, "bo", markersize=rotor_size)
+	plot(x.x-dx, x.y-dx, "bo", markersize=rotor_size)
+	plot(x.x+dx, x.y-dx, "bo", markersize=rotor_size)
 end
 
 # Plots jammer location

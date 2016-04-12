@@ -9,6 +9,8 @@ type PF <: AbstractFilter
 	X::Vector{LocTuple}
 	W::Vector{Float64}
 	Xnew::Vector{LocTuple}
+	Wnew::Vector{Float64}
+	length::Float64
 
 	function PF(m::SearchDomain, n::Int)
 		X = Array(LocTuple, n)
@@ -19,7 +21,8 @@ type PF <: AbstractFilter
 		end
 		Xnew = deepcopy(X)
 		W = zeros(n)
-		return new(n, X, W, Xnew)
+		Wnew = zeros(n)
+		return new(n, X, W, Xnew, Wnew, m.length)
 	end
 end
 
@@ -33,7 +36,21 @@ function update!(pf::PF, x::Vehicle, o::Float64)
 
 	for i = 1:pf.n
 		# draw with probability
-		pf.Xnew[i] = sample(pf.X, WeightVec(pf.W))
+		#pf.Xnew[i] = sample(pf.X, WeightVec(pf.W))
+		j = sample(WeightVec(pf.W))
+		pf.Xnew[i] = pf.X[j]
+		pf.Wnew[i] = pf.W[j]
 	end
 	copy!(pf.X, pf.Xnew)
+	copy!(pf.W, pf.Wnew)
+end
+
+function reset!(f::PF)
+	for i = 1:f.n
+		xi = f.length*rand()
+		yi = f.length*rand()
+		f.X[i] = (xi, yi)
+		f.Xnew[i] = (xi, yi)
+	end
+	fill!(f.W, 0.0)
 end
