@@ -25,7 +25,7 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video:
 	end
 end
 
-function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int; video::Bool=true)
+function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int; video::Bool=true, delay::Real=0.5)
 	# Show current step first
 	if video
 		hold(false)
@@ -34,17 +34,14 @@ function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_s
 
 	# Then go through steps
 	for i = 1:num_steps
-		if video; pause(.5); end
+		if video; pause(delay); end
 		step!(m,x,f,p; video=video)
 		#title("e = $(round(entropy(f),2))")
 	end
 end
 
-function steps!()
-	steps!(10)
-end
-function steps!(num_steps::Int64; video::Bool=true)
-	steps!(Main.m, Main.x, Main.f, Main.p, num_steps, video=video)
+function steps!(num_steps::Int64=10; video::Bool=true, delay::Real=0.5)
+	steps!(Main.m, Main.x, Main.f, Main.p, num_steps, video=video, delay=delay)
 end
 
 # Really, we want a vector of AbstractFilters
