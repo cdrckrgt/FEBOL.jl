@@ -90,13 +90,15 @@ A `GreedyPolicy` moves the agent in the direction that minimizes the expected en
 GreedyPolicy(x::Vehicle, n::Int)
 ```
 The integer `n` denotes how many actions should be considered.
-If `n=6`, then the agent considers the expected entropy given 6 different directions, spaced and even 60 degrees apart.
+If `n=6`, then the agent considers the expected entropy given 6 different directions, spaced an even 60 degrees apart.
 
 #### CirclePolicy
+A `CirclePolicy` moves the agent perpendicularly to the last recorded bearing measurement, which ends up drawing a circle around the source.
 The constructor is as follows:
 ```
 CirclePolicy()
 ```
+The `CirclePolicy` implicitly assumes that the sensor is of `BearingOnly` type.
 
 #### Custom Policy
 You can create your own policies by extending the abstract `Policy` class and implementing the `action` function. Below is an example:
