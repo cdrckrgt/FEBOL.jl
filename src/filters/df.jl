@@ -19,7 +19,7 @@ end
 
 # TODO: I think this can be made faster by checking that df.b[xj,yj] > 0
 function update!(df::DF, x::Vehicle, o::Float64)
-	od = deg2bin(o, df)
+	ob = obs2bin(o, df, x.sensor)
 	num_cells = df.n
 	bp_sum = 0.0
 
@@ -29,7 +29,7 @@ function update!(df::DF, x::Vehicle, o::Float64)
 			if df.b[theta_x, theta_y] > 0.0
 				tx = (theta_x-1) * df.cell_size + df.cell_size/2.0
 				ty = (theta_y-1) * df.cell_size + df.cell_size/2.0
-				df.b[theta_x, theta_y] *= O(x, (tx, ty), od, df)
+				df.b[theta_x, theta_y] *= O(x, (tx, ty), ob, df)
 				bp_sum += df.b[theta_x, theta_y]
 			end
 		end
@@ -102,7 +102,7 @@ function O(x::Vehicle, theta::LocTuple, o::Obs, df::DF)
 	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
 
 	# now look at probability
-	d = Normal(0, x.noise_sigma)
+	d = Normal(0, x.sensor.noise_sigma)
 	p = cdf(d, rel_end) - cdf(d, rel_start)
 	return p
 end
@@ -126,15 +126,15 @@ end
 # 355 - 4.9999 = 0
 # 5 - 14.9999 = 1
 # 15 - 24.999 = 2
-function deg2bin(o::Float64, df::DF)
+function obs2bin(o::Float64, df::DF, s::BearingOnly)
 	full_bin = 360.0 / df.num_bins
 	half_bin = full_bin / 2.0
 
-	od = round( Int, div((o + half_bin), full_bin) )
-	if od == df.num_bins
-		od = 0
+	ob = round( Int, div((o + half_bin), full_bin) )
+	if ob == df.num_bins
+		ob = 0
 	end
-	return od
+	return ob
 end
 
 # returns (start_deg, end_deg) integer tuple

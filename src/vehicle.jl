@@ -10,12 +10,18 @@
 type Vehicle
 	x::Float64
 	y::Float64
-	noise_sigma::Float64
+	heading::Float64
 	max_step::Float64
+	sensor::Sensor
 
-	Vehicle(x::Real,y::Real,ns::Real,ms::Real) = new(float(x),float(y),float(ns),float(ms))
-	Vehicle(x::Real,y::Real,ns::Real) = new(float(x),float(y),float(ns),2.0)
-	Vehicle(x::Real, y::Real) = new(float(x), float(y), 15.0, 2.0)
+	function Vehicle(x::Real,y::Real,h::Real,ms::Real,s::Sensor)
+		return new(float(x),float(y),float(h),float(ms),s)
+	end
+	#Vehicle(x::Real,y::Real,ns::Real) = new(float(x),float(y),float(ns),2.0)
+
+	function Vehicle(x::Real, y::Real)
+		return new( float(x), float(y), 0.0, 2.0, BearingOnly(10.0) )
+	end
 end
 
 function new_location(m::SearchDomain, x::Vehicle, a::Action)
@@ -24,6 +30,9 @@ function new_location(m::SearchDomain, x::Vehicle, a::Action)
 	return new_x, new_y
 end
 
+"""
+`act!(m::SearchDomain, x::Vehicle, a::Action)`
+"""
 function act!(m::SearchDomain, x::Vehicle, a::Action)
 	x.x, x.y = new_location(m, x, a)
 end

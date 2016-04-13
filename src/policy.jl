@@ -7,15 +7,20 @@
 
 abstract Policy
 
-# Default action returns an error
+"""
+`action(m, x, o, f, p)`
+
+Returns an action given SearchDomain `m`, vehicle `x`, observation `o`, filter `f`, and policy `p`.
+"""
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::Policy)
 	return error(typeof(p), " does not yet implement action.")
 end
 
+# TODO: should ensure the heading is not too much either
 function normalize(a::Action, x::Vehicle)
 	ax = a[1]; ay = a[2]
 	den = sqrt(ax*ax + ay*ay)
-	return x.max_step * ax / den, x.max_step * ay / den
+	return x.max_step * ax / den, x.max_step * ay / den, a[3]
 end
 
 
@@ -27,6 +32,11 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::R
 	ay = rand() - 0.5
 	return normalize((ax,ay), x)
 end
+
+# Sit policy
+type SitPolicy <: Policy end
+
+action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SitPolicy) = (0.0,0.0)
 
 
 # Greedy info-theoretic policy
@@ -73,7 +83,7 @@ end
 type CirclePolicy <: Policy 
 	last::Action
 
-	CirclePolicy() = new( (0.0, 0.0) )
+	CirclePolicy() = new( (0.0, 0.0, 0.0) )
 end
 
 # Remembers last action to ensure we follow same direction around circle
@@ -88,9 +98,9 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::C
 		ay = -ay
 	end
 
-	p.last = (ax, ay)
+	p.last = (ax, ay, 0.0)
 
-	return normalize((ax,ay), x)
+	return normalize((ax,ay,0.0), x)
 end
 
 
@@ -117,3 +127,6 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::SpiralPolicy)
 
 	return normalize((ax,ay), x)
 end
+
+
+
