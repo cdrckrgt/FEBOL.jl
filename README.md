@@ -12,6 +12,26 @@ m = SearchDomain(10.0, 9.5, 9.5)
 ```
 The jammer must be within 0 and the length of one side of the domain.
 
+
+## Vehicle
+Each instance of `Vehicle` has the following fields:
+```
+x::Float64
+y::Float64			 
+heading::Float64	# east of north (degrees)
+max_step::Float64	# max distance vehicle can go per unit time (meters)
+sensor::Sensor
+```
+
+## Sensor
+The abstract `Sensor` type describes the sensing model of the vehicle.
+Originally, the only sensor type was bearing only, but this has been expanded to consider other sensing modalities.
+
+#### BearingOnly
+
+#### DirOmni
+
+
 ## Filters
 A filter is something that maintains a belief over the search space and updates it given new observations and vehicle locations.
 
