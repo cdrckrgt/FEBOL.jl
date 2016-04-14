@@ -59,7 +59,7 @@ function fit_180(angle::Float64)
 end
 
 # doesn't actually return a probability. It returns a density
-# TODO: I think we need to make this generic
+# TODO: I think we need to make this generic (not just for bearing only)
 function O(x::Vehicle, theta::LocTuple, o::Float64)
 
 	# Calculate true bearing, and find distance to bin edges
