@@ -135,14 +135,36 @@ end
 ######################################################################
 # Plots locations of the vehicles
 function plot_vehicle(m::SearchDomain, x::Vehicle)
-	dx = 0.01 * m.length
 	mark_size = 10
+	#plot(x.x, x.y, "bx", markersize=mark_size, mew=2)
+
+	c = 0.01 * m.length  *sqrt(2)
+	dx = c*sind(45 + x.heading)
+	dy = c*cosd(45 + x.heading)
+
+	# Plot rotors
 	rotor_size = 5
-	plot(x.x, x.y, "bx", markersize=mark_size, mew=2)
-	plot(x.x+dx, x.y+dx, "bo", markersize=rotor_size)
-	plot(x.x-dx, x.y+dx, "bo", markersize=rotor_size)
-	plot(x.x-dx, x.y-dx, "bo", markersize=rotor_size)
-	plot(x.x+dx, x.y-dx, "bo", markersize=rotor_size)
+	theta1 = 45.0 + x.heading
+	theta2 = 135.0 + x.heading
+	theta3 = 225.0 + x.heading
+	theta4 = 315.0 + x.heading
+	plot(x.x+c*sind(theta1), x.y+c*cosd(theta1), "bo", ms=rotor_size)
+	plot(x.x+c*sind(theta2), x.y+c*cosd(theta2), "bo", ms=rotor_size)
+	plot(x.x+c*sind(theta3), x.y+c*cosd(theta3), "bo", ms=rotor_size)
+	plot(x.x+c*sind(theta4), x.y+c*cosd(theta4), "bo", ms=rotor_size)
+
+	#plot(x.x, x.y, marker=(2,0,3), ms=mark_size)
+
+	# plot direction
+	xline = [x.x, x.x+2*c*sind(x.heading)]
+	yline = [x.y, x.y+2*c*cosd(x.heading)]
+	plot(xline, yline, "r", mew=1.5)
+
+	# Plot frame
+	plot(x.x, x.y, marker=(2,0,-theta1), ms=mark_size,mew=1, markeredgecolor="b")
+	plot(x.x, x.y, marker=(2,0,-theta2), ms=mark_size,mew=1, markeredgecolor="b")
+
+	plot()
 end
 
 # Plots jammer location
