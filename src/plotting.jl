@@ -51,6 +51,7 @@ function plot(m::SearchDomain, f::EKF)
 	plot(m1, m2, "gx", ms=10)
 
 	labels()
+	axis("square")
 	axis(a)
 end
 
