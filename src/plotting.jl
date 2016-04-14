@@ -23,22 +23,32 @@ function plot(m::SearchDomain, f::DF)
 	axis(a)
 end
 
+# Plots mean and 95% confidence ellipse
 function plot(m::SearchDomain, f::EKF)
 	a = [0,m.length,0,m.length]
 
-	# Plot it out...
-	xvals = linspace(0.,m.length,100)
-	yvals = linspace(0.,m.length,100)
-	n = length(xvals)
-	gaussian_arr = zeros(n, n)
-	#d = MvNormal(f.mu, sqrt(f.Sigma))
-	d = MvNormal(f.mu, f.Sigma)
-	for x = 1:n
-		for y = 1:n
-			gaussian_arr[x,y] = pdf(d, [xvals[x],yvals[y]])
-		end
+	Sigma_half = sqrtm(f.Sigma)
+	Sh11 = Sigma_half[1,1]
+	Sh12 = Sigma_half[1,2]
+	Sh21 = Sigma_half[2,1]
+	Sh22 = Sigma_half[2,2]
+	m1 = f.mu[1]
+	m2 = f.mu[2]
+
+	thetas = 0:.02:2pi
+	num_theta = length(thetas)
+	xvals = zeros(num_theta)
+	yvals = zeros(num_theta)
+	c = sqrt(-2.0*log(0.05))
+	for i = 1:num_theta
+		theta = thetas[i]
+		s_theta = sin(theta)
+		c_theta = cos(theta) 
+		xvals[i] = c*(Sh11*s_theta + Sh12*c_theta) + m1
+		yvals[i] = c*(Sh21*s_theta + Sh22*c_theta) + m2
 	end
-	plot_contour(m, gaussian_arr)
+	plot(xvals, yvals, "g")
+	plot(m1, m2, "gx", ms=10)
 
 	labels()
 	axis(a)

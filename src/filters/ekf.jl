@@ -27,7 +27,7 @@ function update!(ekf::EKF, x::Vehicle, o::Float64)
 		yr = 1e-6
 	end
 	Ht = [yr, -xr]' * (180.0 / pi) / (xr^2 + yr^2)
-	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + x.noise_sigma^2)
+	Kt = ekf.Sigma * Ht' * inv(Ht * ekf.Sigma * Ht' + x.sensor.noise_sigma^2)
 
 	o_predict = true_bearing(x, ekf.mu) 
 	# Computing o - o_predict... both will be in range 0 to 360
