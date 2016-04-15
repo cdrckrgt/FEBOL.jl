@@ -87,20 +87,18 @@ end
 
 function O(x::Vehicle, s::DirOmni, theta::LocTuple, o::Float64)
 
+	# calculate the relative int
 	rel_bearing = x.heading - true_bearing(x, theta)
 	if rel_bearing < 0.0
 		rel_bearing += 360.0
 	end
 	rel_int = round(Int, rel_bearing, RoundDown) + 1
 
-	# Calculate true bearing, and find distance to bin edges
-	ang_deg = true_bearing(x, theta)
-	#rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
-	#o_diff = fit_180(o - ang_deg)
-	o_diff = o - x.sensor.means[rel_int]
+	# Calculate expected measurement
+	o_diff = o - s.means[rel_int]
 
 	# now look at probability
-	d = Normal(0, x.sensor.stds[rel_int])
+	d = Normal(0, s.stds[rel_int])
 	#p = cdf(d, rel_end) - cdf(d, rel_start)
 	p = pdf(d, o_diff)
 	return p

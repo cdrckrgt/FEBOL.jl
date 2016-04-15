@@ -9,13 +9,9 @@
 # For right now, assume a random policy
 function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video::Bool=true)
 
-	# receive an observation
+	# observe, update belief, select action, and act
 	o = observe(m,x)
-
-	# update belief
 	update!(f, x, o)
-
-	# update vehicle position
 	a = action(m, x, o, f, p)
 	act!(m,x,a)
 

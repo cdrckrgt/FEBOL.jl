@@ -16,6 +16,7 @@ export step!, steps!, batchsim, batchsim2
 export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy
 export action, act!
 export makenorm
+export Sensor, BearingOnly, DirOmni
 
 typealias Action   NTuple{3, Float64}
 typealias LocTuple NTuple{2, Float64}
