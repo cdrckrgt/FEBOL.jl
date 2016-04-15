@@ -38,11 +38,11 @@ type RandomPolicy <: Policy end
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::RandomPolicy)
 	ax = rand() - 0.5
 	ay = rand() - 0.5
-	az = 10.0
+	ah = 10.0
 	if ax < 0.0
-		az = -10.0
+		ah = -10.0
 	end
-	return normalize((ax,ay,az), x)
+	return normalize((ax,ay,ah), x)
 end
 
 

@@ -10,10 +10,16 @@ type DF <: AbstractFilter
 	n::Int64
 	cell_size::Float64
 	num_bins::Int64
+	bin_range::UnitRange{Int64}
 
-	function DF(m::SearchDomain, n::Int64)
+	function DF(m::SearchDomain, n::Int64, num_bins::Int64=36)
 		b = ones(n, n) / (n * n)
-		return new(b, n, m.length/n, 36)
+		return new(b, n, m.length/n, num_bins, 0:(num_bins-1))
+	end
+	function DF(m::SearchDomain, n::Int64, bin_range::UnitRange{Int64})
+		b = ones(n, n) / (n * n)
+		num_bins = length(bin_range)
+		return new(b, n, m.length/n, num_bins, bin_range)
 	end
 end
 
@@ -84,7 +90,7 @@ reset!(f::DF) = fill!(f.b, 1.0/(f.n*f.n))
 ######################################################################
 
 """
-`O(m::SearchDomain, x::Vehicle, theta, o::Obs)`
+`O(m::SearchDomain, x::Vehicle, theta, o::ObsBin)`
 
 Arguments:
 
@@ -95,16 +101,18 @@ Arguments:
 
 Returns probability of observing `o` from `(xp, theta)` in domain `m`.
 """
-# TODO: this needs to be done for the other sensor as well
-# ... or, we could have a rel_bin_edges function too
-function O(x::Vehicle, theta::LocTuple, o::Obs, df::DF)
-	return O(x, x.sensor, theta, o, df)
+function O(x::Vehicle, theta::LocTuple, o::ObsBin, df::DF)
+	return O(x, (x.x, x.y, x.heading), theta, o, df)
 end
 
-function O(x::Vehicle, s::BearingOnly, theta::LocTuple, o::Obs, df::DF)
+function O(x::Vehicle, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
+	return O(x, x.sensor, xp, theta, o, df)
+end
+
+function O(x::Vehicle, s::BearingOnly, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 
 	# Calculate true bearing, and find distance to bin edges
-	ang_deg = true_bearing(x, theta)
+	ang_deg = true_bearing(xp, theta)
 	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
 
 	# now look at probability
@@ -113,8 +121,8 @@ function O(x::Vehicle, s::BearingOnly, theta::LocTuple, o::Obs, df::DF)
 	return p
 end
 
-function O(x::Vehicle, s::DirOmni, theta::LocTuple, o::Obs, df::DF)
-	rel_bearing = x.heading - true_bearing(x, theta)
+function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
+	rel_bearing = x.heading - true_bearing(xp, theta)
 	if rel_bearing < 0.0
 		rel_bearing += 360.0
 	end
@@ -129,20 +137,6 @@ end
 
 
 
-# TODO: don't jut assume noise here
-function O(xv::Float64, yv::Float64, theta, o::Obs, df::DF)
-
-	# Calculate true bearing, and find distance to bin edges
-	xp = (xv, yv)
-	ang_deg = true_bearing(xp, theta)
-	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
-
-	# now look at probability
-	#p = cdf(m.d, deg2rad(rel_end)) - cdf(m.d, deg2rad(rel_start))
-	d = Normal(0, 10.0)
-	p = cdf(d, rel_end) - cdf(d, rel_start)
-	return p
-end
 
 
 # 355 - 4.9999 = 0
@@ -179,7 +173,7 @@ end
 
 # Find the relative offset
 # TODO: must account for different discretizations
-function rel_bin_edges(bearing_deg, o::Obs, df::DF)
+function rel_bin_edges(bearing_deg, o::ObsBin, df::DF)
 
 	# calculate start, end degrees of bin
 	start_deg, end_deg = bin2deg(o, df)

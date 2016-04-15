@@ -9,15 +9,41 @@ type GreedyPolicy <: Policy
 	actions::Vector{Action}
 
 	function GreedyPolicy(x::Vehicle, n::Int)
+		return GreedyPolicy(x, x.sensor, n)
+	end
+	function GreedyPolicy(x::Vehicle, ::BearingOnly, n::Int)
+
 		angles = linspace(0.0, 360 - 360/n, n)
 
 		# create list of actions
-		actions = Array(Action, n)
+		actions = Array(Action, n+1)
 		for i = 1:n
 			ax = x.max_step * sind(angles[i])
 			ay = x.max_step * cosd(angles[i])
-			actions[i] = (ax, ay)
+			actions[i] = (ax, ay, 0.0)
 		end
+		actions[n+1] = (0.0, 0.0, 0.0)
+
+		return new(n, actions)
+	end
+
+	function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
+
+		angles = linspace(0.0, 360 - 360/n, n)
+
+		# create list of actions
+		actions = Array(Action, 3n+3)
+		for i = 1:n
+			ax = x.max_step * sind(angles[i])
+			ay = x.max_step * cosd(angles[i])
+
+			actions[i] = (ax, ay, -10.0)
+			actions[i+n] = (ax, ay, 0.0)
+			actions[i+2n] = (ax, ay, 10.0)
+		end
+		actions[3n+1] = (0.0, 0.0, -10.0)
+		actions[3n+2] = (0.0, 0.0, 0.0)
+		actions[3n+3] = (0.0, 0.0, 10.0)
 
 		return new(n, actions)
 	end
@@ -26,14 +52,15 @@ end
 
 # loop over all actions.
 # The one with smallest expected entropy is best
+# We know this depends on sensor
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::GreedyPolicy)
 	best_mi = -Inf
-	best_a = (0.0, 0.0)
+	best_a = (0.0, 0.0, 0.0)
 	for a in p.actions
 		# find out where a will take you
-		xv, yv = new_location(m, x, a)
-		# compute best maximum information
-		mi = mutual_information(m,f,xv,yv)
+		xp = new_pose(m, x, a)
+		# compute best mutual information
+		mi = mutual_information(m, x, f, xp)
 		if mi > best_mi
 			best_mi = mi
 			best_a = a

@@ -20,7 +20,7 @@ end
 # have to include search domain because jammer location factors in
 # Really, I should just fold that into the state
 # TODO: just subtracting is not ok, need circle distance (can be negative)
-function update!(eif::EIF, x::Vehicle, o::Obs)
+function update!(eif::EIF, x::Vehicle, o::Float64)
 	if eif.Omega == zeros(2,2)
 		eif.Omega = [1e-8 0; 0 1e-8]
 	end
