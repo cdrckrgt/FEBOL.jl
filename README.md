@@ -47,6 +47,15 @@ DF(m::SearchDomain, n::Int)
 ```
 where `n` is the number of cells per side.
 
+If you create a new `Sensor` subtype called `NewSensor`, you need to implement the following methods for the `DF` type to work:
+```
+obs2bin(o::Float64, f::Filter, s::NewSensor)
+O(x::Vehicle, s::NewSensor, theta::LocTuple, ob::Int, f::Filter)
+```
+The function `obs2bin` converts the continuous domain observation `o` into a discrete value, using the `num_bins` property of the discrete filter.
+The binned observation `ob` is fed into `O`, which provides the probability of receiving `ob`.
+I've implicitly assumed that the observations are discrete in the discrete filter, but I think only the search domain needs to be discretized, technically.
+
 #### Extended Kalman Fiter
 ```
 EKF(m::SearchDomain)
@@ -57,8 +66,15 @@ To create a particle filter, you must provide the search domain `m` and desired 
 ```
 PF(m::SearchDomain, n::Int)
 ```
+If you create a new `Sensor` subtype called `NewSensor`, you must implement the following function:
+```
+O(x::Vehicle, s::NewSensor, theta::LocTuple, o::Float64)
+```
+Currently, it is only required that this return a probability density, rather than a true probability.
 
 #### Custom Filters
+The code below is a template for creating your own filter type.
+You must extend the `AbstractFilter` type and implement the following functions.
 ```
 type CustomFilter <: AbstractFilter
 end
@@ -73,6 +89,10 @@ end
 
 function entropy(f::CustomFilter)
 	# return the entropy of the filter's belief
+end
+
+function reset!(f::CustomFilter)
+	# reset the filter to a uniform prior
 end
 ```
 
