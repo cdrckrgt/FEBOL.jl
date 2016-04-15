@@ -95,7 +95,13 @@ Arguments:
 
 Returns probability of observing `o` from `(xp, theta)` in domain `m`.
 """
+# TODO: this needs to be done for the other sensor as well
+# ... or, we could have a rel_bin_edges function too
 function O(x::Vehicle, theta::LocTuple, o::Obs, df::DF)
+	return O(x, x.sensor, theta, o, df)
+end
+
+function O(x::Vehicle, s::BearingOnly, theta::LocTuple, o::Obs, df::DF)
 
 	# Calculate true bearing, and find distance to bin edges
 	ang_deg = true_bearing(x, theta)
@@ -106,6 +112,22 @@ function O(x::Vehicle, theta::LocTuple, o::Obs, df::DF)
 	p = cdf(d, rel_end) - cdf(d, rel_start)
 	return p
 end
+
+function O(x::Vehicle, s::DirOmni, theta::LocTuple, o::Obs, df::DF)
+	rel_bearing = x.heading - true_bearing(x, theta)
+	if rel_bearing < 0.0
+		rel_bearing += 360.0
+	end
+	rel_int = round(Int, rel_bearing, RoundDown) + 1
+
+	low_val = floor(o)
+	high_val = low_val + 1
+	d = Normal(s.means[rel_int], s.stds[rel_int])
+	p = cdf(d, high_val) - cdf(d, low_val)
+	return p
+end
+
+
 
 # TODO: don't jut assume noise here
 function O(xv::Float64, yv::Float64, theta, o::Obs, df::DF)
@@ -137,8 +159,11 @@ function obs2bin(o::Float64, df::DF, s::BearingOnly)
 	return ob
 end
 
+# here, num_bins isn't too important; we just bin to nearest integer
+obs2bin(o::Float64, df::DF, s::DirOmni) = round(Int, o, RoundDown)
+
+
 # returns (start_deg, end_deg) integer tuple
-# TODO: Modify for variable discretization
 function bin2deg(bin_deg::Int, df::DF)
 	full_bin = 360.0 / df.num_bins
 	half_bin = full_bin / 2.0
@@ -184,4 +209,20 @@ function rel_bin_edges(bearing_deg, o::Obs, df::DF)
 	end
 
 	return rel_start, rel_end
+end
+
+function noiseless(x::Vehicle, theta::LocTuple)
+	noiseless(x, x.sensor, theta)
+end
+function noiseless(x::Vehicle, s::BearingOnly, theta::LocTuple)
+	true_bearing(x, theta)
+end
+function noiseless(x::Vehicle, s::DirOmni, theta::LocTuple)
+	rel_bearing = x.heading - true_bearing(x, theta)
+	if rel_bearing < 0.0
+		rel_bearing += 360.0
+	end
+	rel_int = round(Int, rel_bearing, RoundDown) + 1
+
+	return s.means[rel_int]
 end
