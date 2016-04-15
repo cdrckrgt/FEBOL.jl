@@ -158,7 +158,8 @@ function plot_vehicle(m::SearchDomain, x::Vehicle)
 	# plot direction
 	xline = [x.x, x.x+2*c*sind(x.heading)]
 	yline = [x.y, x.y+2*c*cosd(x.heading)]
-	plot(xline, yline, "r", mew=1.5)
+	#plot(xline, yline, "r", mew=1.5)
+	plot(xline, yline, "r", mew=2)
 
 	# Plot frame
 	plot(x.x, x.y, marker=(2,0,-theta1), ms=mark_size,mew=1, markeredgecolor="b")
