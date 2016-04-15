@@ -14,7 +14,11 @@
 function true_bearing(xp::LocTuple, theta::Vector{Float64})
 	return true_bearing(xp, (theta[1], theta[2]))
 end
+function true_bearing(xp::Pose, theta::Vector{Float64})
+	return true_bearing((xp[1], xp[2]), (theta[1], theta[2]))
+end
 true_bearing(x::Vehicle, theta) = true_bearing( (x.x, x.y), theta)
+true_bearing(p::Pose, theta::LocTuple) = true_bearing( (p[1], p[2]), theta)
 function true_bearing(xp::LocTuple, theta::LocTuple)
 	xr = theta[1] - xp[1]
 	yr = theta[2] - xp[2]

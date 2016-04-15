@@ -4,14 +4,15 @@
 ######################################################################
 
 # sum over all possible jammer locations
-function p_obs(m::SearchDomain, df::DF, xv::Float64, yv::Float64, o::Obs)
+function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 	prob = 0.0
 	for theta_x = 1:df.n
 		for theta_y = 1:df.n
 			if df.b[theta_x,theta_y] > 0.0
-				xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
-				yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
-				prob += df.b[theta_x, theta_y] * O(xv, yv, (xj, yj), o, df)
+				xj = (theta_x-1) * df.cell_size + df.cell_size/2.0
+				yj = (theta_y-1) * df.cell_size + df.cell_size/2.0
+				#prob += df.b[theta_x, theta_y] * O(xv, yv, (xj, yj), o, df)
+				prob += df.b[theta_x, theta_y] * O(x, x.sensor, xp, (xj,yj), o, df)
 			end
 		end
 	end
@@ -19,12 +20,13 @@ function p_obs(m::SearchDomain, df::DF, xv::Float64, yv::Float64, o::Obs)
 end
 
 # computes mutual information for a specific vehicle location
-# TODO: handle different discretization levels
-function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
+#function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
+# xp is a proposed pose
+function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0
 	for o = 0:df.num_bins
-		po = p_obs(m, df, xv, yv, o)
+		po = p_obs(m, x, df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)
 		end
@@ -32,11 +34,12 @@ function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 		# sum over theta
 		for theta_x = 1:df.n
 			for theta_y = 1:df.n
-				xj = (theta_x - 1) * df.cell_size + df.cell_size/2.0
-				yj = (theta_y - 1) * df.cell_size + df.cell_size/2.0
+				xj = (theta_x-1) * df.cell_size + df.cell_size/2.0
+				yj = (theta_y-1) * df.cell_size + df.cell_size/2.0
 
 				if df.b[theta_x, theta_y] > 0.0
-					pot = O(xv, yv, (xj, yj), o, df)
+					#pot = O(xv, yv, (xj, yj), o, df)
+					pot = O(x, x.sensor, xp, (xj,yj), o, df)
 					if pot > 0.0
 						H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
 					end

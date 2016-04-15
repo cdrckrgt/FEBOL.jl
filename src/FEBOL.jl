@@ -18,9 +18,10 @@ export action, act!
 export makenorm
 export Sensor, BearingOnly, DirOmni
 
-typealias Action   NTuple{3, Float64}
-typealias LocTuple NTuple{2, Float64}
-typealias Obs      Int64
+typealias Pose		    NTuple{3, Float64}    # x, y, heading
+typealias Action        NTuple{3, Float64}    # dx, dy, dh
+typealias LocTuple      NTuple{2, Float64}    # x, y
+typealias ObsBin        Int64
 
 include("searchdomain.jl")
 
