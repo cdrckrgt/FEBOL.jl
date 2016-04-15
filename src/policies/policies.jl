@@ -1,5 +1,5 @@
 ######################################################################
-# policy.jl
+# policies.jl
 # Does basic policy stuff.
 # Policy's don't need to remember vehicle's max_step,
 #  as the action function ensures the step is normalized to max_step.
@@ -24,7 +24,15 @@ function normalize(a::Action, x::Vehicle)
 end
 
 
+######################################################################
+# greedy policy
+######################################################################
+include("greedy.jl")
+
+
+######################################################################
 # Random policy
+######################################################################
 type RandomPolicy <: Policy end
 
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::RandomPolicy)
@@ -37,53 +45,30 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::R
 	return normalize((ax,ay,az), x)
 end
 
-# Sit policy
+
+######################################################################
+# Sit policy: Just sit and don't move
+######################################################################
 type SitPolicy <: Policy end
 
 action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SitPolicy) = (0.0,0.0,0.0)
 
 
-# Greedy info-theoretic policy
-# only consider a set of possible actions
-type GreedyPolicy <: Policy
-	n::Int
-	actions::Vector{Action}
+######################################################################
+# Spin Policy: Just sit there and spin
+######################################################################
+type SpinPolicy <: Policy end
 
-	function GreedyPolicy(x::Vehicle, n::Int)
-		angles = linspace(0.0, 360 - 360/n, n)
-
-		# create list of actions
-		actions = Array(Action, n)
-		for i = 1:n
-			ax = x.max_step * sind(angles[i])
-			ay = x.max_step * cosd(angles[i])
-			actions[i] = (ax, ay)
-		end
-
-		return new(n, actions)
-	end
-end
-
-# loop over all actions.
-# The one with smallest expected entropy is best
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::GreedyPolicy)
-	best_mi = -Inf
-	best_a = (0.0, 0.0)
-	for a in p.actions
-		# find out where a will take you
-		xv, yv = new_location(m, x, a)
-		# compute best maximum information
-		mi = mutual_information(m,f,xv,yv)
-		if mi > best_mi
-			best_mi = mi
-			best_a = a
-		end
-	end
-	return best_a
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SpinPolicy)
+	return (0.0, 0.0, 10.0)
 end
 
 
-# Move orthogonally to last measurement
+######################################################################
+# CirclePolicy: Move orthogonally to last measurement
+
+# This ends up tracing a circle around the jammer
+######################################################################
 type CirclePolicy <: Policy 
 	last::Action
 
@@ -108,6 +93,11 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::C
 end
 
 
+######################################################################
+# SpiralPolicy: Like CirclePolicy, but also move towards jammer
+# 
+# TODO: actually implement this
+######################################################################
 # Move orthogonally to last measurement
 type SpiralPolicy <: Policy 
 	last::Action
@@ -130,13 +120,4 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::SpiralPolicy)
 	p.last = (ax, ay)
 
 	return normalize((ax,ay), x)
-end
-
-
-
-# Just sits there and spins
-type SpinPolicy <: Policy end
-
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SpinPolicy)
-	return (0.0, 0.0, 10.0)
 end

@@ -35,7 +35,8 @@ include("filters/filters.jl")
 
 # policies
 include("infotheoretic.jl")
-include("policy.jl")
+include("policies/policies.jl")
+#include("policy.jl")
 
 # Simulation and Plotting
 include("simulations.jl")
