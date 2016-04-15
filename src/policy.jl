@@ -30,13 +30,17 @@ type RandomPolicy <: Policy end
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::RandomPolicy)
 	ax = rand() - 0.5
 	ay = rand() - 0.5
-	return normalize((ax,ay), x)
+	az = 10.0
+	if ax < 0.0
+		az = -10.0
+	end
+	return normalize((ax,ay,az), x)
 end
 
 # Sit policy
 type SitPolicy <: Policy end
 
-action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SitPolicy) = (0.0,0.0)
+action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SitPolicy) = (0.0,0.0,0.0)
 
 
 # Greedy info-theoretic policy
@@ -130,3 +134,9 @@ end
 
 
 
+# Just sits there and spins
+type SpinPolicy <: Policy end
+
+function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SpinPolicy)
+	return (0.0, 0.0, 10.0)
+end

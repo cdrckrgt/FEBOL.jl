@@ -13,7 +13,9 @@ export update!, centroid, entropy, reset!
 export observe
 export plot
 export step!, steps!, batchsim, batchsim2
-export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, action, act!
+export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy
+export action, act!
+export makenorm
 
 typealias Action   NTuple{3, Float64}
 typealias LocTuple NTuple{2, Float64}

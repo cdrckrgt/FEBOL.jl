@@ -20,7 +20,8 @@ type Vehicle
 	#Vehicle(x::Real,y::Real,ns::Real) = new(float(x),float(y),float(ns),2.0)
 
 	function Vehicle(x::Real, y::Real)
-		return new( float(x), float(y), 0.0, 2.0, BearingOnly(10.0) )
+		#return new( float(x), float(y), 0.0, 2.0, BearingOnly(10.0) )
+		return new( float(x), float(y), 0.0, 2.0, DirOmni("norm360.csv") )
 	end
 end
 
@@ -35,4 +36,5 @@ end
 """
 function act!(m::SearchDomain, x::Vehicle, a::Action)
 	x.x, x.y = new_location(m, x, a)
+	x.heading += a[3]
 end
