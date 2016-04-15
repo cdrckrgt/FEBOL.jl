@@ -11,7 +11,6 @@ function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 			if df.b[theta_x,theta_y] > 0.0
 				xj = (theta_x-1) * df.cell_size + df.cell_size/2.0
 				yj = (theta_y-1) * df.cell_size + df.cell_size/2.0
-				#prob += df.b[theta_x, theta_y] * O(xv, yv, (xj, yj), o, df)
 				prob += df.b[theta_x, theta_y] * O(x, x.sensor, xp, (xj,yj), o, df)
 			end
 		end
@@ -20,12 +19,14 @@ function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 end
 
 # computes mutual information for a specific vehicle location
-#function mutual_information(m::SearchDomain, df::DF, xv::Float64, yv::Float64)
 # xp is a proposed pose
+# really need to loop over all possible observations
 function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0
-	for o = 0:df.num_bins
+	#for o = 0:df.num_bins
+	#for o = -20:20  # for DirOmni sensor
+	for o in df.bin_range
 		po = p_obs(m, x, df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)
@@ -38,7 +39,6 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 				yj = (theta_y-1) * df.cell_size + df.cell_size/2.0
 
 				if df.b[theta_x, theta_y] > 0.0
-					#pot = O(xv, yv, (xj, yj), o, df)
 					pot = O(x, x.sensor, xp, (xj,yj), o, df)
 					if pot > 0.0
 						H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
