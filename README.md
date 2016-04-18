@@ -158,6 +158,11 @@ x = Vehicle(50, 50)
 p = GreedyPolicy(x, 16)
 ```
 
+## Another Example
+<p align="center">
+<img src="http://stanford.edu/~dressel/gifs/gif1.gif"/>
+</p>
+
 ## TODO:
 
 * handle observation directly over jammer
