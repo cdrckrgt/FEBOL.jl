@@ -147,7 +147,7 @@ If you've named your objects that way, you don't have to remember the arguments 
 Alternatively, you can specify a number of steps: `steps!(30)`.
 
 
-## Example
+## Bearing Only Examples
 The code below creates a search domain 100 meters by 100 meters, with a jammer located at (5,85).
 A discrete filter with 50 bins is used for the belief representation.
 A vehicle starts at (50,50) and uses a greedy entropy-minimizing policy with 16 different directions.
@@ -158,10 +158,23 @@ x = Vehicle(50, 50)
 p = GreedyPolicy(x, 16)
 ```
 
-## Other Examples
+## Directional+Omni Examples
+```
+using FEBOL
+
+m = SearchDomain(100, 40, 70)
+f = DF(m, 100)
+sensor = DirOmni("norm360.csv")
+sensor.stds *= 0.2
+x = Vehicle(50, 50, sensor)
+p = GreedyPolicy(x, 8)
+
+gif(m,x,f,p,17)
+```
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif2.gif"/>
 </p>
+This example is also interesting:
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif1.gif"/>
 </p>
