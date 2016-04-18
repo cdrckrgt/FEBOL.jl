@@ -1,9 +1,10 @@
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf
 import PyPlot.plot
 using StatsBase: sample, WeightVec
+using Reel
 
 export SearchDomain, theta!
 export Vehicle
@@ -17,6 +18,7 @@ export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy
 export action, act!
 export makenorm
 export Sensor, BearingOnly, DirOmni
+export gif
 
 typealias Pose		    NTuple{3, Float64}    # x, y, heading
 typealias Action        NTuple{3, Float64}    # dx, dy, dh
@@ -42,5 +44,6 @@ include("policies/policies.jl")
 # Simulation and Plotting
 include("simulations.jl")
 include("plotting.jl")
+include("gif.jl")
 
 end # module

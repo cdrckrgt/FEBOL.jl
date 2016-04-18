@@ -15,6 +15,13 @@ function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle)
 	plot(m, f)
 	return # so it doesn't spit out result of axis
 end
+function plot(m::SearchDomain, f::AbstractFilter, p::Pose)
+	plot_theta(m)
+	hold(true)
+	plot_vehicle(m,p)
+	plot(m, f)
+	return # so it doesn't spit out result of axis
+end
 
 function plot(m::SearchDomain, f::DF)
 	a = [0,m.length,0,m.length]
@@ -134,38 +141,40 @@ end
 # Helper functions
 ######################################################################
 # Plots locations of the vehicles
-function plot_vehicle(m::SearchDomain, x::Vehicle)
+plot_vehicle(m::SearchDomain,x::Vehicle) = plot_vehicle(m,x.x,x.y,x.heading)
+plot_vehicle(m::SearchDomain, p::Pose) = plot_vehicle(m, p[1], p[2], p[3])
+function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64)
 	mark_size = 10
 	#plot(x.x, x.y, "bx", markersize=mark_size, mew=2)
 
 	c = 0.01 * m.length  *sqrt(2)
-	dx = c*sind(45 + x.heading)
-	dy = c*cosd(45 + x.heading)
+	dx = c*sind(45 + h)
+	dy = c*cosd(45 + h)
 
 	# Plot rotors
 	rotor_size = 5
-	theta1 = 45.0 + x.heading
-	theta2 = 135.0 + x.heading
-	theta3 = 225.0 + x.heading
-	theta4 = 315.0 + x.heading
-	plot(x.x+c*sind(theta1), x.y+c*cosd(theta1), "bo", ms=rotor_size)
-	plot(x.x+c*sind(theta2), x.y+c*cosd(theta2), "bo", ms=rotor_size)
-	plot(x.x+c*sind(theta3), x.y+c*cosd(theta3), "bo", ms=rotor_size)
-	plot(x.x+c*sind(theta4), x.y+c*cosd(theta4), "bo", ms=rotor_size)
+	theta1 = 45.0 + h
+	theta2 = 135.0 + h
+	theta3 = 225.0 + h
+	theta4 = 315.0 + h
+	plot(x+c*sind(theta1), y+c*cosd(theta1), "bo", ms=rotor_size)
+	plot(x+c*sind(theta2), y+c*cosd(theta2), "bo", ms=rotor_size)
+	plot(x+c*sind(theta3), y+c*cosd(theta3), "bo", ms=rotor_size)
+	plot(x+c*sind(theta4), y+c*cosd(theta4), "bo", ms=rotor_size)
 
 	#plot(x.x, x.y, marker=(2,0,3), ms=mark_size)
 
 	# plot direction
-	xline = [x.x, x.x+2*c*sind(x.heading)]
-	yline = [x.y, x.y+2*c*cosd(x.heading)]
+	xline = [x, x+2*c*sind(h)]
+	yline = [y, y+2*c*cosd(h)]
 	#plot(xline, yline, "r", mew=1.5)
 	plot(xline, yline, "r", mew=2)
 
 	# Plot frame
-	plot(x.x, x.y, marker=(2,0,-theta1), ms=mark_size,mew=1, markeredgecolor="b")
-	plot(x.x, x.y, marker=(2,0,-theta2), ms=mark_size,mew=1, markeredgecolor="b")
+	plot(x, y, marker=(2,0,-theta1), ms=mark_size,mew=1,markeredgecolor="b")
+	plot(x, y, marker=(2,0,-theta2), ms=mark_size,mew=1,markeredgecolor="b")
 
-	plot()
+	#plot()
 end
 
 # Plots jammer location
