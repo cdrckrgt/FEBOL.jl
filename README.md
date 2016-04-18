@@ -158,7 +158,10 @@ x = Vehicle(50, 50)
 p = GreedyPolicy(x, 16)
 ```
 
-## Another Example
+## Other Examples
+<p align="center">
+<img src="http://stanford.edu/~dressel/gifs/gif2.gif"/>
+</p>
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif1.gif"/>
 </p>
