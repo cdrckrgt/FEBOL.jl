@@ -182,8 +182,8 @@ end
 
 # Sets the appropriate plot labels
 function labels()
-	xlabel("x")
-	ylabel("y")
+	xlabel("x (meters)")
+	ylabel("y (meters)")
 end
 
 ######################################################################
