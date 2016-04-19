@@ -158,6 +158,48 @@ x = Vehicle(50, 50)
 p = GreedyPolicy(x, 16)
 ```
 
+```
+using FEBOL
+
+m = SearchDomain(100, 40, 70)
+f = DF(m, 100)
+x = Vehicle(50, 50)
+p = CirclePolicy()
+
+gif(m,x,f,p,18)
+```
+<p align="center">
+<img src="http://stanford.edu/~dressel/gifs/gif3.gif"/>
+</p>
+Alternatively, you can use a `GreedyPolicy`:
+```
+using FEBOL
+
+m = SearchDomain(100, 40, 70)
+f = DF(m, 100)
+x = Vehicle(50, 50)
+p = GreedyPolicy(x, 8)
+
+gif(m,x,f,p,18)
+```
+<p align="center">
+<img src="http://stanford.edu/~dressel/gifs/gif5.gif"/>
+</p>
+The following example is a particle filter with 10,000 particles:
+```
+using FEBOL
+
+m = SearchDomain(100, 40, 70)
+f = PF(m, 10000)
+x = Vehicle(50, 50)
+p = GreedyPolicy(x, 8)
+
+gif(m,x,f,p,18)
+```
+<p align="center">
+<img src="http://stanford.edu/~dressel/gifs/gif4.gif"/>
+</p>
+
 ## Directional+Omni Examples
 ```
 using FEBOL
