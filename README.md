@@ -148,16 +148,12 @@ Alternatively, you can specify a number of steps: `steps!(30)`.
 
 
 ## Bearing Only Examples
-The code below creates a search domain 100 meters by 100 meters, with a jammer located at (5,85).
-A discrete filter with 50 bins is used for the belief representation.
-A vehicle starts at (50,50) and uses a greedy entropy-minimizing policy with 16 different directions.
-```
-m = SearchDomain(100, 5, 85)
-f = DF(m, 50)
-x = Vehicle(50, 50)
-p = GreedyPolicy(x, 16)
-```
-
+The code below creates a search domain 100 meters by 100 meters, with a jammer located at (40,70).
+The vehicle starts at (50,50) and moves at the default 4 m/s.
+It is equipped with the standard `BearingOnly` sensor with 10 degree standard deviation.
+A discrete filter with 100 bins is used for state estimation.
+A `CirclePolicy` moves the UAV perpendicular to the last received bearing.
+Measurements are received every half second.
 ```
 using FEBOL
 
@@ -168,10 +164,11 @@ p = CirclePolicy()
 
 gif(m,x,f,p,18)
 ```
+The resulting trajectory is saved as a gif. The jammer is a red triangle.
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif3.gif"/>
 </p>
-Alternatively, you can use a `GreedyPolicy`:
+Alternatively, you can use a greedy entropy minimizing policy that considers 8 different directions (45 degrees apart).
 ```
 using FEBOL
 
@@ -185,14 +182,14 @@ gif(m,x,f,p,18)
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif5.gif"/>
 </p>
-The following example is a particle filter with 10,000 particles:
+The following example is a particle filter with 10,000 particles. The green x marks the mean of the particles.
 ```
 using FEBOL
 
 m = SearchDomain(100, 40, 70)
 f = PF(m, 10000)
 x = Vehicle(50, 50)
-p = GreedyPolicy(x, 8)
+p = CirclePolicy()
 
 gif(m,x,f,p,18)
 ```
