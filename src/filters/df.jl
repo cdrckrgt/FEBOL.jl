@@ -220,3 +220,13 @@ function noiseless(x::Vehicle, s::DirOmni, theta::LocTuple)
 
 	return s.means[rel_int]
 end
+
+function print_belief(df::DF)
+	for y = df.n:-1:1
+		for x = 1:(df.n-1)
+			@printf "%.2f," df.b[x,y]
+		end
+		@printf "%.2f\n" df.b[df.n,y]
+	end
+	#@printf "%.2f", 
+end

@@ -19,6 +19,7 @@ export action, act!
 export makenorm
 export Sensor, BearingOnly, DirOmni
 export gif
+export print_belief
 
 typealias Pose		    NTuple{3, Float64}    # x, y, heading
 typealias Action        NTuple{3, Float64}    # dx, dy, dh
