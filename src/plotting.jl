@@ -179,8 +179,10 @@ end
 
 # Plots jammer location
 function plot_theta(m::SearchDomain)
-	mark_size = 12
+	mark_size = 11
 	plot(m.theta[1], m.theta[2], "r^", markersize=mark_size)
+	#mark_size = 11
+	#plot(m.theta[1], m.theta[2], "r^", markersize=mark_size, markerfacecolor="none", markeredgecolor="r", mew=2)
 end
 
 # Plots contours of some distribution `d` (a matrix).

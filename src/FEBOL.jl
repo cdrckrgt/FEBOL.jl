@@ -9,7 +9,7 @@ using Reel
 export SearchDomain, theta!
 export Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
-export DF, EKF, EIF, PF
+export DF, EKF, EIF, UKF, PF
 export update!, centroid, entropy, reset!
 export observe
 export plot
