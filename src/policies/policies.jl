@@ -79,8 +79,11 @@ end
 # Otherwise, it will "chatter" back and forth
 # TODO: take into account distance from edge
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::CirclePolicy)
-	ax = -1.0 / sind(o)
-	ay = 1.0 / cosd(o)
+	#ax = -1.0 / sind(o)
+	#ay = 1.0 / cosd(o)
+
+	ax = -cosd(o);
+	ay = sind(o);
 
 	if ax*p.last[1] + ay*p.last[2] < 0.
 		ax = -ax
