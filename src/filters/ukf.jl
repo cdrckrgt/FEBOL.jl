@@ -28,8 +28,7 @@ type UKF <: GaussianFilter
 		w0 = lambda / (n + lambda)
 		wi = 0.5 / (n + lambda)
 
-		#initer = NaiveInitializer(m.length, mu, S)
-		initer = LSInitializer(m.length)
+		initer = NaiveInitializer(m)
 		return new(mu, S, m.length, lambda, n, w0, wi,false,initer)
 	end
 end

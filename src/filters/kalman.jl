@@ -31,6 +31,7 @@ type LSInitializer <: Initializer
 	Sigma::Matrix{Float64}
 	obs::Vector{Float64}
 	pos::Vector{NTuple{2,Float64}}
+	min_obs_num::Int
 
 	function LSInitializer(m::SearchDomain)
 		return LSInitializer(m.length)
@@ -39,13 +40,14 @@ type LSInitializer <: Initializer
 		S = 3e1*eye(2)
 		obs = Array(Float64,0)
 		pos = Array(NTuple{2,Float64},0)
-		return new(length, zeros(2), S, obs, pos)
+		min_obs_num = 5
+		return new(length, zeros(2), S, obs, pos, min_obs_num)
 	end
 end
 function initialize(lsi::LSInitializer, x::Vehicle, o::Float64)
 	push!(lsi.pos, (x.x,x.y))
 	push!(lsi.obs, o)
-	if length(lsi.obs) < 5
+	if length(lsi.obs) < lsi.min_obs_num
 		return false
 	end
 	# ok, do our triangulation/least squares stuff

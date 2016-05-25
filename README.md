@@ -61,6 +61,28 @@ I've implicitly assumed that the observations are discrete in the discrete filte
 EKF(m::SearchDomain)
 ```
 
+#### Unscented Kalman Fiter
+```
+UKF(m::SearchDomain)
+```
+
+#### Gaussian Fiter
+The `GaussianFilter` abstract type is a child of `AbstractFilter` and a parent of `EKF` and `UKF`. I've thought about calling this `KalmanFilter` instead, but that could be ambiguous---someone could think this refers to a specific KF, rather than an abstract type. 
+
+The `GaussianFilter` abstract type covers utilities that both `EKF` and `UKF` use.
+The most important utility is the `Initializer` abstract type.
+Each `EKF` and `UKF` instance contains an `Initializer` subtype that determines how the filter estimate should be initialized.
+
+The default initializer is a `NaiveInitializer` sets the estimate to be the center of the search domain and uses a large initial covariance.
+
+Another initializer is the `LSInitializer`, or least squares initializer. After taking `min_obs_num` observations, this initializer sets the mean to the point in the search domain yielding the smallest sum of least square differences between observed and expected observations. The code below shows how to initialize an instance of `LSInitializer` and modify some of its important fields:
+```
+lsi = LSInitializer(m::SearchDomain)
+lsi.Sigma = 1e3*eye(2)
+lsi.min_obs_num = 5
+```
+
+
 #### Particle Filter
 To create a particle filter, you must provide the search domain `m` and desired number of particles `n`:
 ```

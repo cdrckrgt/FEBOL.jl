@@ -16,8 +16,7 @@ type EKF <: GaussianFilter
 	function EKF(m::SearchDomain)
 		mu = m.length/2 * ones(2)
 		S = 1e9 * eye(2)
-		initer = LSInitializer(m.length)
-		#initer = NaiveInitializer(m)
+		initer = NaiveInitializer(m)
 		return new(mu, S, m.length,false,initer)
 	end
 end
