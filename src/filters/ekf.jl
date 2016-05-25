@@ -2,17 +2,23 @@
 # ekf.jl
 # handles kalman filter stuff
 ######################################################################
+include("kalman.jl")
 
 # length is size of one side of search domain
-type EKF <: AbstractFilter
+type EKF <: GaussianFilter
 	mu::Vector{Float64}			# belief
 	Sigma::Matrix{Float64}		# belief
 	length::Float64	
 
+	initialized::Bool
+	initializer::Initializer
+
 	function EKF(m::SearchDomain)
 		mu = m.length/2 * ones(2)
 		S = 1e9 * eye(2)
-		return new(mu, S, m.length)
+		initer = LSInitializer(m.length)
+		#initer = NaiveInitializer(m)
+		return new(mu, S, m.length,false,initer)
 	end
 end
 
@@ -20,6 +26,12 @@ end
 # Really, I should just fold that into the state
 # TODO: just subtracting is not ok, need circle distance (can be negative)
 function update!(ekf::EKF, x::Vehicle, o::Float64)
+
+	if !ekf.initialized
+		check_initialization(ekf, x, o)
+		return nothing
+	end
+
 	xr = ekf.mu[1] - x.x
 	yr = ekf.mu[2] - x.y
 	if xr == 0.0 && yr === 0.0
@@ -43,6 +55,8 @@ function update!(ekf::EKF, x::Vehicle, o::Float64)
 	# TODO: use copy here
 	ekf.mu = vec(mu_t)
 	ekf.Sigma = Sigma_t
+
+	return nothing
 end
 
 centroid(ekf::EKF) = (ekf.mu[1], ekf.mu[2])

@@ -23,6 +23,10 @@ function plot(m::SearchDomain, f::AbstractFilter, p::Pose)
 	return # so it doesn't spit out result of axis
 end
 
+function plot(m::SearchDomain, f::AbstractFilter)
+	error(typeof(f), " has not implemented `plot`(::SearchDomain, ::AbstractFilter)")
+end
+
 function plot(m::SearchDomain, f::DF)
 	a = [0,m.length,0,m.length]
 	imshow(f.b', interpolation="none",cmap="Greys",origin="lower",extent=a,vmin=0)
@@ -30,17 +34,20 @@ function plot(m::SearchDomain, f::DF)
 	axis(a)
 end
 
+plot(m::SearchDomain, f::EKF) = plot(m, f.mu, f.Sigma)
+plot(m::SearchDomain, f::UKF) = plot(m, f.mu, f.Sigma)
+
 # Plots mean and 95% confidence ellipse
-function plot(m::SearchDomain, f::EKF)
+function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64})
 	a = [0,m.length,0,m.length]
 
-	Sigma_half = sqrtm(f.Sigma)
+	Sigma_half = sqrtm(Sigma)
 	Sh11 = Sigma_half[1,1]
 	Sh12 = Sigma_half[1,2]
 	Sh21 = Sigma_half[2,1]
 	Sh22 = Sigma_half[2,2]
-	m1 = f.mu[1]
-	m2 = f.mu[2]
+	m1 = mu[1]
+	m2 = mu[2]
 
 	thetas = 0:.02:2pi
 	num_theta = length(thetas)
@@ -61,6 +68,7 @@ function plot(m::SearchDomain, f::EKF)
 	axis("square")
 	axis(a)
 end
+
 
 function plot(m::SearchDomain, f::PF)
 	mark_size = 12

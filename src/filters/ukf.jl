@@ -2,42 +2,55 @@
 # ukf.jl
 # All about that unscented Kalman filter
 ######################################################################
+include("kalman.jl")
 
-type UKF <: AbstractFilter
+type UKF <: GaussianFilter
 	mu::Vector{Float64}			# belief
 	Sigma::Matrix{Float64}		# belief
 	length::Float64	
 	lambda::Float64
 	n::Int
-	wm0::Float64
-	wc0::Float64
-	wmci::Float64
 
-	function UKF(m::SearchDomain, alpha::Float64, k::Float64)
+	w0::Float64
+	wi::Float64
+	initialized::Bool
+	initializer::Initializer
+
+	#function UKF(m::SearchDomain, alpha::Float64, k::Float64)
+	function UKF(m::SearchDomain)
 		mu = m.length/2 * ones(2)
-		S = 1e9 * eye(2)
+		S = 1e5 * eye(2)
 
 		n = 2
-		Beta = 2.0
-		lambda = alpha * alpha * (n + k) - n
+		lambda = 2.
 
 		# create w
-		wm0 = lambda / (lambda + n)
-		wc0 = wm0 + (1.0 - alpha*alpha + Beta)
-		wmci = 0.5 / (n + lambda)
+		w0 = lambda / (n + lambda)
+		wi = 0.5 / (n + lambda)
 
-		return new(mu, S, m.length, lambda, n, wm0, wc0, wmci)
+		#initer = NaiveInitializer(m.length, mu, S)
+		initer = LSInitializer(m.length)
+		return new(mu, S, m.length, lambda, n, w0, wi,false,initer)
 	end
 end
 
 
 function update!(ukf::UKF, x::Vehicle, o::Float64)
+
+	# check if initialized..
+	if !ukf.initialized
+		check_initialization(ukf, x, o)
+		return nothing
+	end
+
 	# for ease of writing
-	wc0 = ukf.wc0
-	wm0 = ukf.wm0
-	wmci = ukf.wmci
+	w0 = ukf.w0
+	wi = ukf.wi
 
+	# Prediction step
+	# nothing changes, because jammer doesn't go anywhere
 
+	# Update step
 	# Compute X_bar
 	mu = ukf.mu
 	sqrtSigma = sqrtm((ukf.n+ukf.lambda) * ukf.Sigma)
@@ -49,38 +62,18 @@ function update!(ukf::UKF, x::Vehicle, o::Float64)
 	X3 = mu - sqrtSigma1
 	X4 = mu - sqrtSigma2
 
-	# Compute mu_bar_t
-	mu_bar = wm0*X0 + wmci*(X1 + X2 + X3 + X4)
-
-	# Compute  Sigma_bar
-	Sigma_bar = wc0 * (X0 - mu_bar) * (X0 - mu_bar)'
-	Sigma_bar += wmci * (X1 - mu_bar) * (X1 - mu_bar)'
-	Sigma_bar += wmci * (X2 - mu_bar) * (X2 - mu_bar)'
-	Sigma_bar += wmci * (X3 - mu_bar) * (X3 - mu_bar)'
-	Sigma_bar += wmci * (X4 - mu_bar) * (X4 - mu_bar)'
-
-	# Compute the sqrtSigmas
-	sqrtSigma = sqrtm((ukf.n+ukf.lambda) * Sigma_bar)
-	sqrtSigma1 = sqrtSigma[:,1]
-	sqrtSigma2 = sqrtSigma[:,2]
-
-	# Compute the Z_bar
-	println("Sigma1 = ", sqrtSigma1)
-	println("Sigma2 = ", sqrtSigma2)
-	println("mu_bar = ", mu_bar)
-	println("************************")
-	sqrtSigma1 = real(sqrtSigma1)
-	sqrtSigma2 = real(sqrtSigma2)
-	mu_bar = real(mu_bar)
-	Z0 = true_bearing(x, mu_bar)
-	Z1 = true_bearing(x, mu_bar + sqrtSigma1)
-	Z2 = true_bearing(x, mu_bar + sqrtSigma2)
-	Z3 = true_bearing(x, mu_bar - sqrtSigma1)
-	Z4 = true_bearing(x, mu_bar - sqrtSigma2)
+	# TODO: check if the imaginary parts are too big
+	Z0 = true_bearing(x, real(X0))
+	Z1 = true_bearing(x, real(X1))
+	Z2 = true_bearing(x, real(X2))
+	Z3 = true_bearing(x, real(X3))
+	Z4 = true_bearing(x, real(X4))
 
 	# Compute z_hat and differences
 	# TODO: I'm not sure this is valid for circular domain
-	zhat = wm0*Z0 + wmci*(Z1 + Z2 + Z3 + Z4)
+	#zhat = w0*Z0 + wi*(Z1 + Z2 + Z3 + Z4)
+	zhat = angle_mean((Z0,Z1,Z2,Z3,Z4), (w0,wi,wi,wi,wi))
+
 	Z0_diff = fit_180(Z0 - zhat)
 	Z1_diff = fit_180(Z1 - zhat)
 	Z2_diff = fit_180(Z2 - zhat)
@@ -90,22 +83,25 @@ function update!(ukf::UKF, x::Vehicle, o::Float64)
 	# Compute St
 	# TODO: I'm not sure this is valid for circular domain
 	Qt = x.sensor.noise_sigma * x.sensor.noise_sigma
-	St = wc0 * Z0_diff * Z0_diff
-	St += wmci * Z1_diff * Z1_diff
-	St += wmci * Z2_diff * Z2_diff
-	St += wmci * Z3_diff * Z3_diff
-	St += wmci * Z4_diff * Z4_diff
+	St = w0*Z0_diff^2 + wi*(Z1_diff^2 + Z2_diff^2 + Z3_diff^2 + Z4_diff^2) 
 	St += Qt
 
 	# Compute Sigma_xz
 	# TODO: Not valid for circular domain?
-	Sigma_xz = wmci * (sqrtSigma1) * Z1_diff
-	Sigma_xz += wmci * (sqrtSigma2) * Z2_diff
-	Sigma_xz += wmci * (sqrtSigma1) * Z3_diff
-	Sigma_xz += wmci * (sqrtSigma2) * Z4_diff
+	Sigma_xz = wi * (sqrtSigma1) * Z1_diff
+	Sigma_xz += wi * (sqrtSigma2) * Z2_diff
+	Sigma_xz -= wi * (sqrtSigma1) * Z3_diff
+	Sigma_xz -= wi * (sqrtSigma2) * Z4_diff
 
 	# Compute gain, mean, and standard deviation
 	Kt = Sigma_xz * inv(St)
-	ukf.mu = mu_bar + Kt*fit_180(o - zhat)
-	ukf.Sigma = Sigma_bar - Kt*St*Kt'
+
+	ukf.mu = mu + Kt*fit_180(o - zhat)
+	#ukf.Sigma = Sigma_bar - Kt*St*Kt'
+	# below is same as above, but simpler
+	ukf.Sigma = ukf.Sigma - Sigma_xz * inv(St) * Sigma_xz'
+
+	#println("ukf.mu = ", round(ukf.mu,2))
+	#println("ukf.Sigma = ", round(ukf.Sigma,2))
+	return nothing
 end

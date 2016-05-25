@@ -63,6 +63,28 @@ function fit_180(angle::Float64)
 	return angle
 end
 
+function angle_mean(v)
+	n = length(v)
+	sin_sum = 0.0
+	cos_sum = 0.0
+	for i = 1:n
+		sin_sum += sin(v[i])
+		cos_sum += cos(v[i])
+	end
+	return mod(rad2deg(atan2(sin_sum, cos_sum)), 360.)
+end
+
+function angle_mean(v,w)
+	n = length(v)
+	sin_sum = 0.0
+	cos_sum = 0.0
+	for i = 1:n
+		sin_sum += w[i] * sin(v[i])
+		cos_sum += w[i] * cos(v[i])
+	end
+	return mod(rad2deg(atan2(sin_sum, cos_sum)), 360.)
+end
+
 
 
 ######################################################################
