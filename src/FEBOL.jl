@@ -10,11 +10,11 @@ export SearchDomain, theta!
 export Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
 export DF, EKF, EIF, UKF, PF
-export update!, centroid, entropy, reset!
+export update!, centroid, covariance, entropy, reset!
 export observe
-export plot
+export plot, hold
 export step!, steps!, batchsim, batchsim2
-export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy
+export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy, GaussianMPC
 export action, act!
 export makenorm
 export Sensor, BearingOnly, DirOmni
@@ -46,5 +46,8 @@ include("policies/policies.jl")
 include("simulations.jl")
 include("plotting.jl")
 include("gif.jl")
+
+# for some gps stuff...
+include("gps.jl")
 
 end # module

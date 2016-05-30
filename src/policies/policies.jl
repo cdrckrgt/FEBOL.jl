@@ -29,6 +29,11 @@ end
 ######################################################################
 include("greedy.jl")
 
+######################################################################
+# GaussianMPC
+######################################################################
+include("gaussian_mpc.jl")
+
 
 ######################################################################
 # Random policy
@@ -90,9 +95,21 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::C
 		ay = -ay
 	end
 
-	p.last = (ax, ay, 0.0)
 
-	return normalize((ax,ay,0.0), x)
+	temp_a = normalize((ax,ay,0.0), x)
+	temp_x = x.x + temp_a[1]
+	temp_y = x.y + temp_a[2]
+	ax = temp_a[1]
+	ay = temp_a[2]
+	# If this moves you out of bounds, go the other way
+	if temp_x < 0. || temp_x > m.length || temp_y < 0. || temp_y > m.length
+		ax *= -1.
+		ay *= -1.
+	end
+
+	p.last = (ax, ay, 0.0)
+	return (ax, ay, 0.0)
+	#return normalize((ax,ay,0.0), x)
 end
 
 
