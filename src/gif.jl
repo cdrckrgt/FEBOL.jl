@@ -7,13 +7,16 @@
 """
 `gif(m::SearchDomain, x::Vehicle, f::Filter, p::Policy, num_steps=10, filename=out.gif)`
 """
-function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int=10, filename="out.gif")
+function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int=10, filename="out.gif"; seconds_per_step=0.5)
 	frames = Frames(MIME("image/png"), fps=20)
 
 	# Plot the original scene
 	plot(m, f, x)
 	push!(frames, gcf())
 	close()
+
+	# 20 is the fps
+	frames_per_step = round(Int, seconds_per_step * 20)
 
 	for i = 1:num_steps
 		old_pose = (x.x, x.y, x.heading)
@@ -26,7 +29,7 @@ function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_step
 		dx = (new_pose[1] - old_pose[1]) / 10.0
 		dy = (new_pose[2] - old_pose[2]) / 10.0
 		dh = a[3] / 10.0
-		for j = 1:10
+		for j = 1:frames_per_step
 			#figure()
 			# determine intermediate pose
 			new_h = mod(old_pose[3] + dh, 360.0)
