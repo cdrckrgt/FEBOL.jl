@@ -69,6 +69,9 @@ function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64})
 	axis(a)
 end
 
+#function plot_ellipse()
+#end
+
 
 function plot(m::SearchDomain, f::PF)
 	mark_size = 12
