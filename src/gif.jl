@@ -4,6 +4,9 @@
 # This file makes gifs of simulations
 ######################################################################
 
+"""
+`gif(m::SearchDomain, x::Vehicle, f::Filter, p::Policy, num_steps=10, filename=out.gif)`
+"""
 function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int=10, filename="out.gif")
 	frames = Frames(MIME("image/png"), fps=20)
 
