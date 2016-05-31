@@ -131,9 +131,17 @@ function O(x::Vehicle, s::BearingOnly, xp::Pose, theta::LocTuple, o::ObsBin, df:
 	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
 
 	# now look at probability
-	d = Normal(0, x.sensor.noise_sigma)
-	p = cdf(d, rel_end) - cdf(d, rel_start)
+	#d = Normal(0, x.sensor.noise_sigma)
+	#p = cdf(d, rel_end) - cdf(d, rel_start)
+	sig = x.sensor.noise_sigma::Float64
+	p = my_cdf(sig, rel_end) - my_cdf(sig, rel_start)
+	#p = my_cdf(x.sensor.noise_sigma, rel_end) - my_cdf(x.sensor.noise_sigma, rel_start)
 	return p
+end
+
+function my_cdf(sigma::Float64, x::Float64)
+	temp = x / (sigma*sqrt(2.0))
+	return 0.5 * (1. + erf(temp))
 end
 
 function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
