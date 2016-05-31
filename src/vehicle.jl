@@ -31,9 +31,12 @@ end
 # Does the bounds checking on the action, to see if stays in search domain
 # Ensures heading is within [0,360) (other parts of code assume this)
 function new_pose(m::SearchDomain, x::Vehicle, a::Action)
-	new_x = max(min(x.x + a[1], m.length), 0.0)
-	new_y = max(min(x.y + a[2], m.length), 0.0)
-	new_h = mod(x.heading + a[3], 360.0)
+	return new_pose(m, (x.x, x.y, x.heading), a)
+end
+function new_pose(m::SearchDomain, p::Pose, a::Action)
+	new_x = max(min(p[1] + a[1], m.length), 0.0)
+	new_y = max(min(p[2] + a[2], m.length), 0.0)
+	new_h = mod(p[3] + a[3], 360.0)
 	return new_x, new_y, new_h
 end
 
