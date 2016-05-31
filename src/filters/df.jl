@@ -53,16 +53,31 @@ end
 # returns x, y value
 function centroid(df::DF)
 	x_val = 0.0; y_val = 0.0
-	x_sum = 0.0; y_sum = 0.0
 	for x = 1:df.n
 		for y = 1:df.n
 			x_val += (x-.5) * df.b[x,y]
-			x_sum += df.b[x,y]
 			y_val += (y-.5) * df.b[x,y]
-			y_sum += df.b[x,y]
 		end
 	end
-	return x_val*df.cell_size / x_sum, y_val*df.cell_size / y_sum
+	return x_val*df.cell_size, y_val*df.cell_size
+end
+
+function covariance(df::DF)
+	mu_x, mu_y = centroid(df)
+	c_xx = c_xy = c_yy = 0.0
+	for xi = 1:df.n
+		for yi = 1:df.n
+			x = (xi-0.5)*df.cell_size
+			y = (yi-0.5)*df.cell_size
+
+			c_xx += df.b[xi,yi] * x * x
+			c_yy += df.b[xi,yi] * y * y
+			c_xy += df.b[xi,yi] * (x - mu_x) * (y - mu_y)
+		end
+	end
+	c_xx -= (mu_x * mu_x)
+	c_yy -= (mu_y * mu_y)
+	return [c_xx c_xy; c_xy c_yy]
 end
 
 
