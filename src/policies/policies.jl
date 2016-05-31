@@ -44,7 +44,7 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::R
 	ax = rand() - 0.5
 	ay = rand() - 0.5
 	ah = 10.0
-	if ax < 0.0
+	if rand() < 0.5
 		ah = -10.0
 	end
 	return normalize((ax,ay,ah), x)
