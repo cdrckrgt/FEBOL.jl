@@ -87,6 +87,7 @@ end
 function batchsim2{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int, num_steps::Int)
 	num_filters = length(farr)
 	results = zeros(num_sims, num_filters)
+	times = zeros(1, num_filters)
 	f1 = farr[1]
 	for i = 1:num_sims
 		println()
@@ -109,8 +110,12 @@ function batchsim2{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector
 			#	f = farr[fi]
 			#	update!(f, x, o)
 			#end
+			ti = 1
 			for f in farr
+				tic()
 				update!(f, x, o)
+				times[ti] = toq()
+				ti += 1
 			end
 			a = action(m, x, o, f1, p)
 			act!(m,x,a)
@@ -124,7 +129,7 @@ function batchsim2{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector
 			reset!(f)
 		end
 	end
-	return results
+	return results, times
 end
 
 function norm2(x::LocTuple, y::LocTuple)
