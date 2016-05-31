@@ -29,6 +29,16 @@ end
 
 
 """
+`covariance(f::AbstractFilter)`
+
+Returns the covariance of the filter's belief. If the belief is a Gaussian, this will return Sigma.
+"""
+function covariance(f::AbstractFilter)
+	error(typeof(f), " does not yet implement centroid(f).")
+end
+
+
+"""
 `entropy(f::AbstractFilter)`
 
 Returns the entropy of the filter's belief.
