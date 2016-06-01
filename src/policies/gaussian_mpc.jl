@@ -40,7 +40,7 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::G
 	max_det = 0.0
 	best_action = p.actions[1]
 	for a in p.actions
-		temp_det = rec_det(m,xp,a,p.N,Omega,Rinv,mu,p)
+		temp_det = rec_det(m, xp, a, p.N-1, Omega, Rinv, mu, p)
 		if temp_det > max_det
 			max_det = temp_det
 			best_action = a
@@ -64,8 +64,7 @@ function rec_det(m::SearchDomain, xp::Pose, a::Action, N::Int, Omega::Matrix{Flo
 
 	max_det = 0.0
 	for a in p.actions
-
-		max_det = max( max_det, rec_det(m, xp, a, N-1, Omega+Rinv*(Ct'*Ct), Rinv, mu, p) )
+		max_det = max( max_det, rec_det(m, np, a, N-1, Omega+Rinv*(Ct'*Ct), Rinv, mu, p) )
 	end
 
 	return max_det
