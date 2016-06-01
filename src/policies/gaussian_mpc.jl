@@ -32,12 +32,16 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::G
 	Sigma = covariance(f)
 
 	# convert Sigma to Omega and calculate Rinv
-	try
-		Omega = inv(Sigma)
-	catch
-		println("Sigma = ", Sigma)
-		return p.actions[1]
-	end
+	Omega = inv(Sigma)
+	#try
+	#	Omega = inv(Sigma)
+	#catch
+	#	println("Sigma = ", Sigma)
+	#	println("sum = ", sum(f.b))
+	#	println("max = ", maximum(f.b))
+	#	#println("num = ", maximum(f.b))
+	#	return p.actions[1]
+	#end
 	Rinv = inv(x.sensor.noise_sigma)
 	xp = (x.x, x.y, x.heading)
 

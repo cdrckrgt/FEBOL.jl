@@ -63,6 +63,9 @@ function centroid(df::DF)
 end
 
 function covariance(df::DF)
+	if maximum(df.b) == 1.0
+		return eye(2)
+	end
 	mu_x, mu_y = centroid(df)
 	c_xx = c_xy = c_yy = 0.0
 	for xi = 1:df.n
