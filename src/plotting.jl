@@ -6,20 +6,24 @@
 """
 `plot(m::SearchDomain, f::AbstractFilter, x::Vehicle)`
 
+
+
 Plots the belief, jammer, and vehicles.
 """
-function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle)
-	plot_theta(m)
-	hold(true)
-	plot_vehicle(m,x)
-	plot(m, f)
-	return # so it doesn't spit out result of axis
+function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
+	plot(m, f, (x.x, x.y, x.heading); show_mean=show_mean, show_cov=show_cov, alpha=alpha, color=color)
 end
-function plot(m::SearchDomain, f::AbstractFilter, p::Pose)
+function plot(m::SearchDomain, f::AbstractFilter, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
 	plot_theta(m)
 	hold(true)
-	plot_vehicle(m,p)
-	plot(m, f)
+	plot_vehicle(m, p; color=color)
+	if show_mean
+		plot_mean(centroid(f), color=color)
+	end
+	if show_cov
+		plot(m, centroid(f), covariance(f), color=color)
+	end
+	plot(m, f, alpha=alpha)
 	return # so it doesn't spit out result of axis
 end
 
@@ -27,9 +31,9 @@ function plot(m::SearchDomain, f::AbstractFilter)
 	error(typeof(f), " has not implemented `plot`(::SearchDomain, ::AbstractFilter)")
 end
 
-function plot(m::SearchDomain, f::DF)
+function plot(m::SearchDomain, f::DF; alpha=1.0, cmap="Greys")
 	a = [0,m.length,0,m.length]
-	imshow(f.b', interpolation="none",cmap="Greys",origin="lower",extent=a,vmin=0)
+	imshow(f.b', interpolation="none",cmap=cmap,origin="lower",extent=a,vmin=0, alpha=alpha)
 	labels()
 	axis(a)
 end
@@ -38,7 +42,10 @@ plot(m::SearchDomain, f::EKF) = plot(m, f.mu, f.Sigma)
 plot(m::SearchDomain, f::UKF) = plot(m, f.mu, f.Sigma)
 
 # Plots mean and 95% confidence ellipse
-function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64})
+function plot(m::SearchDomain, mu::LocTuple, Sigma::Matrix{Float64}; color="b")
+	plot(m, [mu[1],mu[2]], Sigma, color=color)
+end
+function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64}; color="b")
 	a = [0,m.length,0,m.length]
 
 	Sigma_half = sqrtm(Sigma)
@@ -61,8 +68,8 @@ function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64})
 		xvals[i] = c*(Sh11*s_theta + Sh12*c_theta) + m1
 		yvals[i] = c*(Sh21*s_theta + Sh22*c_theta) + m2
 	end
-	plot(xvals, yvals, "g")
-	plot(m1, m2, "gx", ms=10)
+	plot(xvals, yvals, color)
+	plot(m1, m2, "$(color)x", ms=10)
 
 	labels()
 	axis("square")
@@ -89,6 +96,13 @@ function plot(m::SearchDomain, f::PF)
 	labels()
 	axis("square")
 	axis(a)
+end
+
+function plot_mean(mu::LocTuple; color="b")
+	plot_mean(mu[1], mu[2], color=color)
+end
+function plot_mean(xmean::Float64, ymean::Float64; color="b")
+	plot(xmean, ymean, "$(color)x", ms=10, mew=2)
 end
 
 
@@ -152,9 +166,9 @@ end
 # Helper functions
 ######################################################################
 # Plots locations of the vehicles
-plot_vehicle(m::SearchDomain,x::Vehicle) = plot_vehicle(m,x.x,x.y,x.heading)
-plot_vehicle(m::SearchDomain, p::Pose) = plot_vehicle(m, p[1], p[2], p[3])
-function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64)
+plot_vehicle(m::SearchDomain,x::Vehicle; color="b") = plot_vehicle(m,x.x,x.y,x.heading, color=color)
+plot_vehicle(m::SearchDomain, p::Pose; color="b") = plot_vehicle(m, p[1], p[2], p[3], color=color)
+function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64; color="b")
 	mark_size = 10
 	#plot(x.x, x.y, "bx", markersize=mark_size, mew=2)
 
@@ -168,10 +182,11 @@ function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64)
 	theta2 = 135.0 + h
 	theta3 = 225.0 + h
 	theta4 = 315.0 + h
-	plot(x+c*sind(theta1), y+c*cosd(theta1), "bo", ms=rotor_size)
-	plot(x+c*sind(theta2), y+c*cosd(theta2), "bo", ms=rotor_size)
-	plot(x+c*sind(theta3), y+c*cosd(theta3), "bo", ms=rotor_size)
-	plot(x+c*sind(theta4), y+c*cosd(theta4), "bo", ms=rotor_size)
+	cs = "$(color)o"
+	plot(x+c*sind(theta1), y+c*cosd(theta1), cs, ms=rotor_size)
+	plot(x+c*sind(theta2), y+c*cosd(theta2), cs, ms=rotor_size)
+	plot(x+c*sind(theta3), y+c*cosd(theta3), cs, ms=rotor_size)
+	plot(x+c*sind(theta4), y+c*cosd(theta4), cs, ms=rotor_size)
 
 	#plot(x.x, x.y, marker=(2,0,3), ms=mark_size)
 
@@ -179,11 +194,11 @@ function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64)
 	xline = [x, x+2*c*sind(h)]
 	yline = [y, y+2*c*cosd(h)]
 	#plot(xline, yline, "r", mew=1.5)
-	plot(xline, yline, "r", mew=2)
+	plot(xline, yline, color, mew=2)
 
 	# Plot frame
-	plot(x, y, marker=(2,0,-theta1), ms=mark_size,mew=1,markeredgecolor="b")
-	plot(x, y, marker=(2,0,-theta2), ms=mark_size,mew=1,markeredgecolor="b")
+	plot(x, y, marker=(2,0,-theta1), ms=mark_size,mew=1,markeredgecolor=color)
+	plot(x, y, marker=(2,0,-theta2), ms=mark_size,mew=1,markeredgecolor=color)
 
 	#plot()
 end
@@ -252,4 +267,51 @@ function meshgrid(x, y)
 		end
 	end
 	return X, Y
+end
+
+######################################################################
+# plotting multiple plots...
+######################################################################
+# TODO: make this just call the other version
+function plot{TP<:AbstractFilter}(m::SearchDomain, farr::Vector{TP}, xarr::Vector{Vehicle}; show_mean::Bool=false, show_cov::Bool=false)
+	for i = 1:length(farr)
+		f = farr[i]
+		x = xarr[i]
+		plot(m, f, (x.x, x.y, x.heading); show_mean=show_mean, show_cov=show_cov)
+	end
+end
+
+function plot{TP<:AbstractFilter}(m::SearchDomain, farr::Vector{TP}, parr::Vector{Pose}; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0)
+	num_vehicles = length(farr)
+	cmaps = ["Blues", "Reds"]
+	colors = ["b", "r"]
+	if num_vehicles == 1
+		cmaps = ["Greys"]
+		colors = ["b"]
+	elseif num_vehicles == 2
+		cmaps = ["Blues", "Reds"]
+		colors = ["b", "r"]
+	elseif num_vehicles == 3
+		cmaps = ["Blues", "Reds", "Greens"]
+		colors = ["b", "r", "g"]
+	elseif num_vehicles == 4
+		cmaps = ["Blues", "Reds", "Greens", "Greys"]
+		colors = ["b", "r", "g", "k"]
+	end
+	plot_theta(m)
+	hold(true)
+	#cmaps = ["Blues", "Reds"]
+	#colors = ["b", "r"]
+	for (fi,f) in enumerate(farr)
+		p = parr[fi]
+		plot_vehicle(m,p, color=colors[fi])
+		if show_mean
+			plot_mean(centroid(f), color=colors[fi])
+		end
+		if show_cov
+			plot(m, centroid(f), covariance(f), color=colors[fi])
+		end
+		plot(m, f, alpha=alpha, cmap=cmaps[fi])
+	end
+	return # so it doesn't spit out result of axis
 end
