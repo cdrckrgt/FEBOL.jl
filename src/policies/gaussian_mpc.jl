@@ -40,6 +40,7 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::G
 	#	println("sum = ", sum(f.b))
 	#	println("max = ", maximum(f.b))
 	#	#println("num = ", maximum(f.b))
+	#	error()
 	#	return p.actions[1]
 	#end
 	Rinv = inv(x.sensor.noise_sigma)
