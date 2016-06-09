@@ -20,6 +20,8 @@ export makenorm
 export Sensor, BearingOnly, DirOmni
 export gif
 export print_belief
+export LSInitializer, NaiveInitializer
+export ErgodicManager
 
 typealias Pose		    NTuple{3, Float64}    # x, y, heading
 typealias Action        NTuple{3, Float64}    # dx, dy, dh
@@ -48,6 +50,10 @@ include("plotting.jl")
 include("gif.jl")
 
 # for some gps stuff...
+# TODO: let's talk about this gps stuff in README
 include("gps.jl")
+
+# for some ergodicity stuff...
+include("ergodicity.jl")
 
 end # module
