@@ -14,6 +14,12 @@ type SearchDomain
 		@assert theta_y <= length
 		return new(length, (theta_x, theta_y))
 	end
+	function SearchDomain(length::Real)
+		length = float(length)
+		theta_x = length * rand()
+		theta_y = length * rand()
+		return new(length, (theta_x, theta_y))
+	end
 end
 
 """
