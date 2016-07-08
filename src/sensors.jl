@@ -14,7 +14,7 @@ type DirOmni <: Sensor
 
 	function DirOmni(file::AbstractString)
 		means = vec(readcsv(file)[:,2])
-		stds = ones(360)
+		stds = 2*ones(360)
 		return new(means, stds)
 	end
 end

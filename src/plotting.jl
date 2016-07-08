@@ -6,8 +6,6 @@
 """
 `plot(m::SearchDomain, f::AbstractFilter, x::Vehicle)`
 
-
-
 Plots the belief, jammer, and vehicles.
 """
 function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
@@ -27,19 +25,40 @@ function plot(m::SearchDomain, f::AbstractFilter, p::Pose; show_mean::Bool=false
 	return # so it doesn't spit out result of axis
 end
 
-function plot(m::SearchDomain, f::AbstractFilter)
+function plot(m::SearchDomain, b::Matrix{Float64}, x::Vehicle; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
+	plot(m, b, (x.x, x.y, x.heading); show_mean=show_mean, show_cov=show_cov, alpha=alpha, color=color)
+end
+
+function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
+	plot_theta(m)
+	hold(true)
+	plot_vehicle(m, p; color=color)
+	if show_mean
+		plot_mean(centroid(b, m.length), color=color)
+	end
+	if show_cov
+		plot(m, centroid(b,m.length), covariance(b,m.length), color=color)
+	end
+	plot(m, b, alpha=alpha)
+	return # so it doesn't spit out result of axis
+end
+
+function plot(m::SearchDomain, f::AbstractFilter; alpha=1.0)
 	error(typeof(f), " has not implemented `plot`(::SearchDomain, ::AbstractFilter)")
 end
 
 function plot(m::SearchDomain, f::DF; alpha=1.0, cmap="Greys")
+	plot(m, f.b, alpha=alpha, cmap=cmap)
+end
+function plot(m::SearchDomain, b::Matrix{Float64}; alpha=1.0, cmap="Greys")
 	a = [0,m.length,0,m.length]
-	imshow(f.b', interpolation="none",cmap=cmap,origin="lower",extent=a,vmin=0, alpha=alpha)
+	imshow(b', interpolation="none",cmap=cmap,origin="lower",extent=a,vmin=0, alpha=alpha)
 	labels()
 	axis(a)
 end
 
-plot(m::SearchDomain, f::EKF) = plot(m, f.mu, f.Sigma)
-plot(m::SearchDomain, f::UKF) = plot(m, f.mu, f.Sigma)
+plot(m::SearchDomain, f::EKF; alpha=0.1) = plot(m, f.mu, f.Sigma)
+plot(m::SearchDomain, f::UKF; alpha=0.1) = plot(m, f.mu, f.Sigma)
 
 # Plots mean and 95% confidence ellipse
 function plot(m::SearchDomain, mu::LocTuple, Sigma::Matrix{Float64}; color="b")

@@ -37,7 +37,7 @@ type LSInitializer <: Initializer
 		return LSInitializer(m.length)
 	end
 	function LSInitializer(length::Float64)
-		S = 3e1*eye(2)
+		S = 3e3*eye(2)
 		obs = Array(Float64,0)
 		pos = Array(NTuple{2,Float64},0)
 		min_obs_num = 5

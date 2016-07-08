@@ -44,12 +44,12 @@ function update!(ekf::EKF, x::Vehicle, o::Float64)
 	# Computing o - o_predict... both will be in range 0 to 360
 	# Make sure this value is within -180,180
 	o_diff = fit_180(o - o_predict)
-	print("o = ", round(o,1), ", op = ", round(o_predict,1), ", od = ", round(o_diff,1))
+	#print("o = ", round(o,1), ", op = ", round(o_predict,1), ", od = ", round(o_diff,1))
 	#println("od = ", o_diff)
 	#mu_t = ekf.mu + Kt * (o - o_predict)
 	mu_t = ekf.mu + Kt * o_diff
 	Sigma_t = (eye(2)  - Kt * Ht) * ekf.Sigma
-	println(": mu = ($(round(mu_t[1],1)), $(round(mu_t[2],1)))")
+	#println(": mu = ($(round(mu_t[1],1)), $(round(mu_t[2],1)))")
 
 	# TODO: use copy here
 	ekf.mu = vec(mu_t)

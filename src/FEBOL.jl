@@ -1,7 +1,7 @@
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig
 import PyPlot.plot
 using StatsBase: sample, WeightVec
 using Reel
@@ -21,13 +21,23 @@ export Sensor, BearingOnly, DirOmni
 export gif
 export print_belief
 export LSInitializer, NaiveInitializer
-export ErgodicManager
+export my_pdf
+
+# Stuff for ergodicity
+export ErgodicManager, phik!, reconstruct, decompose_trajectory, score
+export TrajectoryManager, create_trajectory
 
 typealias Pose		    NTuple{3, Float64}    # x, y, heading
 typealias Action        NTuple{3, Float64}    # dx, dy, dh
 typealias LocTuple      NTuple{2, Float64}    # x, y
 typealias ObsBin        Int64
 
+export Pose
+
+# math functions
+include("math.jl")
+
+# search domain
 include("searchdomain.jl")
 
 # Sensing models
@@ -54,6 +64,7 @@ include("gif.jl")
 include("gps.jl")
 
 # for some ergodicity stuff...
-include("ergodicity.jl")
+include("ergodicity/ergodicity.jl")
+include("ergodicity/trajectory.jl")
 
 end # module
