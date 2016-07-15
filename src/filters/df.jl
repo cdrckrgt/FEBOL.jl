@@ -79,7 +79,7 @@ function centroid(d::Matrix{Float64}, L::Float64)
 end
 
 function covariance(df::DF)
-	mu_x, mu_y = 0.0
+	mu_x = mu_y = 0.0
 	c_xx = c_xy = c_yy = 0.0
 	for xi = 1:df.n
 		for yi = 1:df.n
