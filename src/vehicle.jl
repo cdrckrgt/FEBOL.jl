@@ -33,9 +33,12 @@ end
 function new_pose(m::SearchDomain, x::Vehicle, a::Action)
 	return new_pose(m, (x.x, x.y, x.heading), a)
 end
+# TODO: add vehicle limits...
 function new_pose(m::SearchDomain, p::Pose, a::Action)
-	new_x = max(min(p[1] + a[1], m.length), 0.0)
-	new_y = max(min(p[2] + a[2], m.length), 0.0)
+	#new_x = max(min(p[1] + a[1], m.length), 0.0)
+	#new_y = max(min(p[2] + a[2], m.length), 0.0)
+	new_x = p[1] + a[1]
+	new_y = p[2] + a[2]
 	new_h = mod(p[3] + a[3], 360.0)
 	return new_x, new_y, new_h
 end
