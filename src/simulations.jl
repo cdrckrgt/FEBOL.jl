@@ -169,3 +169,26 @@ function norm2(x::LocTuple, y::LocTuple)
 	d2 = x[2] - y[2]
 	return sqrt(d1*d1 + d2*d2)
 end
+
+function sim(j::LocTuple, actions::Vector{Pose}, observations::Vector{Float64}, b::Vector{Matrix{Float64}}, m::SearchDomain, x::Vehicle; show_mean=false, show_cov=false)
+	# always start the vehicle in the center
+	# NO, don't do that
+	#x.x = m.length / 2.0
+	#x.y = m.length / 2.0
+	theta!(m, j[1], j[2])
+
+	# warn user if jammer is not where it should be
+	#if abs(dx) > x.x || abs(dy) > x.y
+	#	println("WARNING: jammer outside search domain.")
+	#end
+
+	# loop through all observations...
+	for (oi,o) in enumerate(observations)
+		#update!(f, x, o)
+		#plot(m, b[oi], x, show_mean=true, show_cov=true)
+		plot(m, b[oi], x, show_mean=show_mean, show_cov=show_cov, obs=o)
+		savefig("temp_$(oi).png", format="png")
+		hold(false)
+		act!(m, x, actions[oi])
+	end
+end

@@ -136,3 +136,99 @@ function gif{TF<:AbstractFilter, TP<:Policy}(m::SearchDomain, xarr::Vector{Vehic
 	end
 	write(filename, frames)
 end
+
+export simgif
+
+# really, this is for white sands results
+function simgif(j::LocTuple, actions::Vector{Pose}, observations::Vector{Float64}, b::Vector{Matrix{Float64}}, m::SearchDomain, x::Vehicle; show_mean=false, show_cov=false, show_path=false)
+	# always start the vehicle in the center
+	# NO, don't do that
+	#x.x = m.length / 2.0
+	#x.y = m.length / 2.0
+	theta!(m, j[1], j[2])
+
+	num_vehicles = 1
+	new_poses = Array(Pose, num_vehicles)
+	old_poses = Array(Pose, num_vehicles)
+	diffs = Array(Pose, num_vehicles)
+
+	frames = Frames(MIME("image/png"), fps=20)
+
+	# Set up the paths
+	x_path = [x.x]
+	y_path = [x.y]
+
+	# Plot the original scene
+	#plot(m, b[1], x, show_mean=show_mean, show_cov=show_cov, obs=observations[1])
+	plot(m, b[1], x, show_mean=show_mean, show_cov=show_cov)
+	push!(frames, gcf())
+	close()
+
+	# 20 is the fps
+	seconds_per_step = 2.0
+	frames_per_step = round(Int, seconds_per_step * 20)
+
+	# warn user if jammer is not where it should be
+	#if abs(dx) > x.x || abs(dy) > x.y
+	#	println("WARNING: jammer outside search domain.")
+	#end
+	colors = ["b", "r"]
+	if num_vehicles == 1
+		colors = ["b"]
+	elseif num_vehicles == 2
+		colors = ["b", "r"]
+	elseif num_vehicles == 3
+		colors = ["b", "r", "g"]
+	elseif num_vehicles == 4
+		colors = ["b", "r", "g", "k"]
+	end
+
+	# loop through all observations...
+	num_obs = length(observations)
+	for (oi,o) in enumerate(observations)
+		println("oi = ", oi)
+		xi = 1
+		old_pose = (x.x, x.y, x.heading)
+		old_poses[xi] = old_pose
+
+		a = actions[oi]
+		act!(m, x, actions[oi])
+		new_pose = (x.x, x.y, x.heading)
+		new_poses[xi] = new_pose
+		# Plot everything in between old pose and new pose
+		dx = (new_pose[1] - old_pose[1]) / frames_per_step
+		dy = (new_pose[2] - old_pose[2]) / frames_per_step
+		dh = a[3] / frames_per_step
+		diffs = (dx, dy, dh)
+
+		#plot(m, b[oi], x, show_mean=true, show_cov=true)
+		#println("oi = ", oi)
+		FEBOL.plot(m, b[oi], x, show_mean=show_mean, show_cov=show_cov)
+		for j = 1:frames_per_step
+			xi = 1
+			figure()
+			# determine intermediate pose
+			dx, dy, dh = diffs
+			old_pose = old_poses[xi]
+			new_h = mod(old_pose[3] + dh, 360.0)
+			old_pose = (old_pose[1] + dx, old_pose[2] + dy, new_h)
+			old_poses[xi] = (old_pose)
+			push!(x_path, old_pose[1])
+			push!(y_path, old_pose[2])
+			#plot(m, farr, old_poses; show_mean=show_mean, show_cov=show_cov, alpha=alpha)
+			#FEBOL.plot(m, b[oi], old_pose, show_mean=show_mean, show_cov=show_cov, obs=o)
+			FEBOL.plot(m, b[oi], old_pose, show_mean=show_mean, show_cov=show_cov)
+			if show_path
+				plot(x_path, y_path, colors[1])
+			end
+
+			push!(frames, gcf())
+			close()
+		end
+		#savefig("temp_$(oi).png", format="png")
+		#hold(false)
+		#act!(m, x, actions[oi])
+	end
+	filename="temp.gif"
+	write(filename, frames)
+end

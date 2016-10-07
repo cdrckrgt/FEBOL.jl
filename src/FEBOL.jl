@@ -13,8 +13,8 @@ export DF, EKF, EIF, UKF, PF
 export update!, centroid, covariance, entropy, reset!
 export observe
 export plot, hold
-export step!, steps!, batchsim, batchsim2
-export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy, GaussianMPC
+export step!, steps!, batchsim, batchsim2, sim
+export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy, GaussianMPC, GreedyPolicy2
 export action, act!
 export makenorm
 export Sensor, BearingOnly, DirOmni
@@ -22,9 +22,10 @@ export gif
 export print_belief
 export LSInitializer, NaiveInitializer
 export my_pdf
+export true_bearing
 
 # Stuff for ergodicity
-export ErgodicManager, phik!, reconstruct, decompose_trajectory, score
+export ErgodicManager, phik!, reconstruct, decompose, ergodic_score
 export TrajectoryManager, create_trajectory
 
 typealias Pose		    NTuple{3, Float64}    # x, y, heading
@@ -66,5 +67,6 @@ include("gps.jl")
 # for some ergodicity stuff...
 include("ergodicity/ergodicity.jl")
 include("ergodicity/trajectory.jl")
+include("ergodicity/max_trajectory.jl")
 
 end # module

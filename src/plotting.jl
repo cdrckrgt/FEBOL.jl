@@ -25,20 +25,32 @@ function plot(m::SearchDomain, f::AbstractFilter, p::Pose; show_mean::Bool=false
 	return # so it doesn't spit out result of axis
 end
 
-function plot(m::SearchDomain, b::Matrix{Float64}, x::Vehicle; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
-	plot(m, b, (x.x, x.y, x.heading); show_mean=show_mean, show_cov=show_cov, alpha=alpha, color=color)
+function plot(m::SearchDomain, b::Matrix{Float64}, x::Vehicle; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b", obs=nothing)
+	plot(m, b, (x.x, x.y, x.heading); show_mean=show_mean, show_cov=show_cov, alpha=alpha, color=color, obs=obs)
 end
 
-function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
+function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b", obs=nothing)
 	plot_theta(m)
 	hold(true)
 	plot_vehicle(m, p; color=color)
+	#title_string = "plot: "
+	title_string = ""
+	if obs != nothing
+		title_string = "$(title_string)o = $(obs), "
+	end
 	if show_mean
 		plot_mean(centroid(b, m.length), color=color)
 	end
 	if show_cov
-		plot(m, centroid(b,m.length), covariance(b,m.length), color=color)
+		cov = covariance(b,m.length)
+		evals = eigvals(cov)
+		e1 = round(evals[1],1)
+		e2 = round(evals[2],1)
+		plot(m, centroid(b,m.length), cov, color=color)
+		title_string = "$(title_string)e1 = $e1, e2 = $e2"
+		#title("e1 = $e1, e2 = $e2")
 	end
+	title(title_string)
 	plot(m, b, alpha=alpha)
 	return # so it doesn't spit out result of axis
 end
