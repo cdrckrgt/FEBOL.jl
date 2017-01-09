@@ -4,8 +4,9 @@
 # TODO: omfg Alphak is really Lambdak
 ######################################################################
 
-typealias VVF64   Vector{Vector{Float64}}
-typealias VMF64   Vector{Matrix{Float64}}
+typealias VV_F   Vector{Vector{Float64}}   # vector of vector of floats
+typealias V_T2F  Vector{NTuple{2,Float64}} # vector of tuples of 2 floats
+typealias VMF64  Vector{Matrix{Float64}}   # vector of matrix of floats
 
 # kpixl is a (K+1 x bins) matrix, each entry storing cos(k*pi*x / L)
 #  this assumes some discretization
@@ -15,6 +16,7 @@ type ErgodicManager
 	L::Float64
 	cell_size::Float64
 	hk::Matrix{Float64}
+	phi::Matrix{Float64}
 	phik::Matrix{Float64}
 	Alphak::Matrix{Float64}
 	kpixl::Matrix{Float64}
@@ -26,7 +28,8 @@ type ErgodicManager
 		kpixl = zeros(K+1, bins)
 		L = m.length
 		cell_size = L / bins
-		em = new(K, bins, L, cell_size, hk, phik, Alphak, kpixl)
+		phi = ones(bins,bins) / (bins * bins)
+		em = new(K, bins, L, cell_size, hk, phi, phik, Alphak, kpixl)
 
 		Alphak!(em)
 		kpixl!(em)
@@ -89,12 +92,14 @@ end
 ######################################################################
 # update the Fourier coefficients based on some distribution
 # Here, I assume it is discrete, but I should change this...
+# TODO: maybe I should do some bouns checking?
 function phik!(em::ErgodicManager, d::Matrix{Float64})
 	for k1 = 0:em.K
 		for k2 = 0:em.K
 			em.phik[k1+1,k2+1] = phik_ij(em, k1, k2, d)
 		end
 	end
+	em.phi = d
 end
 
 function phik!(em::ErgodicManager, dm::Vector{Float64}, ds::Matrix{Float64})
@@ -113,18 +118,23 @@ function phik!(em::ErgodicManager, dm::Vector{Float64}, ds::Matrix{Float64})
 	end
 
 	# normalize... I'm not sure if this is necessary
-	for xi = 1:em.bins
-		for yi = 1:em.bins
-			d[xi,yi] /= d_sum
-		end
-	end
+	# Wow, works a lot better when I don't do it...
+	#for xi = 1:em.bins
+	#	for yi = 1:em.bins
+	#		d[xi,yi] /= d_sum
+	#	end
+	#end
 
+	# no need to specify distribution if i store phi
 	phik!(em, d)
+	#phik!(em)
 end
+
+phik!(em::ErgodicManager) = phik!(em, em.phi)
 
 
 # iterate over the state space
-function phik_ij(em::ErgodicManager, k1, k2, d::Matrix{Float64})
+function phik_ij(em::ErgodicManager, k1::Int, k2::Int, d::Matrix{Float64})
 	val = 0.0
 	cs2 = em.cell_size * em.cell_size
 	for xi = 1:em.bins
@@ -141,6 +151,15 @@ end
 # Reconstructing an underlying function
 # TODO: check that I don't have to multiply by cell size squared
 ######################################################################
+"""
+`reconstruct(em)`
+
+Reconstructs distribution from `em.phik`.
+
+`reconstruct(em, ck::Matrix{Float64})`
+
+Reconstructs distribution from `ck`.
+"""
 function reconstruct(em::ErgodicManager)
 	# iterate over all bins
 	half_size = em.cell_size / 2.0
@@ -157,6 +176,30 @@ function reconstruct(em::ErgodicManager)
 				for k2 = 0:em.K
 					cy = em.kpixl[k2+1,yi]
 					vals[xi,yi] += em.phik[k1+1,k2+1]*cx*cy/em.hk[k1+1,k2+1]
+				end
+			end
+		end
+	end
+	return vals
+end
+
+# identical to above just using ck instead of em.phik
+function reconstruct(em::ErgodicManager, ck::Matrix{Float64})
+	# iterate over all bins
+	half_size = em.cell_size / 2.0
+	cs2 = em.cell_size * em.cell_size
+
+	vals = zeros(em.bins, em.bins)
+
+	for xi = 1:em.bins
+		x = (xi-1)*em.cell_size + half_size
+		for yi = 1:em.bins
+			y = (yi-1)*em.cell_size + half_size
+			for k1 = 0:em.K
+				cx = em.kpixl[k1+1,xi]
+				for k2 = 0:em.K
+					cy = em.kpixl[k2+1,yi]
+					vals[xi,yi] += ck[k1+1,k2+1]*cx*cy/em.hk[k1+1,k2+1]
 				end
 			end
 		end
