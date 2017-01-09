@@ -85,7 +85,7 @@ end
 # This is not really gps related
 # Reads my log file
 # TODO: handle different types of beliefs
-function parse_log(filename::ASCIIString)
+function parse_log(filename::String)
 
 	obs = Array(Float64, 0)
 	actions = Array(Pose, 0)
