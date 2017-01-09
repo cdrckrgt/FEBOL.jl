@@ -240,6 +240,24 @@ This example is also interesting:
 <img src="http://stanford.edu/~dressel/gifs/gif1.gif"/>
 </p>
 
+## FOV examples
+```
+using FEBOL
+
+m = SearchDomain(100, 40, 70)
+f = DF(m, 100)
+f.bin_range = 0:1
+region_probs = [(60.0,0.9), 70.0,0.5), (180.0,0.1)]
+sensor = FOV(region_probs)
+x = Vehicle(50, 50, sensor)
+p = GreedyPolicy(x, 8)
+
+gif(m,x,f,p,18)
+```
+<p align="center">
+<img src="http://stanford.edu/~dressel/gifs/gif8.gif"/>
+</p>
+
 ## TODO:
 
 * handle observation directly over jammer
@@ -247,7 +265,6 @@ This example is also interesting:
 * implement centroid, variance functions
 * rigorously test centroid functions
 * allow user to specify degree discretization in discrete filter (also particle filter?)
-* draw uav instead of star
 * allow interpolations in plotting (instead of "none")
 
 [![Build Status](https://travis-ci.org/dressel/FEBOL.jl.svg?branch=master)](https://travis-ci.org/dressel/FEBOL.jl)
