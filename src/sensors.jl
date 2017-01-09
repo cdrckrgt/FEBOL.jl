@@ -19,6 +19,10 @@ type DirOmni <: Sensor
 	end
 end
 
+type FOV <: Sensor
+	region_probs::Vector{NTuple{2,Float64}}
+end
+
 
 # Takes a vector of 36 angles and turns it into 360 via linear interpolation
 function makenorm()

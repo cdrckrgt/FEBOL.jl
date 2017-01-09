@@ -17,7 +17,7 @@ export step!, steps!, batchsim, batchsim2, sim
 export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy, GaussianMPC, GreedyPolicy2
 export action, act!
 export makenorm
-export Sensor, BearingOnly, DirOmni
+export Sensor, BearingOnly, DirOmni, FOV
 export gif
 export print_belief
 export LSInitializer, NaiveInitializer

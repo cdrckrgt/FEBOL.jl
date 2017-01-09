@@ -51,17 +51,30 @@ function observe(m::SearchDomain, x::Vehicle, s::DirOmni)
 	return s.means[rel_int] + s.stds[rel_int]*randn()
 end
 
-# Fits an angle into -180 to 180
-# Assume the angle is within -360 to 360
-function fit_180(angle::Float64)
-	if angle > 180.0
-		#angle = 360.0 - angle   # omfg this is how i did it before. wrong.
-		angle -= 360.0
-	elseif angle < -180.0
-		angle += 360.0
+# 1 means it is in the field of view
+# 0 means it is not
+function observe(m::SearchDomain, x::Vehicle, s::FOV)
+
+	# ensure bearing is reflected across
+	rel_bearing = fit_180(x.heading - true_bearing(x, m.theta))
+	if rel_bearing < 0.0
+		rel_bearing = -1.0 * rel_bearing
 	end
-	return angle
+
+	prob_in_view = 0.0
+	n = length(s.region_probs)
+	for i = 1:n
+		temp_angle, temp_prob = s.region_probs[i]
+		if rel_bearing  <= temp_angle
+			prob_in_view = temp_prob
+			break
+		end
+	end
+
+	o = (rand() < prob_in_view) ? 1.0 : 0.0
+	return o
 end
+
 
 function angle_mean(v)
 	n = length(v)
@@ -128,4 +141,29 @@ function O(x::Vehicle, s::DirOmni, theta::LocTuple, o::Float64)
 	#p = cdf(d, rel_end) - cdf(d, rel_start)
 	p = pdf(d, o_diff)
 	return p
+end
+
+# o technically has to be a float, but we only have two obs:
+#  1 = in field of view
+#  0 = not in field of view
+function O(x::Vehicle, s::FOV, theta::LocTuple, o::Float64)
+
+	# determine relative bearing and fix it in 0 to 180
+	rel_bearing = fit_180(x.heading - true_bearing(x, theta))
+	if rel_bearing < 0.0
+		rel_bearing = -1.0 * rel_bearing
+	end
+
+	prob_in_view = 0.0
+	n = length(s.region_probs)
+	for i = 1:n
+		temp_angle, temp_prob = s.region_probs[i]
+		if rel_bearing  <= temp_angle
+			prob_in_view = temp_prob
+			break
+		end
+	end
+
+	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+	return ret_val
 end

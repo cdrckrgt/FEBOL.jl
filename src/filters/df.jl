@@ -186,10 +186,6 @@ function O(x::Vehicle, s::BearingOnly, xp::Pose, theta::LocTuple, o::ObsBin, df:
 	return p
 end
 
-function my_cdf(sigma::Float64, x::Float64)
-	temp = x / (sigma*sqrt(2.0))
-	return 0.5 * (1. + erf(temp))
-end
 
 function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 	rel_bearing = x.heading - true_bearing(xp, theta)
@@ -203,6 +199,28 @@ function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 	d = Normal(s.means[rel_int], s.stds[rel_int])
 	p = cdf(d, high_val) - cdf(d, low_val)
 	return p
+end
+
+# I don't really get why this is here...
+function O(x::Vehicle, s::FOV, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
+	# determine relative bearing and fix it in 0 to 180
+	rel_bearing = fit_180(xp[3] - true_bearing(xp, theta))
+	if rel_bearing < 0.0
+		rel_bearing = -1.0 * rel_bearing
+	end
+
+	prob_in_view = 0.0
+	n = length(s.region_probs)
+	for i = 1:n
+		temp_angle, temp_prob = s.region_probs[i]
+		if rel_bearing  <= temp_angle
+			prob_in_view = temp_prob
+			break
+		end
+	end
+
+	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+	return ret_val
 end
 
 
@@ -225,6 +243,8 @@ end
 
 # here, num_bins isn't too important; we just bin to nearest integer
 obs2bin(o::Float64, df::DF, s::DirOmni) = round(Int, o, RoundDown)
+
+obs2bin(o::Float64, df::DF, s::FOV) = round(Int, o)
 
 
 # returns (start_deg, end_deg) integer tuple
