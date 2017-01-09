@@ -59,28 +59,6 @@ function gps_sim(j::LocTuple, x0::LocTuple, actions::Vector{Pose}, observations:
 	end
 end
 
-function gps_sim(j::LocTuple, x0::LocTuple, actions::Vector{Pose}, observations::Vector{Float64}, b::Vector{Matrix{Float64}}, m::SearchDomain, x::Vehicle)
-	# always start the vehicle in the center
-	x.x = m.length / 2.0
-	x.y = m.length / 2.0
-	dx,dy = gps_offset(x0, j)
-	theta!(m, (x.x+dx, x.y+dy))
-
-	# warn user if jammer is not where it should be
-	if abs(dx) > x.x || abs(dy) > x.y
-		println("WARNING: jammer outside search domain.")
-	end
-
-	# loop through all observations...
-	for (oi,o) in enumerate(observations)
-		#update!(f, x, o)
-		#plot(m, b[oi], x, show_mean=true, show_cov=true)
-		plot(m, b[oi], x, show_mean=false, show_cov=false)
-		savefig("temp_$(oi).png", format="png")
-		hold(false)
-		act!(m, x, actions[oi])
-	end
-end
 
 # This is not really gps related
 # Reads my log file

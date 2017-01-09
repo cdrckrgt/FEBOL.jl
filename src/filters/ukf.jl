@@ -2,7 +2,7 @@
 # ukf.jl
 # All about that unscented Kalman filter
 ######################################################################
-include("kalman.jl")
+#include("kalman.jl")
 
 type UKF <: GaussianFilter
 	mu::Vector{Float64}			# belief

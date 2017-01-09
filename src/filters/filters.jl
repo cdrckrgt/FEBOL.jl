@@ -60,6 +60,7 @@ end
 
 # Include the different filters
 include("df.jl")
+include("kalman.jl")
 include("ekf.jl")
 include("eif.jl")
 include("ukf.jl")

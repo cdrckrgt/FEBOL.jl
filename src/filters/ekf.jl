@@ -2,7 +2,7 @@
 # ekf.jl
 # handles kalman filter stuff
 ######################################################################
-include("kalman.jl")
+#include("kalman.jl")
 
 # length is size of one side of search domain
 type EKF <: GaussianFilter
