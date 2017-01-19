@@ -22,14 +22,38 @@ heading::Float64	# east of north (degrees)
 max_step::Float64	# max distance vehicle can go per unit time (meters)
 sensor::Sensor
 ```
+There are several constructors. Below is the default:
+```
+v = Vehicle(x::Real, y::Real, h::Real, ms::Real, s::Sensor)
+```
+If you just give it a starting location, `heading` is set to 0, `max_step` is set to 2.0, and the `sensor` is defaulted to `BearingOnly(10.0)` (a bearing-only sensor with noise std deviation of 10 deg).
+```
+v = Vehicle(x::Real, y::Real)
+```
+Alternatively, you can pass the sensor in as well, with the omitted variables as above:
+```
+v = Vehicle(x::Real, y::Real, s::Sensor)
+```
 
 ## Sensor
 The abstract `Sensor` type describes the sensing model of the vehicle.
 Originally, the only sensor type was bearing only, but this has been expanded to consider other sensing modalities.
 
 #### BearingOnly
+```
+BearingOnly(noise_sigma)
+```
 
 #### DirOmni
+The `DirOmni` sensor combines a directional antenna with an omni-directional antenna.
+
+#### FOV
+The `FOV` sensor is a "field-of-view" sensor. The observed value 1 suggests the source is in the vehicle's field of view, and 0 suggests the source is not.
+```
+region_probs = [(60.0,0.9), (120.0, 0.5), (180.0,0.1)]
+sensor = FOV(region_probs)
+v = Vehicle(50,50, sensor)
+```
 
 
 ## Filters
