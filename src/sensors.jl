@@ -5,7 +5,7 @@
 abstract Sensor
 
 type BearingOnly <: Sensor
-	noise_sigma::Float64
+	noise_sigma::Float64		# noise std deviation (degrees)
 end
 
 type DirOmni <: Sensor
