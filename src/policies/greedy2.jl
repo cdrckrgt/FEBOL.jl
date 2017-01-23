@@ -7,6 +7,9 @@
 # Defines a greedy, info-theoretic policy
 # Currently only considers a small set of the possible actions
 ######################################################################
+# eval_type = 1 (discrete greedy maximization)
+# eval_type = 2 (determinant)
+# eval_type = 3 (largest eigenvalue)
 type GreedyPolicy2 <: Policy
 	eval_type::Int
 end
