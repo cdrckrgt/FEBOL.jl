@@ -28,6 +28,12 @@ type Vehicle
 
 end
 
+function reset!(m::SearchDomain, x::Vehicle)
+	x.x = m.length/2.0
+	x.y = m.length/2.0
+	x.heading = 0.0
+end
+
 # Does the bounds checking on the action, to see if stays in search domain
 # Ensures heading is within [0,360) (other parts of code assume this)
 function new_pose(m::SearchDomain, x::Vehicle, a::Action)
