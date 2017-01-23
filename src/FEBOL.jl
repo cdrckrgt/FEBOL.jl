@@ -59,6 +59,7 @@ include("policies/policies.jl")
 include("simulations.jl")
 include("plotting.jl")
 include("gif.jl")
+include("batchsim.jl")
 
 # for some gps stuff...
 # TODO: let's talk about this gps stuff in README
