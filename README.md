@@ -200,6 +200,7 @@ It is equipped with the standard `BearingOnly` sensor with 10 degree standard de
 A discrete filter with 100 bins is used for state estimation.
 A `CirclePolicy` moves the UAV perpendicular to the last received bearing.
 Measurements are received every half second.
+
 ```
 using FEBOL
 
@@ -214,7 +215,9 @@ The resulting trajectory is saved as a gif. The jammer is a red triangle.
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif3.gif"/>
 </p>
+
 Alternatively, you can use a greedy entropy minimizing policy that considers 8 different directions (45 degrees apart).
+
 ```
 using FEBOL
 
