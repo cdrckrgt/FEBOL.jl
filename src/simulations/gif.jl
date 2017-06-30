@@ -232,3 +232,72 @@ function simgif(j::LocTuple, actions::Vector{Pose}, observations::Vector{Float64
 	filename="temp.gif"
 	write(filename, frames)
 end
+
+# really, this is for white sands results
+# This shouldn't be so hard...
+export simgif2
+function simgif2(states::Vector{Pose}, beliefs::Vector{Matrix{Float64}}, m::SearchDomain, x::Vehicle; show_mean=false, show_cov=false, show_path=false, j::LocTuple=m.theta)
+
+	theta!(m, j[1], j[2])
+	frames_per_second = 4
+	frames = Frames(MIME("image/png"), fps=frames_per_second)
+
+	# Set up the paths
+	x_path = [x.x]
+	y_path = [x.y]
+
+	# Plot the original scene
+	plot(m, beliefs[1], x, show_mean=show_mean, show_cov=show_cov,obs=0)
+	push!(frames, gcf())
+	close()
+
+	# 20 is the fps
+	seconds_per_step = 1.0
+	frames_per_step = round(Int, seconds_per_step * frames_per_second)
+
+	colors = ["b"]
+
+	# loop through all beliefs...
+	num_b = length(beliefs)
+	s = states[1]
+	for bi = 2:(num_b+1)
+		println("bi = ", bi)
+		sp = states[num_b]
+		if bi < (num_b + 1)
+			sp = states[bi]
+		end
+
+		# Plot everything in between old pose and new pose
+		dx = (sp[1] - s[1]) / frames_per_step
+		dy = (sp[2] - s[2]) / frames_per_step
+		dh = fit_180(sp[3] - s[3]) / frames_per_step
+		diffs = (dx, dy, dh)
+
+		#plot(m, b[oi], x, show_mean=true, show_cov=true)
+		#println("oi = ", oi)
+		#FEBOL.plot(m, beliefs[bi-1], x,show_mean=show_mean, show_cov=show_cov)
+		for j = 1:frames_per_step
+			figure()
+			# determine intermediate pose
+			dx, dy, dh = diffs
+			new_h = mod(s[3] + dh, 360.0)
+			s = (s[1] + dx, s[2] + dy, new_h)
+
+			push!(x_path, s[1])
+			push!(y_path, s[2])
+
+			FEBOL.plot(m, beliefs[bi-1], s, show_mean=show_mean, show_cov=show_cov, obs=bi-1)
+			if show_path
+				# changed by LD for rss submission
+				#plot(x_path, y_path, colors[1])
+				plot(x_path, y_path, "k")
+			end
+
+			push!(frames, gcf())
+			close()
+		end
+	end
+	#filename="temp.mp4"
+	filename="temp.gif"
+	write(filename, frames)
+end

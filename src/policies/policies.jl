@@ -51,6 +51,9 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::R
 	return normalize((ax,ay,ah), x)
 end
 
+# random policy for rotate for bearing method
+include("random2.jl")
+
 
 ######################################################################
 # Sit policy: Just sit and don't move

@@ -1,4 +1,4 @@
-######################################################################
+#####################################################################
 # simulations.jl
 ######################################################################
 
@@ -18,6 +18,24 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video:
 	if video
 		hold(false)
 		plot(m, f, x)
+	end
+end
+
+export simulate
+function simulate(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, tc::TerminationCondition=StepThreshold(10); video::Bool=true, delay::Real=0.5)
+	# Show current step first
+	if video
+		hold(false)
+		plot(m,f,x)
+	end
+
+	# Then go through steps
+	step_count = 0
+	while !is_complete(f, tc, step_count)
+		if video; pause(delay); end
+		step!(m,x,f,p; video=video)
+		step_count += 1
+		#title("e = $(round(entropy(f),2))")
 	end
 end
 
@@ -190,5 +208,36 @@ function sim(j::LocTuple, actions::Vector{Pose}, observations::Vector{Float64}, 
 		savefig("temp_$(oi).png", format="png")
 		hold(false)
 		act!(m, x, actions[oi])
+	end
+end
+
+export sim2
+function sim2(j::LocTuple, states::Vector{Pose}, observations::Vector{Float64}, b::Vector{Matrix{Float64}}, m::SearchDomain, x::Vehicle; show_mean=false, show_cov=false, show_path::Bool=true)
+	# always start the vehicle in the center
+	# NO, don't do that
+	#x.x = m.length / 2.0
+	#x.y = m.length / 2.0
+	theta!(m, j[1], j[2])
+
+	path_x = Float64[]
+	path_y = Float64[]
+
+	# loop through all observations...
+	for (oi,o) in enumerate(observations)
+		if show_path
+			#plot path
+			plot(path_x, path_y, "k")
+		end
+		hold(true)
+		plot(m, b[oi], x, show_mean=show_mean, show_cov=show_cov, obs=oi)
+		#savefig("temp_$(oi).pdf", format="pdf", dpi=300)
+		savefig("temp_$(oi).png", format="png")
+		hold(false)
+		push!(path_x, x.x)
+		push!(path_y, x.y)
+		x.x = states[oi][1]
+		x.y = states[oi][2]
+		x.heading = states[oi][3]
+		#act!(m, x, actions[oi])
 	end
 end

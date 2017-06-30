@@ -71,7 +71,8 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::GreedyPolicy)
 		xp = new_pose(m, x, a)
 		# compute best mutual information
 		mi = mutual_information(m, x, f, xp)
-		#println("mi = ", mi)
+		#println("a = ", a)
+		#println("\tmi = ", mi)
 		if mi > best_mi
 			best_mi = mi
 			best_a = a

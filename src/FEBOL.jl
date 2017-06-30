@@ -1,7 +1,8 @@
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig
+using PyCall
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib
 import PyPlot.plot
 using StatsBase: sample, WeightVec
 using Reel
@@ -56,18 +57,22 @@ include("policies/policies.jl")
 #include("policy.jl")
 
 # Simulation and Plotting
-include("simulations.jl")
-include("plotting.jl")
-include("gif.jl")
-include("batchsim.jl")
+include("simulations/termination.jl")
+include("simulations/costs.jl")
+include("simulations/simulations.jl")
+include("simulations/plotting.jl")
+PyCall.PyDict(matplotlib["rcParams"])["font.family"]=["Times New Roman"]
+include("simulations/gif.jl")
+include("simulations/batchsim.jl")
 
 # for some gps stuff...
 # TODO: let's talk about this gps stuff in README
 include("gps.jl")
 
 # for some ergodicity stuff...
-include("ergodicity/ergodicity.jl")
-include("ergodicity/trajectory.jl")
-include("ergodicity/max_trajectory.jl")
+# 1/23/2017 commenting this out because I don't think I use it much
+#include("ergodicity/ergodicity.jl")
+#include("ergodicity/trajectory.jl")
+#include("ergodicity/max_trajectory.jl")
 
 end # module

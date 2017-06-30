@@ -4,64 +4,6 @@
 # running many simulations
 ######################################################################
 export SimUnit
-export MaxNormThreshold, is_complete
-export ConstantCost, MoveAndRotateCost
-
-######################################################################
-# termination condition stuff
-######################################################################
-abstract TerminationCondition
-
-type EntropyThreshold <: TerminationCondition
-	value::Float64
-end
-type MaxNormThreshold <: TerminationCondition
-	value::Float64
-end
-
-# determines if a simulation has reached its 
-function is_complete(f::AbstractFilter, ::TerminationCondition)
-	error("Termination condition not implemented for this filter or termination condition")
-end
-function is_complete(f::DF, mnt::MaxNormThreshold)
-	ret_val = false
-	if maximum(f.b) > mnt.value
-		ret_val = true
-	end
-	return ret_val
-end
-
-
-######################################################################
-# costs
-######################################################################
-abstract CostModel
-
-type ConstantCost <: CostModel
-	value::Float64
-end
-
-type MoveAndRotateCost <: CostModel
-	speed::Float64
-	time_per_rotation::Float64
-end
-
-function get_action_cost(a::Action, cm::CostModel)
-	error("get_action_cost not implemented for this cost model type.")
-end
-
-function get_action_cost(a::Action, cc::ConstantCost)
-	return cc.value
-end
-
-function get_action_cost(a::Action, marc::MoveAndRotateCost)
-	dx = a[1]
-	dy = a[2]
-	dist = sqrt(dx*dx + dy*dy)
-	return (dist / marc.speed) + marc.time_per_rotation
-end
-
-
 
 ######################################################################
 # Simulation unit
@@ -104,13 +46,17 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, num_sims::Int, tc
 
 			# starts at -1 because after first round, should be zero
 			temp_cost = -1.0
-			while !is_complete(uav.f, tc)
+			step_count = 0
+			while !is_complete(uav.f, tc, step_count)
 				# observe, update filter, act
 				o = observe(m, uav.x)
 				update!(uav, o)
 				a = action(m, uav, o)
 				act!(m, uav.x, a)
+
+				# get cost and update step count
 				temp_cost += get_action_cost(a, uav.cm)
+				step_count += 1
 			end
 
 			costs[sim_ind, uav_ind] = temp_cost

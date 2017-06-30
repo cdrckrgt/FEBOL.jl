@@ -3,6 +3,7 @@
 # has things like mutual information and stuff
 ######################################################################
 
+export p_obs
 # sum over all possible jammer locations
 function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 	prob = 0.0
@@ -21,6 +22,7 @@ end
 # computes mutual information for a specific vehicle location
 # xp is a proposed pose
 # really need to loop over all possible observations
+export mutual_information
 function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0

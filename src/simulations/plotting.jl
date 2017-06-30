@@ -36,7 +36,9 @@ function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=fals
 	#title_string = "plot: "
 	title_string = ""
 	if obs != nothing
-		title_string = "$(title_string)o = $(obs), "
+		# TODO: just temporary for rss submission
+		#title_string = "$(title_string)o = $(obs), "
+		title_string = "t = $(obs) s"
 	end
 	if show_mean
 		plot_mean(centroid(b, m.length), color=color)
@@ -50,7 +52,7 @@ function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=fals
 		title_string = "$(title_string)e1 = $e1, e2 = $e2"
 		#title("e1 = $e1, e2 = $e2")
 	end
-	title(title_string)
+	title(title_string, fontname="Times New Roman", fontsize=18)
 	plot(m, b, alpha=alpha)
 	return # so it doesn't spit out result of axis
 end
@@ -63,6 +65,8 @@ function plot(m::SearchDomain, f::DF; alpha=1.0, cmap="Greys")
 	plot(m, f.b, alpha=alpha, cmap=cmap)
 end
 function plot(m::SearchDomain, b::Matrix{Float64}; alpha=1.0, cmap="Greys")
+	# alpha changed by LD for rss submission 2017
+	alpha = 0.5
 	a = [0,m.length,0,m.length]
 	imshow(b', interpolation="none",cmap=cmap,origin="lower",extent=a,vmin=0, alpha=alpha)
 	labels()
@@ -195,49 +199,58 @@ end
 
 ######################################################################
 # Helper functions
+# mec = markeredgecolor
+# mfc = markerfacecolor
+# lw = linewidth
 ######################################################################
 # Plots locations of the vehicles
 plot_vehicle(m::SearchDomain,x::Vehicle; color="b") = plot_vehicle(m,x.x,x.y,x.heading, color=color)
 plot_vehicle(m::SearchDomain, p::Pose; color="b") = plot_vehicle(m, p[1], p[2], p[3], color=color)
 function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64; color="b")
 	mark_size = 10
-	#plot(x.x, x.y, "bx", markersize=mark_size, mew=2)
 
-	c = 0.01 * m.length  *sqrt(2)
+	# Changed by LD for 01/30/2017 for rss submission
+	#c = 0.01 * m.length  *sqrt(2)
+	c = 0.015 * m.length  *sqrt(2)
 	dx = c*sind(45 + h)
 	dy = c*cosd(45 + h)
 
 	# Plot rotors
-	rotor_size = 5
+	# LD change 01/30/2017 for rss submission
+	#rotor_size = 5
+	rotor_size = 7.5
 	theta1 = 45.0 + h
 	theta2 = 135.0 + h
-	theta3 = 225.0 + h
+	theta3 = 225.0 +  h
 	theta4 = 315.0 + h
-	cs = "$(color)o"
-	plot(x+c*sind(theta1), y+c*cosd(theta1), cs, ms=rotor_size)
-	plot(x+c*sind(theta2), y+c*cosd(theta2), cs, ms=rotor_size)
-	plot(x+c*sind(theta3), y+c*cosd(theta3), cs, ms=rotor_size)
-	plot(x+c*sind(theta4), y+c*cosd(theta4), cs, ms=rotor_size)
+	#cs = "$(color)o"
+	cs = "wo"
+	color = "k"
+	plot(x+c*sind(theta1), y+c*cosd(theta1), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
+	plot(x+c*sind(theta2), y+c*cosd(theta2), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
+	plot(x+c*sind(theta3), y+c*cosd(theta3), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
+	plot(x+c*sind(theta4), y+c*cosd(theta4), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
 
-	#plot(x.x, x.y, marker=(2,0,3), ms=mark_size)
-
-	# plot direction
+	# plot heading direction
 	xline = [x, x+2*c*sind(h)]
 	yline = [y, y+2*c*cosd(h)]
-	#plot(xline, yline, "r", mew=1.5)
-	plot(xline, yline, color, mew=2)
+	# Changed by LD 01/30/2017 for rss submission
+	#plot(xline, yline, color, mew=2)
+	#plot(xline, yline, color, lw=2)
+	plot(xline, yline, color, lw=2.5)
 
 	# Plot frame
-	plot(x, y, marker=(2,0,-theta1), ms=mark_size,mew=1,markeredgecolor=color)
-	plot(x, y, marker=(2,0,-theta2), ms=mark_size,mew=1,markeredgecolor=color)
+	plot(x, y, marker=(2,0,-theta1), ms=mark_size, mew=1, mec=color)
+	plot(x, y, marker=(2,0,-theta2), ms=mark_size, mew=1, mec=color)
 
-	#plot()
 end
 
 # Plots jammer location
 function plot_theta(m::SearchDomain)
-	mark_size = 11
-	plot(m.theta[1], m.theta[2], "r^", markersize=mark_size)
+	# changed by LD 01/30/2017 for RSS submission
+	#mark_size = 11
+	mark_size = 13
+	plot(m.theta[1], m.theta[2], "w^", markersize=mark_size, mew=3,markerfacecolor="none")
 	#mark_size = 11
 	#plot(m.theta[1], m.theta[2], "r^", markersize=mark_size, markerfacecolor="none", markeredgecolor="r", mew=2)
 end
@@ -250,8 +263,8 @@ end
 
 # Sets the appropriate plot labels
 function labels()
-	xlabel("x (meters)")
-	ylabel("y (meters)")
+	xlabel("East (m)", fontsize=18)
+	ylabel("North (m)", fontsize=18)
 end
 
 ######################################################################

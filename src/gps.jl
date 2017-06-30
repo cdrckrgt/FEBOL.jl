@@ -7,6 +7,7 @@ using GPS2XY
 
 export gps_sim, gps_offset
 export parse_log
+export parse_belief, parse_action
 
 
 # create simulation and drawing from
@@ -68,6 +69,7 @@ function parse_log(filename::String)
 	obs = Array(Float64, 0)
 	actions = Array(Pose, 0)
 	beliefs = Array(Matrix{Float64}, 0)
+	states = Array(Pose, 0)
 
 	logfile = open(filename, "r")
 
@@ -109,9 +111,66 @@ function parse_log(filename::String)
 				end
 			end
 			push!(beliefs, b)
+		elseif contains(line, "state")
+			# action line
+			s_vec = split(split(line, " = ")[2], ",")
+			# the actions we get are north,east,yaw. we want dx,dy,yaw
+			sx  = parse(Float64, s_vec[2])
+			sy  = parse(Float64, s_vec[1])
+			sh  = parse(Float64, s_vec[3])
+			push!(states, (sx, sy, sh))
 		end
 	end
 	close(logfile)
 
-	return obs,actions,beliefs
+	return obs,actions,beliefs,states
+end
+
+# I'm not sure this would work...
+function parse_belief(logfile)
+	# now read the next bunch of lines
+	bline = readline(logfile)
+	if bline == ""
+		error("No belief here.")
+	end
+	arr = split(bline, ",")
+	n = length(arr)
+	b = Array(Float64, n, n)
+	for i = 1:n
+		b[i,n] = parse(Float64, arr[i])
+	end
+	for i = 2:n
+		bline = readline(logfile)
+		arr = split(bline, ",")
+		for j = 1:n
+			b[j,n-i+1] = parse(Float64, arr[j])
+		end
+	end
+
+	return b
+end
+
+"""
+`parse_action(logfile)`
+
+Returns tuple `(d_east,d_north,d_yaw)`
+"""
+function parse_action(logfile)
+	line = readline(logfile)
+	a_vec = split(split(line, " = ")[2], ",")
+	# the actions we get are north,east,yaw. we want dx,dy,yaw
+	d_east  = parse(Float64, a_vec[2])
+	d_north  = parse(Float64, a_vec[1])
+	d_yaw  = parse(Float64, a_vec[3])
+	return d_east, d_north, d_yaw
+end
+
+# Meh, I don't know if I will use this...
+function parse_obs(logfile)
+	line = readline(logfile)
+	if line == ""
+		error("NO OBS HERE")
+	end
+	d_yaw  = parse(Float64, a_vec[3])
+	return 1
 end
