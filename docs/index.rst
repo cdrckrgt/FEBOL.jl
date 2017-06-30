@@ -13,6 +13,7 @@ Welcome to FEBOL's documentation!
     Vehicle <vehicle.rst>
     Sensors <sensors.rst>
     Filters <filters.rst>
+    Policies <policies.rst>
 
 
 
