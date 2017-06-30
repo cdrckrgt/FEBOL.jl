@@ -231,6 +231,7 @@ gif(m,x,f,p,18)
 <p align="center">
 <img src="http://stanford.edu/~dressel/gifs/gif5.gif"/>
 </p>
+
 The following example is a particle filter with 10,000 particles. The green x marks the mean of the particles.
 ```
 using FEBOL
