@@ -5,6 +5,9 @@ The main question I want to answer is: what effects do the various filters and a
 
 This code is rapidly changing. I make no guarantees about its correctness or usability at any time.
 
+Check out the [complete documentation](http://feboljl.readthedocs.io/en/latest/index.html).
+
+
 ## SearchDomain
 To create a 10m by 10m search domain with a jammer located at 9.5, 9.5 you can do the following:
 ```
