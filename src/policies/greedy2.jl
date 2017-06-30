@@ -20,7 +20,6 @@ end
 # We know this depends on sensor
 function action(m::SearchDomain, v::Vehicle, o::Float64, f::DF, p::GreedyPolicy2)
 	best_mi = -Inf
-	half_cell = f.cell_size / 2.0
 	best_x = v.x
 	best_y = v.y
 
@@ -35,9 +34,9 @@ function action(m::SearchDomain, v::Vehicle, o::Float64, f::DF, p::GreedyPolicy2
 	mi = 0.
 
 	for xi = 1:f.n
-		x = (xi-1.0)*f.cell_size + half_cell
+		x = (xi - 0.5) * f.cell_size
 		for yi = 1:f.n
-			y = (yi-1.0)*f.cell_size + half_cell
+			y = (yi - 0.5) * f.cell_size
 
 			if p.eval_type == 1
 				xp = (x,y,0.0)

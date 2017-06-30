@@ -171,6 +171,7 @@ function O(x::Vehicle, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 	return O(x, x.sensor, xp, theta, o, df)
 end
 
+# I don't understand why I need the vehicle in this function
 function O(x::Vehicle, s::BearingOnly, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 
 	# Calculate true bearing, and find distance to bin edges

@@ -8,9 +8,9 @@
 # y is north-south position
 # (0,0) is south west
 type Vehicle
-	x::Float64
-	y::Float64
-	heading::Float64
+	x::Float64				# x-location
+	y::Float64				# y-location
+	heading::Float64		# degrees east of north
 	max_step::Float64
 	sensor::Sensor
 

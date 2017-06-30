@@ -10,8 +10,8 @@ function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 	for theta_x = 1:df.n
 		for theta_y = 1:df.n
 			if df.b[theta_x,theta_y] > 0.0
-				xj = (theta_x-1) * df.cell_size + df.cell_size/2.0
-				yj = (theta_y-1) * df.cell_size + df.cell_size/2.0
+				xj = (theta_x-0.5) * df.cell_size
+				yj = (theta_y-0.5) * df.cell_size
 				prob += df.b[theta_x, theta_y] * O(x, x.sensor, xp, (xj,yj), o, df)
 			end
 		end
@@ -34,11 +34,11 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 			H_o -= po * log(po)
 		end
 
-		# sum over theta
+		# sum over possible jammer locations
 		for theta_x = 1:df.n
 			for theta_y = 1:df.n
-				xj = (theta_x-1) * df.cell_size + df.cell_size/2.0
-				yj = (theta_y-1) * df.cell_size + df.cell_size/2.0
+				xj = (theta_x - 0.5) * df.cell_size
+				yj = (theta_y - 0.5) * df.cell_size
 
 				if df.b[theta_x, theta_y] > 0.0
 					pot = O(x, x.sensor, xp, (xj,yj), o, df)
@@ -53,12 +53,16 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 end
 
 # computes mutual information for all locations
-# TODO: update for the FEBOL package
-function mutual_information(m::SearchDomain)
-	mut_info = zeros(m.num_cells, m.num_cells)
-	for xv = 1:m.num_cells
-		for yv = 1:m.num_cells
-			mut_info[xv,yv] = mutual_information(m, xv-1.0, yv-1.0)
+# the provided discrete filter gives the domain size and belief
+# I need a Vehicle or Sensor to pass into the observation function
+function mutual_information(m::SearchDomain, uav::Vehicle, df::DF)
+	mut_info = zeros(df.n, df.n)
+	for xv = 1:df.n
+		x = (xv - 0.5) * df.cell_size
+		for yv = 1:df.n
+			y = (yv - 0.5) * df.cell_size
+			xp = (uav.x, uav.y, uav.heading)
+			mut_info[xv,yv] = mutual_information(m, uav, df, xp)
 		end
 	end
 	return mut_info
