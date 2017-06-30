@@ -10,6 +10,7 @@ Welcome to FEBOL's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+    Vehicle <vehicle.rst>
     Sensors <sensors.rst>
     Filters <filters.rst>
 

@@ -13,27 +13,6 @@ m = SearchDomain(10.0, 9.5, 9.5)
 The jammer must be within 0 and the length of one side of the domain.
 
 
-## Vehicle
-Each instance of `Vehicle` has the following fields:
-```
-x::Float64
-y::Float64			 
-heading::Float64	# east of north (degrees)
-max_step::Float64	# max distance vehicle can go per unit time (meters)
-sensor::Sensor
-```
-There are several constructors. Below is the default:
-```
-v = Vehicle(x::Real, y::Real, h::Real, ms::Real, s::Sensor)
-```
-If you just give it a starting location, `heading` is set to 0, `max_step` is set to 2.0, and the `sensor` is defaulted to `BearingOnly(10.0)` (a bearing-only sensor with noise std deviation of 10 deg).
-```
-v = Vehicle(x::Real, y::Real)
-```
-Alternatively, you can pass the sensor in as well, with the omitted variables as above:
-```
-v = Vehicle(x::Real, y::Real, s::Sensor)
-```
 
 ## Sensor
 The abstract `Sensor` type describes the sensing model of the vehicle.
