@@ -47,50 +47,54 @@ Gaussian Fiter
 The :code:`GaussianFilter` abstract type is a child of :code:`AbstractFilter` and a parent of :code:`EKF` and :code:`UKF`. I've thought about calling this :code:`KalmanFilter` instead, but that could be ambiguous---someone could think this refers to a specific KF, rather than an abstract type. 
 
 The `GaussianFilter` abstract type covers utilities that both `EKF` and `UKF` use.
-The most important of these is the `Initializer` abstract type.
-Each `EKF` and `UKF` instance contains an `Initializer` subtype that determines how the filter estimate should be initialized.
+The most important of these is the :code:`Initializer` abstract type.
+Each :code:`EKF` and :code:`UKF` instance contains an :code:`Initializer` subtype that determines how the filter estimate should be initialized.
 
-The default initializer is a `NaiveInitializer` sets the estimate to be the center of the search domain and uses a large initial covariance.
+The default initializer is a :code:`NaiveInitializer` sets the estimate to be the center of the search domain and uses a large initial covariance.
 
-Another initializer is the `LSInitializer`, or least squares initializer. After taking `min_obs_num` observations, this initializer sets the mean to the point in the search domain yielding the smallest sum of least square differences between observed and expected observations. The code below shows how to initialize an instance of `LSInitializer` and modify some of its important fields:
-```
-lsi = LSInitializer(m::SearchDomain)
-lsi.Sigma = 1e3*eye(2)
-lsi.min_obs_num = 5
-```
+Another initializer is the :code:`LSInitializer`, or least squares initializer. After taking :code:`min_obs_num` observations, this initializer sets the mean to the point in the search domain yielding the smallest sum of least square differences between observed and expected observations. The code below shows how to initialize an instance of :code:`LSInitializer` and modify some of its important fields:
+::
+
+    lsi = LSInitializer(m::SearchDomain)
+    lsi.Sigma = 1e3*eye(2)
+    lsi.min_obs_num = 5
 
 
-#### Particle Filter
-To create a particle filter, you must provide the search domain `m` and desired number of particles `n`:
-```
-PF(m::SearchDomain, n::Int)
-```
-If you create a new `Sensor` subtype called `NewSensor`, you must implement the following function:
-```
-O(x::Vehicle, s::NewSensor, theta::LocTuple, o::Float64)
-```
+Particle Filter
+=====================
+To create a particle filter, you must provide the search domain :code:`m` and desired number of particles :code:`n`:
+::
+
+    PF(m::SearchDomain, n::Int)
+
+If you create a new :code:`Sensor` subtype called :code:`NewSensor`, you must implement the following function:
+::
+
+    O(x::Vehicle, s::NewSensor, theta::LocTuple, o::Float64)
+
 Currently, it is only required that this return a probability density, rather than a true probability.
 
-#### Custom Filters
+Custom Filters
+=====================
 The code below is a template for creating your own filter type.
-You must extend the `AbstractFilter` type and implement the following functions.
-```
-type CustomFilter <: AbstractFilter
-end
+You must extend the :code:`AbstractFilter` type and implement the following functions.
+::
 
-function update!(f::CustomFilter, x::Vehicle, o::Float64)
-	# update the belief in the filter.
-end
+    type CustomFilter <: AbstractFilter
+    end
 
-function centroid(f::CustomFilter)
-	# return the centroid of the filter's belief
-end
+    function update!(f::CustomFilter, x::Vehicle, o::Float64)
+        # update the belief in the filter.
+    end
 
-function entropy(f::CustomFilter)
-	# return the entropy of the filter's belief
-end
+    function centroid(f::CustomFilter)
+        # return the centroid of the filter's belief
+    end
 
-function reset!(f::CustomFilter)
-	# reset the filter to a uniform prior
-end
-```
+    function entropy(f::CustomFilter)
+        # return the entropy of the filter's belief
+    end
+
+    function reset!(f::CustomFilter)
+        # reset the filter to a uniform prior
+    end
