@@ -14,6 +14,7 @@ Welcome to FEBOL's documentation!
     Sensors <sensors.rst>
     Filters <filters.rst>
     Policies <policies.rst>
+    Simulations <simulations.rst>
 
 
 

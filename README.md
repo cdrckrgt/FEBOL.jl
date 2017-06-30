@@ -9,36 +9,6 @@ Check out the [complete documentation](http://feboljl.readthedocs.io/en/latest/i
 
 
 
-## Sensor
-The abstract `Sensor` type describes the sensing model of the vehicle.
-Originally, the only sensor type was bearing only, but this has been expanded to consider other sensing modalities.
-
-#### BearingOnly
-```
-BearingOnly(noise_sigma)
-```
-
-#### DirOmni
-The `DirOmni` sensor combines a directional antenna with an omni-directional antenna.
-
-#### FOV
-The `FOV` sensor is a "field-of-view" sensor. The observed value 1 suggests the source is in the vehicle's field of view, and 0 suggests the source is not.
-```
-region_probs = [(60.0,0.9), (120.0, 0.5), (180.0,0.1)]
-sensor = FOV(region_probs)
-v = Vehicle(50,50, sensor)
-```
-
-
-## Simulations
-```
-steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int)
-```
-Alternatively, you can just call `steps!()`.
-This will run a simulation for 10 steps. 
-It assumes you have a model `m`, a Vehicle `x`, a filter `f`, and a policy `p` in the main module (with those names).
-If you've named your objects that way, you don't have to remember the arguments required for `steps!`.
-Alternatively, you can specify a number of steps: `steps!(30)`.
 
 
 ## Bearing Only Examples
