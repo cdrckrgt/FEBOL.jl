@@ -11,6 +11,15 @@ In short, it just seems easier to maintain a single filter type rather than worr
 
 Discrete Filter
 =====================
+The discrete filter type, :code:`DF`, has the following fields
+::
+
+	b::Matrix{Float64}      # probability over jammer locations
+	n::Int64                # number of cells per side
+	cell_size::Float64      # side length of each cell
+	num_bins::Int64         # related to number of observations
+	bin_range::UnitRange{Int64}
+
 The constructor for a discrete filter is
 ::
 
