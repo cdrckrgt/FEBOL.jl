@@ -1,6 +1,27 @@
 ===============
 Simulations
 ===============
+
+Simulating a Single Step
+==========================
+Suppose :code:`m` is a search domain, :code:`x` is a vehicle, :code:`f` is a filter, and :code:`p` is a policy.
+You can simulate a step with the following code:
+::
+
+    o = observe(m, x)
+    update!(f, x, o)
+	a = action(m, x, o, f, p)
+	act!(m,x,a)
+
+
+The :code:`step!` function performs this code and also plots if the optional :code:`video` argument is set to true.
+::
+
+    step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video::Bool=true)
+
+
+Simulating Multiple Steps
+===========================
 ::
 
     steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int)
