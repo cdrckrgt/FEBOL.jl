@@ -28,9 +28,11 @@ end
 
 function update!(pf::PF, x::Vehicle, o::Float64)
 	w_sum = 0.0
+	p = (x.x, x.y, x.heading)
 	for i = 1:pf.n
 		# don't need to sample from transition, just calculate weights
-		 pf.W[i] = O(x, pf.X[i], o) # calculate probability of obs
+		 #pf.W[i] = O(x, pf.X[i], o) # calculate probability of obs
+		 pf.W[i] = O(x.sensor, pf.X[i], p, o) # calculate probability of obs
 		 w_sum = pf.W[i]
 	end
 

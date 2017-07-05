@@ -4,24 +4,18 @@
 
 abstract Sensor
 
-type BearingOnly <: Sensor
-	noise_sigma::Float64		# noise std deviation (degrees)
+include("bearing.jl")
+include("range.jl")
+include("diromni.jl")
+include("fov.jl")
+
+function observe(m::SearchDomain, s::Sensor, p::Pose)
+	error("`observe` not defined for this sensor!")
 end
 
-type DirOmni <: Sensor
-	means::Vector{Float64}
-	stds::Vector{Float64}
-
-	function DirOmni(file::AbstractString)
-		means = vec(readcsv(file)[:,2])
-		stds = 2*ones(360)
-		return new(means, stds)
-	end
-end
-
-type FOV <: Sensor
-	region_probs::Vector{NTuple{2,Float64}}
-end
+# Required for particle filter
+# does not require probability, returns density
+O(s::Sensor, theta, p::Pose, o::Float64)
 
 
 # Takes a vector of 36 angles and turns it into 360 via linear interpolation

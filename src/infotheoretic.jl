@@ -61,7 +61,8 @@ function mutual_information(m::SearchDomain, uav::Vehicle, df::DF)
 		x = (xv - 0.5) * df.cell_size
 		for yv = 1:df.n
 			y = (yv - 0.5) * df.cell_size
-			xp = (uav.x, uav.y, uav.heading)
+			# TODO: really, should have some other heading
+			xp = (x, y, 0.0)
 			mut_info[xv,yv] = mutual_information(m, uav, df, xp)
 		end
 	end

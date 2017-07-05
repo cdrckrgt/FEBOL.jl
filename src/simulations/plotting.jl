@@ -107,7 +107,7 @@ function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64}; colo
 	plot(m1, m2, "$(color)x", ms=10)
 
 	labels()
-	axis("square")
+	#axis("square")
 	axis(a)
 end
 
@@ -115,7 +115,7 @@ end
 #end
 
 
-function plot(m::SearchDomain, f::PF)
+function plot(m::SearchDomain, f::PF; alpha=1.0)
 	mark_size = 12
 	a = [0,m.length,0,m.length]
 	x = zeros(f.n)
@@ -124,12 +124,12 @@ function plot(m::SearchDomain, f::PF)
 		x[i] = f.X[i][1]
 		y[i] = f.X[i][2]
 	end
-	scatter(x,y,c=f.W,cmap="Greys",vmin=0)
-	#scatter(x,y,c=f.W,cmap="Blues",vmin=0)
+	#scatter(x,y,c=f.W,cmap="Greys",vmin=0)
+	scatter(x,y,c=f.W,cmap="Blues",vmin=0, alpha=0.2)
 	xmean, ymean = centroid(f)
 	plot(xmean, ymean, "gx", ms=10, mew=2)
 	labels()
-	axis("square")
+	axis("scaled")
 	axis(a)
 end
 

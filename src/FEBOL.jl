@@ -18,7 +18,7 @@ export step!, steps!, batchsim, batchsim2, sim
 export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy, GaussianMPC, GreedyPolicy2
 export action, act!
 export makenorm
-export Sensor, BearingOnly, DirOmni, FOV
+export Sensor, RangeOnly, BearingOnly, DirOmni, FOV
 export gif
 export print_belief
 export LSInitializer, NaiveInitializer
@@ -43,7 +43,7 @@ include("math.jl")
 include("searchdomain.jl")
 
 # Sensing models
-include("sensors.jl")
+include("sensors/sensors.jl")
 
 include("vehicle.jl")
 include("observations.jl")

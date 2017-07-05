@@ -33,3 +33,50 @@ function fit_180(angle::Float64)
 	end
 	return angle
 end
+
+
+######################################################################
+# Find the true angle between UAV and jammer.
+#
+# Parameters:
+#  xp - location of vehicle
+#  theta - location of jammer
+#
+# Returns true angle, measured from north, in degrees.
+function true_bearing(xp::LocTuple, theta::LocTuple)
+	xr = theta[1] - xp[1]
+	yr = theta[2] - xp[2]
+	return mod(rad2deg(atan2(xr,yr)), 360)
+end
+true_bearing(p::Pose, theta::LocTuple) = true_bearing( (p[1], p[2]), theta)
+function true_bearing(xp::LocTuple, theta::Vector{Float64})
+	return true_bearing(xp, (theta[1], theta[2]))
+end
+function true_bearing(xp::Pose, theta::Vector{Float64})
+	return true_bearing((xp[1], xp[2]), (theta[1], theta[2]))
+end
+
+
+######################################################################
+# I don't remember what these are for at all
+function angle_mean(v)
+	n = length(v)
+	sin_sum = 0.0
+	cos_sum = 0.0
+	for i = 1:n
+		sin_sum += sin(v[i])
+		cos_sum += cos(v[i])
+	end
+	return mod(rad2deg(atan2(sin_sum, cos_sum)), 360.)
+end
+
+function angle_mean(v,w)
+	n = length(v)
+	sin_sum = 0.0
+	cos_sum = 0.0
+	for i = 1:n
+		sin_sum += w[i] * sin(v[i])
+		cos_sum += w[i] * cos(v[i])
+	end
+	return mod(rad2deg(atan2(sin_sum, cos_sum)), 360.)
+end

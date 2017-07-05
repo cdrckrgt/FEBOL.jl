@@ -55,3 +55,19 @@ end
 function act!(m::SearchDomain, x::Vehicle, a::Action)
 	x.x, x.y, x.heading = new_pose(m, x, a)
 end
+
+
+"""
+`observe(m::SearchDomain, x::Vehicle)`
+
+Sample an observation. Returns a float between 0 and 360.
+"""
+function observe(m::SearchDomain, x::Vehicle)
+	p = (x.x, x.y, x.heading)
+	observe(m, x.sensor, p)
+end
+
+
+# not sure where else to put this
+# variant of true_bearing that takes in vehicle
+true_bearing(x::Vehicle, theta) = true_bearing( (x.x, x.y), theta)
