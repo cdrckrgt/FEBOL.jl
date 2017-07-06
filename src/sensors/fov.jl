@@ -4,6 +4,12 @@
 
 type FOV <: Sensor
 	region_probs::Vector{NTuple{2,Float64}}
+
+	# for discretized measurements
+	num_bins::Int
+	bin_range::UnitRange{Int64}
+
+	FOV(region_probs::Vector{NTuple{2,Float64}}) = new(region_probs, 2, 0:1)
 end
 
 

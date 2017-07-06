@@ -29,7 +29,7 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 	H_o_t = 0.0
 	#for o = 0:df.num_bins
 	#for o = -20:20  # for DirOmni sensor
-	for o in df.bin_range
+	for o in x.sensor.bin_range
 		po = p_obs(m, x, df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)

@@ -27,6 +27,22 @@ type GreedyPolicy <: Policy
 		return new(n, actions)
 	end
 
+	# TODO: this is garbage, make it generic
+	function GreedyPolicy(x::Vehicle, ::RangeOnly, n::Int)
+
+		angles = linspace(0.0, 360 - 360/n, n)
+
+		# create list of actions
+		actions = Array(Action, n+1)
+		for i = 1:n
+			ax = x.max_step * sind(angles[i])
+			ay = x.max_step * cosd(angles[i])
+			actions[i] = (ax, ay, 0.0)
+		end
+		actions[n+1] = (0.0, 0.0, 0.0)
+
+		return new(n, actions)
+	end
 	function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
 		actions = make_action_list(x, n)
 		return new(n, actions)
