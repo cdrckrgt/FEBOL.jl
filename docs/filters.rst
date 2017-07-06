@@ -27,12 +27,6 @@ The constructor for a discrete filter is
 
 where :code:`n` is the number of cells per side.
 
-If you create a new :code:`Sensor` subtype called :code:`NewSensor`, you need to implement the following methods for the :code:`DF` type to work:
-::
-
-    obs2bin(o::Float64, f::Filter, s::NewSensor)
-    O(x::Vehicle, s::NewSensor, theta::LocTuple, ob::Int, f::Filter)
-
 The function :code:`obs2bin` converts the continuous domain observation :code:`o` into a discrete value, using the :code:`num_bins` property of the discrete filter.
 The binned observation :code:`ob` is fed into :code:`O`, which provides the probability of receiving :code:`ob`.
 I've implicitly assumed that the observations are discrete in the discrete filter, but I think only the search domain needs to be discretized, technically.

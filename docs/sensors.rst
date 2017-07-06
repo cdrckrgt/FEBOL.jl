@@ -34,8 +34,15 @@ You can make your own sensors.
 
 You must implement the :code:`observe` function, which returns an observation (of type :code:`Float64`).
 ::
-    observe(m::SearchDomain, s::Sensor, p::Pose)
+    observe(m::SearchDomain, s::NewSensor, p::Pose)
+
 
 If you want the particle filter to work, you need to define an observation model.
 ::
-    O(s::Sensor, theta::LocTuple, p::Pose, o::Float64)
+    O(s::NewSensor, theta::LocTuple, p::Pose, o::Float64)
+
+If you want the discrete filter to work, you need to define a discretized version, and a function that converts an observation (Float64) into a discretized version (Int)
+::
+
+    obs2bin(o::Float64, s::NewSensor)   # returns an int
+    O(s::NewSensor, theta::LocTuple, p::Pose, o::Int)
