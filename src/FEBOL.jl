@@ -46,7 +46,6 @@ include("searchdomain.jl")
 include("sensors/sensors.jl")
 
 include("vehicle.jl")
-include("observations.jl")
 
 # Filters
 include("filters/filters.jl")

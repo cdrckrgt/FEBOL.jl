@@ -25,17 +25,20 @@ end
 
 # TODO: I think this can be made faster by checking that df.b[xj,yj] > 0
 function update!(df::DF, x::Vehicle, o::Float64)
-	ob = obs2bin(o, df, x.sensor)
+	ob = obs2bin(o, x.sensor)
 	num_cells = df.n
 	bp_sum = 0.0
+
+	p = (x.x, x.y, x.heading)
 
 	for theta_x = 1:num_cells
 		for theta_y = 1:num_cells
 			# convert grid cell number to actual location
 			if df.b[theta_x, theta_y] > 0.0
-				tx = (theta_x-1) * df.cell_size + df.cell_size/2.0
-				ty = (theta_y-1) * df.cell_size + df.cell_size/2.0
-				df.b[theta_x, theta_y] *= O(x, (tx, ty), ob, df)
+				tx = (theta_x-0.5) * df.cell_size
+				ty = (theta_y-0.5) * df.cell_size
+				#df.b[theta_x, theta_y] *= O(x, (tx, ty), ob, df)
+				df.b[theta_x, theta_y] *= O(x.sensor, (tx,ty), p, ob)
 				bp_sum += df.b[theta_x, theta_y]
 			end
 		end
@@ -146,156 +149,18 @@ end
 
 reset!(f::DF) = fill!(f.b, 1.0/(f.n*f.n))
 
-
-######################################################################
-# Functions required for O()
-######################################################################
-
-"""
-`O(m::SearchDomain, x::Vehicle, theta, o::ObsBin)`
-
-Arguments:
-
- * `m` is a `SearchDomain`
- * `x` is a `Vehicle`
- * `theta` is a possible jammer location
- * `o` is an observation, 0 to 35
-
-Returns probability of observing `o` from `(xp, theta)` in domain `m`.
-"""
-function O(x::Vehicle, theta::LocTuple, o::ObsBin, df::DF)
-	return O(x, (x.x, x.y, x.heading), theta, o, df)
-end
-
-function O(x::Vehicle, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
-	return O(x, x.sensor, xp, theta, o, df)
-end
-
-# I don't understand why I need the vehicle in this function
-function O(x::Vehicle, s::BearingOnly, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
-
-	# Calculate true bearing, and find distance to bin edges
-	ang_deg = true_bearing(xp, theta)
-	rel_start, rel_end = rel_bin_edges(ang_deg, o, df)
-
-	# now look at probability
-	#d = Normal(0, x.sensor.noise_sigma)
-	#p = cdf(d, rel_end) - cdf(d, rel_start)
-	sig = x.sensor.noise_sigma::Float64
-	p = my_cdf(sig, rel_end) - my_cdf(sig, rel_start)
-	#p = my_cdf(x.sensor.noise_sigma, rel_end) - my_cdf(x.sensor.noise_sigma, rel_start)
-	return p
-end
-
-
-function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
-	rel_bearing = x.heading - true_bearing(xp, theta)
-	if rel_bearing < 0.0
-		rel_bearing += 360.0
-	end
-	rel_int = round(Int, rel_bearing, RoundDown) + 1
-
-	low_val = floor(o)
-	high_val = low_val + 1
-	d = Normal(s.means[rel_int], s.stds[rel_int])
-	p = cdf(d, high_val) - cdf(d, low_val)
-	return p
-end
-
-# I don't really get why this is here...
-function O(x::Vehicle, s::FOV, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
-	# determine relative bearing and fix it in 0 to 180
-	rel_bearing = fit_180(xp[3] - true_bearing(xp, theta))
-	if rel_bearing < 0.0
-		rel_bearing = -1.0 * rel_bearing
-	end
-
-	prob_in_view = 0.0
-	n = length(s.region_probs)
-	for i = 1:n
-		temp_angle, temp_prob = s.region_probs[i]
-		if rel_bearing  <= temp_angle
-			prob_in_view = temp_prob
-			break
+function print_belief(df::DF)
+	for y = df.n:-1:1
+		for x = 1:(df.n-1)
+			@printf "%.2f," df.b[x,y]
 		end
+		@printf "%.2f\n" df.b[df.n,y]
 	end
-
-	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
-	return ret_val
+	#@printf "%.2f", 
 end
 
 
-
-
-
-# 355 - 4.9999 = 0
-# 5 - 14.9999 = 1
-# 15 - 24.999 = 2
-function obs2bin(o::Float64, df::DF, s::BearingOnly)
-	full_bin = 360.0 / df.num_bins
-	half_bin = full_bin / 2.0
-
-	ob = round( Int, div((o + half_bin), full_bin) )
-	if ob == df.num_bins
-		ob = 0
-	end
-	return ob
-end
-
-# here, num_bins isn't too important; we just bin to nearest integer
-obs2bin(o::Float64, df::DF, s::DirOmni) = round(Int, o, RoundDown)
-
-obs2bin(o::Float64, df::DF, s::FOV) = round(Int, o)
-
-
-# returns (start_deg, end_deg) integer tuple
-function bin2deg(bin_deg::Int, df::DF)
-	full_bin = 360.0 / df.num_bins
-	half_bin = full_bin / 2.0
-	if bin_deg == 0
-		start_val = -half_bin
-		end_val = half_bin
-	else
-		start_val = full_bin * bin_deg - half_bin
-		end_val  = full_bin * bin_deg + half_bin
-	end
-	return start_val, end_val
-end
-
-# Find the relative offset
-# TODO: must account for different discretizations
-function rel_bin_edges(bearing_deg, o::ObsBin, df::DF)
-
-	# calculate start, end degrees of bin
-	start_deg, end_deg = bin2deg(o, df)
-
-	# compute relative distance to true bearing
-	rel_start = fit_180(bearing_deg - start_deg)
-	rel_end = fit_180(bearing_deg - end_deg)
-
-	#rel_start = min(abs(rel_start), abs(rel_end))
-	#rel_end = rel_start + 360.0 / df.num_bins
-
-	# Make sure start is further left on number line
-	if rel_end < rel_start
-		temp = rel_start
-		rel_start = rel_end
-		rel_end = temp
-	end
-
-	# If we straddle the wrong point
-	# Say df.num_bins = 10, and rel_start = -175, rel_end = 175
-	# rel_end - rel_start would be 350 degrees, but this should be 10
-	# so set rel_start to 175 and rel_end to 185
-	# TODO: I'm pretty sure this doesn't work for df.num_bins = 2
-	if (rel_end - rel_start) - 1e-3 > (360.0/df.num_bins)
-		rel_start = rel_end
-		rel_end += 360.0/df.num_bins
-	end
-
-	return rel_start, rel_end
-end
-
+# I never use these...
 function noiseless(x::Vehicle, theta::LocTuple)
 	noiseless(x, x.sensor, theta)
 end
@@ -310,14 +175,4 @@ function noiseless(x::Vehicle, s::DirOmni, theta::LocTuple)
 	rel_int = round(Int, rel_bearing, RoundDown) + 1
 
 	return s.means[rel_int]
-end
-
-function print_belief(df::DF)
-	for y = df.n:-1:1
-		for x = 1:(df.n-1)
-			@printf "%.2f," df.b[x,y]
-		end
-		@printf "%.2f\n" df.b[df.n,y]
-	end
-	#@printf "%.2f", 
 end

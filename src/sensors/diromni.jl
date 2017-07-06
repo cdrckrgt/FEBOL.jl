@@ -45,3 +45,22 @@ function O(s::DirOmni, theta::LocTuple, p::Pose, o::Float64)
 	p = pdf(d, o_diff)
 	return p
 end
+
+
+#function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
+function O(s::DirOmni, theta::LocTuple, xp::Pose, o::ObsBin)
+	rel_bearing = x.heading - true_bearing(xp, theta)
+	if rel_bearing < 0.0
+		rel_bearing += 360.0
+	end
+	rel_int = round(Int, rel_bearing, RoundDown) + 1
+
+	low_val = floor(o)
+	high_val = low_val + 1
+	d = Normal(s.means[rel_int], s.stds[rel_int])
+	p = cdf(d, high_val) - cdf(d, low_val)
+	return p
+end
+
+# here, num_bins isn't too important; we just bin to nearest integer
+obs2bin(o::Float64, s::DirOmni) = round(Int, o, RoundDown)

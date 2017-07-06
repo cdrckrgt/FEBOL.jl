@@ -10,9 +10,10 @@ function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 	for theta_x = 1:df.n
 		for theta_y = 1:df.n
 			if df.b[theta_x,theta_y] > 0.0
-				xj = (theta_x-0.5) * df.cell_size
-				yj = (theta_y-0.5) * df.cell_size
-				prob += df.b[theta_x, theta_y] * O(x, x.sensor, xp, (xj,yj), o, df)
+				tx = (theta_x-0.5) * df.cell_size
+				ty = (theta_y-0.5) * df.cell_size
+				#prob += df.b[theta_x, theta_y] * O(x, x.sensor, xp, (xj,yj), o, df)
+				prob += df.b[theta_x, theta_y] * O(x.sensor, (tx,ty), xp, o)
 			end
 		end
 	end
@@ -37,11 +38,12 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 		# sum over possible jammer locations
 		for theta_x = 1:df.n
 			for theta_y = 1:df.n
-				xj = (theta_x - 0.5) * df.cell_size
-				yj = (theta_y - 0.5) * df.cell_size
+				tx = (theta_x - 0.5) * df.cell_size
+				ty = (theta_y - 0.5) * df.cell_size
 
 				if df.b[theta_x, theta_y] > 0.0
-					pot = O(x, x.sensor, xp, (xj,yj), o, df)
+					#pot = O(x, x.sensor, xp, (xj,yj), o, df)
+					pot = O(x.sensor, (tx,ty), xp, o)
 					if pot > 0.0
 						H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
 					end
