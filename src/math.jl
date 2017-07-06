@@ -80,3 +80,30 @@ function angle_mean(v,w)
 	end
 	return mod(rad2deg(atan2(sin_sum, cos_sum)), 360.)
 end
+
+
+######################################################################
+# I don't really remember using this
+# Takes a vector of 36 angles and turns it into 360 via linear interpolation
+function makenorm()
+	data = readcsv("norm.csv")
+	values = vec(data[:,2])
+	new_values = zeros(360)
+	for i = 1:35
+		val_start = 10*(i-1)+1
+		new_values[val_start] = values[i]
+		for j = 1:9
+			new_values[val_start + j] = (10.0-j)*values[i] + j*values[i+1]
+			new_values[val_start + j] /= 10.0
+		end
+	end
+	# now handle the last one
+	i = 36
+	val_start = 10*(i-1)+1
+	new_values[val_start] = values[i]
+	for j = 1:9
+		new_values[val_start + j] = (10.0-j)*values[i] + j*values[1]
+		new_values[val_start + j] /= 10.0
+	end
+	return new_values
+end
