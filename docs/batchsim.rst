@@ -8,7 +8,7 @@ FEBOL's framework performing these batch simulations is the :code:`batchsim` fun
 
 ::
 
-    function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, num_sims::Int, tc::TerminationCondition)
+    batchsim(m::SearchDomain, vsu::Vector{SimUnit}, num_sims::Int, tc::TerminationCondition)
 
 
 Simulation Unit
@@ -25,3 +25,49 @@ Simulation Unit
             return new(x,f,p,cm)
         end
     end
+
+
+Cost Model
+==============
+The abstract :code:`CostModel` type handles how costs are applied throughout the simulations.
+
+To define your own 
+::
+
+    type CustomCost <: CostModel
+        # whatever fields you need for get_action_cost
+    end
+    function get_action_cost(a::Action, cm::CostModel)
+        # return a Float64 describing cost
+    end
+
+For example, the :code:`ConstantCost` model has the following.
+::
+
+    type ConstantCost <: CostModel
+        value::Float64
+    end
+
+    function get_action_cost(a::Action, cc::ConstantCost)
+        return cc.value
+    end
+
+The :code:`MoveAndRotateCost` is a more complex example.
+::
+
+    type MoveAndRotateCost <: CostModel
+        speed::Float64
+        time_per_rotation::Float64
+    end
+
+    function get_action_cost(a::Action, marc::MoveAndRotateCost)
+        dx = a[1]
+        dy = a[2]
+        dist = sqrt(dx*dx + dy*dy)
+        return (dist / marc.speed) + marc.time_per_rotation
+    end
+
+
+Termination Condition
+=======================
+
