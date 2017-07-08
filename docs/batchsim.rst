@@ -33,7 +33,7 @@ Cost Model
 The abstract :code:`CostModel` type handles how costs are applied throughout the simulations.
 Two cost models are provided:
 
-To define your own cost model, you must extend the abstract :code:`CostModel` type and implement the :code:`get_action_cost` for the new cost model.
+To define your own cost model, you must extend the abstract :code:`CostModel` type and implement the :code:`get_action_cost` function.
 ::
 
     type CustomCost <: CostModel
@@ -45,6 +45,8 @@ To define your own cost model, you must extend the abstract :code:`CostModel` ty
 
 For an example, let's examine the :code:`ConstantCost` model, which applies the same cost at each step.
 This cost might represent the time each step takes.
+Therefore, a simulated trajectory's cost would simulate how much time it took.
+The :code:`ConstantCost` model is defined as follows,
 ::
 
     type ConstantCost <: CostModel
@@ -73,4 +75,51 @@ The :code:`MoveAndRotateCost` is a more complex example.
 
 Termination Condition
 =======================
+The abstract :code:`TerminationCondition` type determines when an individual simulation should be terminated.
 
+
+To define your own termination condition, you must extend the abstract :code:`TerminationCondition` type and implement the :code:`is_complete` function.
+::
+
+    type CustomTC <: TerminationCondition
+        # whatever fields you need
+    end
+
+    function is_complete(f::AbstractFilter, ctc::CustomTC, step_count::Int)
+        # return true if termination condition reached, false if not
+    end
+
+The :code:`step_count` argument is passed in by the thing.
+(Clarify if it starts at one or zero.)
+You can define the :code:`is_complete` function for a specific kind of filter if you only plan on using one filter.
+
+The :code:`StepThreshold` is provided.
+It terminates after a specified number of steps has been simulated.
+::
+
+    type StepThreshold <: TerminationCondition
+        value::Int
+    end
+    function is_complete(f::DF, st::StepThreshold, step_count::Int)
+        ret_val = false
+        if step_count >= st.value
+            ret_val = true
+        end
+        return ret_val
+    end
+
+The :code:`MaxNormThreshold` termination condition is also provided.
+The implementation is below
+::
+
+    type MaxNormThreshold <: TerminationCondition
+        value::Float64
+    end
+
+    function is_complete(f::DF, mnt::MaxNormThreshold, ::Int)
+        ret_val = false
+        if maximum(f.b) > mnt.value
+            ret_val = true
+        end
+        return ret_val
+    end
