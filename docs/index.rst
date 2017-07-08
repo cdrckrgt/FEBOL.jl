@@ -10,6 +10,7 @@ Welcome to FEBOL's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+    Basic Types <basic_types.rst>
     Vehicle <vehicle.rst>
     Sensors <sensors.rst>
     Filters <filters.rst>
