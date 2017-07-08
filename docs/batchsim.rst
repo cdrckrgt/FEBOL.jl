@@ -10,6 +10,7 @@ FEBOL's framework performing these batch simulations is the :code:`batchsim` fun
 
     batchsim(m::SearchDomain, vsu::Vector{SimUnit}, num_sims::Int, tc::TerminationCondition)
 
+What this returns is
 
 Simulation Unit
 ==================
@@ -30,8 +31,9 @@ Simulation Unit
 Cost Model
 ==============
 The abstract :code:`CostModel` type handles how costs are applied throughout the simulations.
+Two cost models are provided:
 
-To define your own 
+To define your own cost model, you must extend the abstract :code:`CostModel` type and implement the :code:`get_action_cost` for the new cost model.
 ::
 
     type CustomCost <: CostModel
@@ -41,7 +43,8 @@ To define your own
         # return a Float64 describing cost
     end
 
-For example, the :code:`ConstantCost` model has the following.
+For an example, let's examine the :code:`ConstantCost` model, which applies the same cost at each step.
+This cost might represent the time each step takes.
 ::
 
     type ConstantCost <: CostModel
