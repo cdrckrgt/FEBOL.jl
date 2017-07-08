@@ -15,6 +15,7 @@ Welcome to FEBOL's documentation!
     Filters <filters.rst>
     Policies <policies.rst>
     Simulations <simulations.rst>
+    Batch Simulations <batchsim.rst>
     TODO <todo.rst>
 
 
