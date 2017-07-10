@@ -40,7 +40,7 @@ function action(m::SearchDomain, v::Vehicle, o::Float64, f::DF, p::GreedyPolicy2
 
 			if p.eval_type == 1
 				xp = (x,y,0.0)
-				mi = mutual_information(m, v, f, xp)
+				mi = mutual_information2(m, v, f, xp)
 			else
 				xr = mu_x - x
 				yr = mu_y - y

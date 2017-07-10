@@ -36,22 +36,37 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 		end
 
 		# sum over possible jammer locations
-		for theta_x = 1:df.n
-			for theta_y = 1:df.n
-				tx = (theta_x - 0.5) * df.cell_size
-				ty = (theta_y - 0.5) * df.cell_size
+		for txi = 1:df.n
+			for tyi = 1:df.n
+				tx = (txi - 0.5) * df.cell_size
+				ty = (tyi - 0.5) * df.cell_size
 
-				if df.b[theta_x, theta_y] > 0.0
-					#pot = O(x, x.sensor, xp, (xj,yj), o, df)
+				if df.b[txi, tyi] > 0.0
 					pot = O(x.sensor, (tx,ty), xp, o)
 					if pot > 0.0
-						H_o_t -= pot * df.b[theta_x, theta_y] * log(pot)
+						H_o_t -= pot * df.b[txi, tyi] * log(pot)
 					end
 				end
 			end
 		end
 	end
 	return H_o - H_o_t
+end
+
+# this version is valid if the sensor noise is the same regardless
+#  of the vehicle and sensor locations
+export mutual_information2
+function mutual_information2(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
+	H_o = 0.0
+
+	for o in x.sensor.bin_range
+		po = p_obs(m, x, df, xp, o)
+		if po > 0.0
+			H_o -= po * log(po)
+		end
+
+	end
+	return H_o
 end
 
 # computes mutual information for all locations
@@ -66,6 +81,20 @@ function mutual_information(m::SearchDomain, uav::Vehicle, df::DF)
 			# TODO: really, should have some other heading
 			xp = (x, y, 0.0)
 			mut_info[xv,yv] = mutual_information(m, uav, df, xp)
+		end
+	end
+	return mut_info
+end
+
+function mutual_information2(m::SearchDomain, uav::Vehicle, df::DF)
+	mut_info = zeros(df.n, df.n)
+	for xv = 1:df.n
+		x = (xv - 0.5) * df.cell_size
+		for yv = 1:df.n
+			y = (yv - 0.5) * df.cell_size
+			# TODO: really, should have some other heading
+			xp = (x, y, 0.0)
+			mut_info[xv,yv] = mutual_information2(m, uav, df, xp)
 		end
 	end
 	return mut_info
