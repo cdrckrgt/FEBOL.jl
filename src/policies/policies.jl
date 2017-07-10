@@ -23,6 +23,8 @@ function normalize(a::Action, x::Vehicle)
 	return x.max_step * ax / den, x.max_step * ay / den, a[3]
 end
 
+function reset!(p::Policy) end
+
 
 ######################################################################
 # greedy policies

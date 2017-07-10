@@ -40,9 +40,10 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, num_sims::Int, tc
 		for (uav_ind, uav) in enumerate(uav_array)
 			print(uav_ind, ",")
 
-			# reset the filter and vehicle
+			# reset the filter, vehicle, and policy
 			reset!(uav.f)
 			reset!(m, uav.x)
+			reset!(uav.p)
 
 			# starts at -1 because after first round, should be zero
 			temp_cost = -1.0
