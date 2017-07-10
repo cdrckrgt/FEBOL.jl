@@ -1,5 +1,10 @@
 ######################################################################
 # termination condition stuff
+#
+# TODO: I probably don't need to pass in step_count, the step
+#  threshold could simply keep track of this as a field
+#
+# Although maybe it is useful to have it passed in?
 ######################################################################
 export StepThreshold, MaxNormThreshold
 export is_complete
@@ -7,7 +12,7 @@ export is_complete
 abstract TerminationCondition
 
 # determines if a simulation has reached its 
-function is_complete(f::AbstractFilter, ::TerminationCondition)
+function is_complete(f::AbstractFilter, ::TerminationCondition, ::Int)
 	error("Termination condition not implemented for this filter or termination condition")
 end
 
