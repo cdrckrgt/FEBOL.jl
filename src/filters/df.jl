@@ -1,6 +1,7 @@
 ######################################################################
 # df.jl
-# Discrete filters
+#
+# Discrete filter
 ######################################################################
 
 # n is the number of cells per side
@@ -11,21 +12,32 @@ type DF <: AbstractFilter
 	cell_size::Float64
 	num_bins::Int64
 	bin_range::UnitRange{Int64}
+	sensor::Sensor
 
 	function DF(m::SearchDomain, n::Int64, num_bins::Int64=36)
 		b = ones(n, n) / (n * n)
-		return new(b, n, m.length/n, num_bins, 0:(num_bins-1))
+		return new(b, n, m.length/n, num_bins, 0:(num_bins-1), BearingOnly(10))
 	end
 	function DF(m::SearchDomain, n::Int64, bin_range::UnitRange{Int64})
 		b = ones(n, n) / (n * n)
 		num_bins = length(bin_range)
-		return new(b, n, m.length/n, num_bins, bin_range)
+		return new(b, n, m.length/n, num_bins, bin_range, BearingOnly(10))
+	end
+
+	function DF(m::SearchDomain, n::Int64, sensor::Sensor, num_bins::Int64=36)
+		b = ones(n, n) / (n * n)
+		return new(b, n, m.length/n, num_bins, 0:(num_bins-1), sensor)
+	end
+	function DF(m::SearchDomain, n::Int64, sensor::Sensor bin_range::UnitRange{Int64})
+		b = ones(n, n) / (n * n)
+		num_bins = length(bin_range)
+		return new(b, n, m.length/n, num_bins, bin_range, sensor)
 	end
 end
 
 # TODO: I think this can be made faster by checking that df.b[xj,yj] > 0
 function update!(df::DF, x::Vehicle, o::Float64)
-	ob = obs2bin(o, x.sensor)
+	ob = obs2bin(o, df.sensor)
 	num_cells = df.n
 	bp_sum = 0.0
 
@@ -37,8 +49,7 @@ function update!(df::DF, x::Vehicle, o::Float64)
 			if df.b[theta_x, theta_y] > 0.0
 				tx = (theta_x-0.5) * df.cell_size
 				ty = (theta_y-0.5) * df.cell_size
-				#df.b[theta_x, theta_y] *= O(x, (tx, ty), ob, df)
-				df.b[theta_x, theta_y] *= O(x.sensor, (tx,ty), p, ob)
+				df.b[theta_x, theta_y] *= O(df.sensor, (tx,ty), p, ob)
 				bp_sum += df.b[theta_x, theta_y]
 			end
 		end
