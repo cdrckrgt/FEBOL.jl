@@ -1,1 +1,6 @@
 julia 0.4
+Distributions
+StatsBase
+Reel
+PyCall
+PyPlot
