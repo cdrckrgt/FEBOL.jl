@@ -28,7 +28,7 @@ type DF <: AbstractFilter
 		b = ones(n, n) / (n * n)
 		return new(b, n, m.length/n, num_bins, 0:(num_bins-1), sensor)
 	end
-	function DF(m::SearchDomain, n::Int64, sensor::Sensor bin_range::UnitRange{Int64})
+	function DF(m::SearchDomain, n::Int64, sensor::Sensor, bin_range::UnitRange{Int64})
 		b = ones(n, n) / (n * n)
 		num_bins = length(bin_range)
 		return new(b, n, m.length/n, num_bins, bin_range, sensor)
