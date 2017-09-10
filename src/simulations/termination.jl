@@ -9,7 +9,7 @@
 export StepThreshold, MaxNormThreshold
 export is_complete
 
-abstract TerminationCondition
+abstract type TerminationCondition end
 
 # determines if a simulation has reached its 
 function is_complete(f::AbstractFilter, ::TerminationCondition, ::Int)

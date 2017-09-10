@@ -5,7 +5,7 @@
 ######################################################################
 export ConstantCost, MoveCost, MoveCost2, MoveAndRotateCost
 
-abstract CostModel
+abstract type CostModel end
 
 type ConstantCost <: CostModel
 	value::Float64

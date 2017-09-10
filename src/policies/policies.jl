@@ -5,7 +5,7 @@
 #  as the action function ensures the step is normalized to max_step.
 ######################################################################
 
-abstract Policy
+abstract type Policy end
 
 """
 `action(m, x, o, f, p)`

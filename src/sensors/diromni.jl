@@ -49,7 +49,8 @@ end
 
 #function O(x::Vehicle, s::DirOmni, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 function O(s::DirOmni, theta::LocTuple, xp::Pose, o::ObsBin)
-	rel_bearing = x.heading - true_bearing(xp, theta)
+	#rel_bearing = x.heading - true_bearing(xp, theta)
+	rel_bearing = xp[3] - true_bearing(xp, theta)
 	if rel_bearing < 0.0
 		rel_bearing += 360.0
 	end

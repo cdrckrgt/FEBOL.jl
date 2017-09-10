@@ -6,7 +6,8 @@
 export WaypointPolicy
 
 # to simplify some notation in this file
-typealias VVF Vector{Vector{Float64}}
+#typealias VVF Vector{Vector{Float64}}
+const VVF = Vector{Vector{Float64}}
 
 type WaypointPolicy <: Policy
 	current_index::Int

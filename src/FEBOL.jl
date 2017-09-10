@@ -2,9 +2,9 @@ module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
 using PyCall
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib, rc
 import PyPlot.plot
-using StatsBase: sample, WeightVec
+using StatsBase: sample
 using Reel
 
 export SearchDomain, theta!
@@ -29,10 +29,16 @@ export true_bearing
 export ErgodicManager, phik!, reconstruct, decompose, ergodic_score
 export TrajectoryManager, create_trajectory
 
-typealias Pose		    NTuple{3, Float64}    # x, y, heading
-typealias Action        NTuple{3, Float64}    # dx, dy, dh
-typealias LocTuple      NTuple{2, Float64}    # x, y
-typealias ObsBin        Int64
+# Old (Julia v0.5) way of doing it
+#typealias Pose		    NTuple{3, Float64}    # x, y, heading
+#typealias Action        NTuple{3, Float64}    # dx, dy, dh
+#typealias LocTuple      NTuple{2, Float64}    # x, y
+#typealias ObsBin        Int64
+
+const Pose = NTuple{3, Float64}
+const Action = NTuple{3, Float64}
+const LocTuple = NTuple{2, Float64}
+const ObsBin = Int64
 
 export Pose
 
@@ -60,7 +66,9 @@ include("simulations/termination.jl")
 include("simulations/costs.jl")
 include("simulations/simulations.jl")
 include("simulations/plotting.jl")
-PyCall.PyDict(matplotlib["rcParams"])["font.family"]=["Times New Roman"]
+#PyCall.PyDict(matplotlib["rcParams"])["font.family"]=["Times New Roman"]
+#PyCall.PyDict(matplotlib["rcParams"])["font.family"]=["serif"]
+rc("font", family="serif")
 include("simulations/gif.jl")
 include("simulations/batchsim.jl")
 

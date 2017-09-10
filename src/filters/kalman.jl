@@ -7,8 +7,8 @@
 #  Sigma
 ######################################################################
 
-abstract GaussianFilter <: AbstractFilter
-abstract Initializer
+abstract type GaussianFilter <: AbstractFilter end
+abstract type Initializer end
 
 type NaiveInitializer <: Initializer
 	length::Float64

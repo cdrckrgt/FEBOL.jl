@@ -3,7 +3,7 @@
 # Handles the different filters
 ######################################################################
 
-abstract AbstractFilter
+abstract type AbstractFilter end
 
 """
 `update!(f::AbstractFilter, x::Vehicle, o::Real)`

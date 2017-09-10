@@ -1,6 +1,10 @@
 ######################################################################
 # plotting.jl
 # Handles all the calls to PyPlot to generate plots
+#
+# hold is deprecated as of Matplotlib 2.0
+#  Figures now default to hold (true)
+#  I think we should adhere to this for future compliance
 ######################################################################
 
 """
@@ -13,7 +17,7 @@ function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle; show_mean::Bool=fa
 end
 function plot(m::SearchDomain, f::AbstractFilter, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
 	plot_theta(m)
-	hold(true)
+	#hold(true) # deprecated
 	plot_vehicle(m, p; color=color)
 	if show_mean
 		plot_mean(centroid(f), color=color)
@@ -31,7 +35,7 @@ end
 
 function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b", obs=nothing)
 	plot_theta(m)
-	hold(true)
+	#hold(true)  # deprecated
 	plot_vehicle(m, p; color=color)
 	#title_string = "plot: "
 	title_string = ""
@@ -343,7 +347,7 @@ function plot{TP<:AbstractFilter}(m::SearchDomain, farr::Vector{TP}, parr::Vecto
 		colors = ["b", "r", "g", "k"]
 	end
 	plot_theta(m)
-	hold(true)
+	#hold(true)  # deprecated
 	#cmaps = ["Blues", "Reds"]
 	#colors = ["b", "r"]
 	for (fi,f) in enumerate(farr)

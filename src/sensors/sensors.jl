@@ -2,7 +2,7 @@
 # sensors.jl
 ######################################################################
 
-abstract Sensor
+abstract type Sensor end
 
 include("bearing.jl")
 include("range.jl")
