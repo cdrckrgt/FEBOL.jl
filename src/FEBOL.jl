@@ -13,7 +13,7 @@ export Belief, Gaussian, ParticleSet, DiscreteBelief
 export DF, EKF, EIF, UKF, PF
 export update!, centroid, covariance, entropy, reset!
 export observe
-export plot, hold
+export plot, hold, plot_vehicle, title, pause
 export step!, steps!, batchsim, batchsim2, sim
 export Policy, RandomPolicy, SitPolicy, GreedyPolicy, CirclePolicy, SpinPolicy, GaussianMPC, GreedyPolicy2
 export action, act!
