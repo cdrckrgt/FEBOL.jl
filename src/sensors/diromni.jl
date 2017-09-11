@@ -6,10 +6,13 @@ type DirOmni <: Sensor
 	means::Vector{Float64}
 	stds::Vector{Float64}
 
+	bin_range::UnitRange{Int64}
+
 	function DirOmni(file::AbstractString)
 		means = vec(readcsv(file)[:,2])
 		stds = 2*ones(360)
-		return new(means, stds)
+		bin_range = -30:30
+		return new(means, stds, bin_range)
 	end
 end
 
