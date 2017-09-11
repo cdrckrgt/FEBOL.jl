@@ -56,7 +56,7 @@ function plot(m::SearchDomain, b::Matrix{Float64}, p::Pose; show_mean::Bool=fals
 		title_string = "$(title_string)e1 = $e1, e2 = $e2"
 		#title("e1 = $e1, e2 = $e2")
 	end
-	title(title_string, fontname="Times New Roman", fontsize=18)
+	title(title_string, fontname="Times New Roman", fontsize=12)
 	plot(m, b, alpha=alpha)
 	return # so it doesn't spit out result of axis
 end
@@ -71,10 +71,12 @@ end
 function plot(m::SearchDomain, b::Matrix{Float64}; alpha=1.0, cmap="Greys")
 	# alpha changed by LD for rss submission 2017
 	alpha = 0.5
+	alpha = 0.6
 	a = [0,m.length,0,m.length]
 	imshow(b', interpolation="none",cmap=cmap,origin="lower",extent=a,vmin=0, alpha=alpha)
 	labels()
 	axis(a)
+	tick_params(direction="in")
 end
 
 plot(m::SearchDomain, f::EKF; alpha=0.1) = plot(m, f.mu, f.Sigma)
@@ -113,6 +115,7 @@ function plot(m::SearchDomain, mu::Vector{Float64}, Sigma::Matrix{Float64}; colo
 	labels()
 	#axis("square")
 	axis(a)
+	tick_params(direction="in")
 end
 
 #function plot_ellipse()
@@ -135,6 +138,7 @@ function plot(m::SearchDomain, f::PF; alpha=1.0)
 	labels()
 	axis("scaled")
 	axis(a)
+	tick_params(direction="in")
 end
 
 function plot_mean(mu::LocTuple; color="b")
@@ -215,14 +219,18 @@ function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64; color
 
 	# Changed by LD for 01/30/2017 for rss submission
 	#c = 0.01 * m.length  *sqrt(2)
-	c = 0.015 * m.length  *sqrt(2)
+	#c = 0.015 * m.length  *sqrt(2)
+	#c = 0.012 * m.length  *sqrt(2)
+	c = 0.013 * m.length  *sqrt(2)
 	dx = c*sind(45 + h)
 	dy = c*cosd(45 + h)
 
 	# Plot rotors
 	# LD change 01/30/2017 for rss submission
 	#rotor_size = 5
-	rotor_size = 7.5
+	#rotor_size = 7.5
+	rotor_size = 5.5
+	rotor_size = 6.5
 	theta1 = 45.0 + h
 	theta2 = 135.0 + h
 	theta3 = 225.0 +  h
@@ -230,10 +238,10 @@ function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64; color
 	#cs = "$(color)o"
 	cs = "wo"
 	color = "k"
-	plot(x+c*sind(theta1), y+c*cosd(theta1), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
-	plot(x+c*sind(theta2), y+c*cosd(theta2), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
-	plot(x+c*sind(theta3), y+c*cosd(theta3), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
-	plot(x+c*sind(theta4), y+c*cosd(theta4), cs, ms=rotor_size, mew=3, mfc="none", mec=color)
+	plot(x+c*sind(theta1), y+c*cosd(theta1), cs, ms=rotor_size, mew=2.5, mfc="none", mec=color)
+	plot(x+c*sind(theta2), y+c*cosd(theta2), cs, ms=rotor_size, mew=2.5, mfc="none", mec=color)
+	plot(x+c*sind(theta3), y+c*cosd(theta3), cs, ms=rotor_size, mew=2.5, mfc="none", mec=color)
+	plot(x+c*sind(theta4), y+c*cosd(theta4), cs, ms=rotor_size, mew=2.5, mfc="none", mec=color)
 
 	# plot heading direction
 	xline = [x, x+2*c*sind(h)]
@@ -241,7 +249,8 @@ function plot_vehicle(m::SearchDomain, x::Float64, y::Float64, h::Float64; color
 	# Changed by LD 01/30/2017 for rss submission
 	#plot(xline, yline, color, mew=2)
 	#plot(xline, yline, color, lw=2)
-	plot(xline, yline, color, lw=2.5)
+	#plot(xline, yline, color, lw=2.5)
+	plot(xline, yline, color, lw=2.)
 
 	# Plot frame
 	plot(x, y, marker=(2,0,-theta1), ms=mark_size, mew=1, mec=color)
@@ -253,8 +262,10 @@ end
 function plot_theta(m::SearchDomain)
 	# changed by LD 01/30/2017 for RSS submission
 	#mark_size = 11
-	mark_size = 13
-	plot(m.theta[1], m.theta[2], "w^", markersize=mark_size, mew=3,markerfacecolor="none")
+	#mark_size = 13
+	mark_size = 11
+	#mark_size = 13
+	plot(m.theta[1], m.theta[2], "k^", markersize=mark_size, mew=2.5,markerfacecolor="none")
 	#mark_size = 11
 	#plot(m.theta[1], m.theta[2], "r^", markersize=mark_size, markerfacecolor="none", markeredgecolor="r", mew=2)
 end
@@ -267,8 +278,8 @@ end
 
 # Sets the appropriate plot labels
 function labels()
-	xlabel("East (m)", fontsize=18)
-	ylabel("North (m)", fontsize=18)
+	xlabel("East (m)", fontsize=12)
+	ylabel("North (m)", fontsize=12)
 end
 
 ######################################################################

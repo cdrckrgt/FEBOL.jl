@@ -2,7 +2,7 @@ module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
 using PyCall
-using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib, rc
+using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib, rc, tick_params
 import PyPlot.plot
 using StatsBase: sample
 using Reel
