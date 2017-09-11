@@ -45,19 +45,30 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, num_sims::Int, tc
 			reset!(m, uav.x)
 			reset!(uav.p)
 
-			# starts at -1 because after first round, should be zero
-			temp_cost = -1.0
-			step_count = 0
+
+			# before doing anything else, we observe
+			#  and update filter once
+			o = observe(m, uav.x)
+			update!(uav, o)
+
+			# This was our first step; steps count number of observations
+			step_count = 1
+
+			# What was the cost to getting this first observation?
+			temp_cost = get_action_cost(uav.cm)
+
 			while !is_complete(uav.f, tc, step_count)
-				# observe, update filter, act
-				o = observe(m, uav.x)
-				update!(uav, o)
+				# act
 				a = action(m, uav, o)
 				act!(m, uav.x, a)
 
 				# get cost and update step count
 				temp_cost += get_action_cost(a, uav.cm)
 				step_count += 1
+
+				# observe and update
+				o = observe(m, uav.x)
+				update!(uav, o)
 			end
 
 			costs[sim_ind, uav_ind] = temp_cost

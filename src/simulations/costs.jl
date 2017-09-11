@@ -33,10 +33,15 @@ end
 function get_action_cost(a::Action, cm::CostModel)
 	error("get_action_cost not implemented for this cost model type.")
 end
+function get_action_cost(cm::CostModel)
+	error("get_action_cost not implemented for this cost model type.")
+end
+
 
 function get_action_cost(a::Action, cc::ConstantCost)
 	return cc.value
 end
+get_action_cost(cc::ConstantCost) = cc.value
 
 function get_action_cost(a::Action, mc::MoveCost)
 	dx = a[1]
@@ -58,3 +63,4 @@ function get_action_cost(a::Action, marc::MoveAndRotateCost)
 	dist = sqrt(dx*dx + dy*dy)
 	return (dist / marc.speed) + marc.time_per_rotation
 end
+get_action_cost(marc::MoveAndRotateCost) = marc.time_per_rotation
