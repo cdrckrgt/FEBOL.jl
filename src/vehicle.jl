@@ -67,6 +67,17 @@ function observe(m::SearchDomain, x::Vehicle)
 	observe(m, x.sensor, p)
 end
 
+# version for array of vehicles
+function observe(m::SearchDomain, vx::Vector{Vehicle})
+	num_vehicles = length(vx)
+	o_arr = Array{Float64}(num_vehicles)
+	for i = 1:num_vehicles
+		pose_i = (vx[i].x, vx[i].y, vx[i].heading)
+		o_arr[i] = observe(m, vx[i].sensor, pose_i)
+	end
+	return o_arr
+end
+
 
 # not sure where else to put this
 # variant of true_bearing that takes in vehicle

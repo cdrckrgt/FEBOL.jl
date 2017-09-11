@@ -17,6 +17,14 @@ function update!(f::AbstractFilter, x::Vehicle, o::Float64)
 	error(typeof(f), " does not yet implement update!(f,x,o).")
 end
 
+# multi vehile update
+function update!(f::AbstractFilter,vx::Vector{Vehicle}, vo::Vector{Float64})
+	num_vehicles = length(vx)
+	for i = 1:num_vehicles
+		update!(f, vx[i], vo[i])
+	end
+end
+
 
 """
 `centroid(f::AbstractFilter)`

@@ -15,6 +15,14 @@ Plots the belief, jammer, and vehicles.
 function plot(m::SearchDomain, f::AbstractFilter, x::Vehicle; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
 	plot(m, f, (x.x, x.y, x.heading); show_mean=show_mean, show_cov=show_cov, alpha=alpha, color=color)
 end
+# allow plotting of multiple vehicles with a single shared filter
+function plot(m::SearchDomain, f::AbstractFilter, vx::Vector{Vehicle})
+	plot(m, f, vx[1])
+	num_vehicles = length(vx)
+	for i = 2:num_vehicles
+		plot_vehicle(m, vx[i])
+	end
+end
 function plot(m::SearchDomain, f::AbstractFilter, p::Pose; show_mean::Bool=false, show_cov::Bool=false, alpha=1.0, color="b")
 	plot_theta(m)
 	#hold(true) # deprecated
