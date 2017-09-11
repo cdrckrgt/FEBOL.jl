@@ -16,7 +16,7 @@ type GreedyPolicy <: Policy
 		angles = linspace(0.0, 360 - 360/n, n)
 
 		# create list of actions
-		actions = Array(Action, n+1)
+		actions = Array{Action}(n+1)
 		for i = 1:n
 			ax = x.max_step * sind(angles[i])
 			ay = x.max_step * cosd(angles[i])
@@ -33,7 +33,7 @@ type GreedyPolicy <: Policy
 		angles = linspace(0.0, 360 - 360/n, n)
 
 		# create list of actions
-		actions = Array(Action, n+1)
+		actions = Array{Action}(n+1)
 		for i = 1:n
 			ax = x.max_step * sind(angles[i])
 			ay = x.max_step * cosd(angles[i])
@@ -59,7 +59,7 @@ function make_action_list(x::Vehicle, n::Int)
 	d_angle = 10.0
 
 	# create list of actions
-	actions = Array(Action, 3n+3)
+	actions = Array{Action}(3n+3)
 	for i = 1:n
 		ax = x.max_step * sind(angles[i])
 		ay = x.max_step * cosd(angles[i])
