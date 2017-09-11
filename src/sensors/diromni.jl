@@ -54,8 +54,14 @@ end
 function O(s::DirOmni, theta::LocTuple, xp::Pose, o::ObsBin)
 	#rel_bearing = x.heading - true_bearing(xp, theta)
 	rel_bearing = xp[3] - true_bearing(xp, theta)
+	#println("rel_bearing = ", rel_bearing)
 	if rel_bearing < 0.0
 		rel_bearing += 360.0
+	end
+	# had to do this because rel_bearing was sometimes -2.8e-14
+	# when adding this to 360.0, julia returned 360.0
+	if rel_bearing == 360.0
+		rel_bearing -= 1.0
 	end
 	rel_int = round(Int, rel_bearing, RoundDown) + 1
 
