@@ -16,16 +16,17 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video:
 	act!(m,x,a)
 
 	if video
-		hold(false)
+		cla()
 		plot(m, f, x)
 	end
 end
 
 export simulate
+# similar to steps!, but uses the more current termination condition
 function simulate(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, tc::TerminationCondition=StepThreshold(10); video::Bool=true, delay::Real=0.5)
 	# Show current step first
 	if video
-		hold(false)
+		clf()
 		plot(m,f,x)
 	end
 
@@ -42,7 +43,7 @@ end
 function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int; video::Bool=true, delay::Real=0.5)
 	# Show current step first
 	if video
-		hold(false)
+		clf()
 		plot(m,f,x)
 	end
 
