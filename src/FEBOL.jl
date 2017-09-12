@@ -7,6 +7,7 @@ import PyPlot.plot
 using StatsBase: sample
 using Reel
 
+
 export SearchDomain, theta!
 export Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
