@@ -1,9 +1,8 @@
 ######################################################################
 # costs.jl
 #
-# TODO: export CostModel so people can extend it?
 ######################################################################
-export ConstantCost, MoveCost, MoveCost2, MoveAndRotateCost
+export CostModel, ConstantCost, MoveCost, MoveCost2, MoveAndRotateCost
 
 abstract type CostModel end
 

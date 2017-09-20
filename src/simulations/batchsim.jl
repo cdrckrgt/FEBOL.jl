@@ -3,21 +3,6 @@
 #
 # running many simulations
 ######################################################################
-export SimUnit
-
-######################################################################
-# Simulation unit
-######################################################################
-type SimUnit
-	x::Vehicle
-	f::AbstractFilter
-	p::Policy
-	cm::CostModel
-
-	function SimUnit(x::Vehicle, f::AbstractFilter, p::Policy, cm::CostModel=ConstantCost(1.0))
-		return new(x,f,p,cm)
-	end
-end
 
 # The following are just helper functions that simplify signatures
 function update!(su::SimUnit, o::Float64)

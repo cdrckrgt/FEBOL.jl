@@ -71,6 +71,7 @@ include("simulations/plotting.jl")
 #PyCall.PyDict(matplotlib["rcParams"])["font.family"]=["serif"]
 rc("font", family="serif")
 include("simulations/gif.jl")
+include("simulations/simunit.jl")
 include("simulations/batchsim.jl")
 
 # for some gps stuff...
