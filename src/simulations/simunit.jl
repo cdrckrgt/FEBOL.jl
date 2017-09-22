@@ -42,6 +42,7 @@ function simulate(m::SearchDomain, uav::SimUnit, tc::TerminationCondition; video
 
 	# plot if need be
 	if video
+		figure("Simulation")
 		plot(m, uav.f, uav.x)
 		title("i = $(step_count)")
 	end
@@ -65,6 +66,7 @@ function simulate(m::SearchDomain, uav::SimUnit, tc::TerminationCondition; video
 		# plot if need be
 		if video
 			pause(pause_time)
+			figure("Simulation")
 			cla()
 			plot(m, uav.f, uav.x)
 			max_b = maximum(uav.f.b)
