@@ -32,8 +32,11 @@ The :code:`CirclePolicy` implicitly assumes that the sensor is of :code:`Bearing
 
 Custom Policy
 ===================
-You can create your own policies by extending the abstract :code:`Policy` class and implementing the :code:`action` function. Below is an example:
+You can create your own policies by extending the abstract :code:`Policy` class and implementing the :code:`action` function. Below is an example. Remember that to extend :code:`FEBOL`'s :code:`action` function, you must import it instead of just relying on :code:`using`:
 ::
+
+    using FEBOL
+    import FEBOL.action
 
     type CustomPolicy <: Policy
     end
