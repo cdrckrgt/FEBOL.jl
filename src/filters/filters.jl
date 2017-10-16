@@ -4,6 +4,7 @@
 ######################################################################
 
 abstract type AbstractFilter end
+export AbstractFilter
 
 """
 `update!(f::AbstractFilter, x::Vehicle, o::Real)`
