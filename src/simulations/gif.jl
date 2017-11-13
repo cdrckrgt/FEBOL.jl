@@ -9,8 +9,8 @@
 """
 function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int=10, filename="out.gif"; seconds_per_step=0.5, show_mean=false, show_cov=false, show_path=false)
 	frames = Frames(MIME("image/png"), fps=20)
-	path_x = Array(Float64,0)
-	path_y = Array(Float64,0)
+	path_x = Float64[]
+	path_y = Float64[]
 
 	# Plot the original scene
 	plot(m, f, x)
@@ -49,7 +49,9 @@ function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_step
 			close()
 		end
 	end
-	write(filename, frames)
+	#write(filename, frames)
+	write("temp.mp4", frames)
+	write("temp.gif", frames)
 end
 
 gif() = gif(Main.m, Main.x, Main.f, Main.p, 10)
