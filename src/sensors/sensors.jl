@@ -8,6 +8,8 @@ include("bearing.jl")
 include("range.jl")
 include("diromni.jl")
 include("fov.jl")
+include("fovn.jl")
+include("fov3.jl")
 
 function observe(m::SearchDomain, s::Sensor, p::Pose)
 	error("`observe` not defined for this sensor.")

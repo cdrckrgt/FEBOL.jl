@@ -5,7 +5,7 @@
 # Currently only considers a small set of the possible actions
 ######################################################################
 type GreedyPolicy <: Policy
-	n::Int
+	n::Int                      # only used to generate action list
 	actions::Vector{Action}
 
 	function GreedyPolicy(x::Vehicle, n::Int)
@@ -52,6 +52,11 @@ type GreedyPolicy <: Policy
 		actions = make_action_list(x, n)
 		return new(n, actions)
 	end
+	function GreedyPolicy(x::Vehicle, ::FOV3, n::Int)
+		actions = make_action_list(x, n)
+		return new(n, actions)
+	end
+    GreedyPolicy() = new()
 end
 
 function make_action_list(x::Vehicle, n::Int)
