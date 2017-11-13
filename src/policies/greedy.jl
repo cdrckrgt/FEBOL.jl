@@ -20,24 +20,24 @@ type GreedyPolicy <: Policy
 	end
 	function GreedyPolicy(x::Vehicle, ::BearingOnly, n::Int)
         actions = make_action_list(x.max_step, n, 0)
-		return new(n, actions)
+		return new(actions)
 	end
 	function GreedyPolicy(x::Vehicle, ::RangeOnly, n::Int)
         actions = make_action_list(x.max_step, n, 0)
-		return new(n, actions)
+		return new(actions)
 	end
 	function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
         actions = make_action_list(x.max_step, n, [-10,0,10])
-		return new(n, actions)
+		return new(actions)
 	end
 
 	function GreedyPolicy(x::Vehicle, ::FOV, n::Int)
 		actions = make_action_list(x.max_step, n, [-10,0,10])
-		return new(n, actions)
+		return new(actions)
 	end
 	function GreedyPolicy(x::Vehicle, ::FOV3, n::Int)
         actions = make_action_list(x.max_step, n, [-10,0,10])
-		return new(n, actions)
+		return new(actions)
 	end
 end
 
