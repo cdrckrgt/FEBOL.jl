@@ -1,19 +1,27 @@
 ######################################################################
-# fov.jl
+# fovm.jl
+#
+# like FOV, but allow for more regions?
 ######################################################################
 
 type FOV <: Sensor
-	region_probs::Vector{NTuple{2,Float64}}
+    cone_width::Float64
+    alpha::Float64          # mistake rate
 
 	# for discretized measurements
 	num_bins::Int
 	bin_range::UnitRange{Int64}
 
-	FOV(region_probs::Vector{NTuple{2,Float64}}) = new(region_probs, 2, 0:1)
+    function FOV(cone_width::Real, alpha::Float64)
+        return new(float(cone_width), alpha, 2, 0:1)
+    end
+
+    FOV() = FOV(120.0, 0.1)
+
 end
 
 
-# 1 means it is in the field of view
+# 1 means it is in the field of view of front antenna
 # 0 means it is not
 function observe(m::SearchDomain, s::FOV, p::Pose)
 
@@ -23,15 +31,17 @@ function observe(m::SearchDomain, s::FOV, p::Pose)
 		rel_bearing = -1.0 * rel_bearing
 	end
 
-	prob_in_view = 0.0
-	n = length(s.region_probs)
-	for i = 1:n
-		temp_angle, temp_prob = s.region_probs[i]
-		if rel_bearing  <= temp_angle
-			prob_in_view = temp_prob
-			break
-		end
-	end
+    a1 = s.cone_width / 2.0
+    a2 = 180.0 - a1
+
+    prob_in_view = 0.0
+    if rel_bearing < a1
+        prob_in_view = 1.0 - s.alpha
+    elseif rel_bearing < a2
+        prob_in_view = 0.5
+    else
+        prob_in_view = s.alpha
+    end
 
 	o = (rand() < prob_in_view) ? 1.0 : 0.0
 	return o
@@ -49,17 +59,22 @@ function O(s::FOV, theta::LocTuple, p::Pose, o::Float64)
 		rel_bearing = -1.0 * rel_bearing
 	end
 
-	prob_in_view = 0.0
-	n = length(s.region_probs)
-	for i = 1:n
-		temp_angle, temp_prob = s.region_probs[i]
-		if rel_bearing  <= temp_angle
-			prob_in_view = temp_prob
-			break
-		end
-	end
+    a1 = s.cone_width / 2.0
+    a2 = 180.0 - a1
 
+    prob_in_view = 0.0  # probability in view of front antenna
+
+    if rel_bearing < a1
+        prob_in_view = 1.0 - s.alpha
+    elseif rel_bearing < a2
+        prob_in_view = 0.5
+    else
+        prob_in_view = s.alpha
+    end
+
+    # prob that it's one (in view of front antenna)
 	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+
 	return ret_val
 end
 
@@ -73,15 +88,19 @@ function O(s::FOV, theta::LocTuple, xp::Pose, o::ObsBin)
 		rel_bearing = -1.0 * rel_bearing
 	end
 
-	prob_in_view = 0.0
-	n = length(s.region_probs)
-	for i = 1:n
-		temp_angle, temp_prob = s.region_probs[i]
-		if rel_bearing  <= temp_angle
-			prob_in_view = temp_prob
-			break
-		end
-	end
+    a1 = s.cone_width / 2.0
+    a2 = 180.0 - a1
+
+    prob_in_view = 0.0  # probability in view of front antenna
+
+    if rel_bearing < a1
+        prob_in_view = 1.0 - s.alpha
+    elseif rel_bearing < a2
+        prob_in_view = 0.5
+    else
+        prob_in_view = s.alpha
+    end
+
 
 	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
 	return ret_val
