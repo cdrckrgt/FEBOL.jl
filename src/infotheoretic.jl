@@ -3,17 +3,17 @@
 # has things like mutual information and stuff
 ######################################################################
 
+export mutual_information3
 export p_obs
 # sum over all possible jammer locations
 function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
 	prob = 0.0
-	for theta_x = 1:df.n
-		for theta_y = 1:df.n
-			if df.b[theta_x,theta_y] > 0.0
-				tx = (theta_x-0.5) * df.cell_size
-				ty = (theta_y-0.5) * df.cell_size
-				#prob += df.b[theta_x, theta_y] * O(x, x.sensor, xp, (xj,yj), o, df)
-				prob += df.b[theta_x, theta_y] * O(x.sensor, (tx,ty), xp, o)
+	for txi = 1:df.n
+		for tyi = 1:df.n
+			if df.b[txi,tyi] > 0.0
+				tx = (txi-0.5) * df.cell_size
+				ty = (tyi-0.5) * df.cell_size
+				prob += df.b[txi, tyi] * O(df.sensor, (tx,ty), xp, o)
 			end
 		end
 	end
@@ -42,7 +42,7 @@ function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 				ty = (tyi - 0.5) * df.cell_size
 
 				if df.b[txi, tyi] > 0.0
-					pot = O(x.sensor, (tx,ty), xp, o)
+					pot = O(df.sensor, (tx,ty), xp, o)
 					if pot > 0.0
 						H_o_t -= pot * df.b[txi, tyi] * log(pot)
 					end
@@ -86,6 +86,23 @@ function mutual_information(m::SearchDomain, uav::Vehicle, df::DF)
 	return mut_info
 end
 
+# for FOV stuff... this is ugly
+function mutual_information3(m::SearchDomain, uav::Vehicle, df::DF)
+	mut_info = zeros(df.n, df.n, df.n)
+	for xv = 1:df.n
+		x = (xv - 0.5) * df.cell_size
+		for yv = 1:df.n
+			y = (yv - 0.5) * df.cell_size
+			for zv = 1:df.n
+				z = (zv - 0.5) * (360./21.0)
+				xp = (x, y, z)
+				mut_info[xv,yv,zv] = mutual_information(m, uav, df, xp)
+			end
+		end
+	end
+	return mut_info
+end
+
 function mutual_information2(m::SearchDomain, uav::Vehicle, df::DF)
 	mut_info = zeros(df.n, df.n)
 	for xv = 1:df.n
@@ -104,6 +121,7 @@ end
 # fisher information
 export fisher_det
 
+# TODO: mega wrong, don't pass in the uav's sensor, pass in the filter's
 fisher_det(uav::Vehicle, df::DF) = fisher_det(uav.sensor, df)
 
 function fisher_det(bo::BearingOnly, df::DF)
