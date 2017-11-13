@@ -25,6 +25,8 @@ end
 
 function reset!(p::Policy) end
 
+# to make action lists
+include("action_list.jl")
 
 ######################################################################
 # greedy policies

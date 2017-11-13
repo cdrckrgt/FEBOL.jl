@@ -5,80 +5,42 @@
 # Currently only considers a small set of the possible actions
 ######################################################################
 type GreedyPolicy <: Policy
-	n::Int                      # only used to generate action list
 	actions::Vector{Action}
 
+    GreedyPolicy() = new()
+
+    function GreedyPolicy(max_step, n, headings; stay=true)
+        return new( make_action_list(max_step, n, headings) )
+    end
+
+
+    # Functions below are garbage and should be eliminated
 	function GreedyPolicy(x::Vehicle, n::Int)
 		return GreedyPolicy(x, x.sensor, n)
 	end
 	function GreedyPolicy(x::Vehicle, ::BearingOnly, n::Int)
-
-		angles = linspace(0.0, 360 - 360/n, n)
-
-		# create list of actions
-		actions = Array{Action}(n+1)
-		for i = 1:n
-			ax = x.max_step * sind(angles[i])
-			ay = x.max_step * cosd(angles[i])
-			actions[i] = (ax, ay, 0.0)
-		end
-		actions[n+1] = (0.0, 0.0, 0.0)
-
+        actions = make_action_list(x.max_step, n, 0)
 		return new(n, actions)
 	end
-
-	# TODO: this is garbage, make it generic
 	function GreedyPolicy(x::Vehicle, ::RangeOnly, n::Int)
-
-		angles = linspace(0.0, 360 - 360/n, n)
-
-		# create list of actions
-		actions = Array{Action}(n+1)
-		for i = 1:n
-			ax = x.max_step * sind(angles[i])
-			ay = x.max_step * cosd(angles[i])
-			actions[i] = (ax, ay, 0.0)
-		end
-		actions[n+1] = (0.0, 0.0, 0.0)
-
+        actions = make_action_list(x.max_step, n, 0)
 		return new(n, actions)
 	end
 	function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
-		actions = make_action_list(x, n)
+        actions = make_action_list(x.max_step, n, [-10,0,10])
 		return new(n, actions)
 	end
 
 	function GreedyPolicy(x::Vehicle, ::FOV, n::Int)
-		actions = make_action_list(x, n)
+		actions = make_action_list(x.max_step, n, [-10,0,10])
 		return new(n, actions)
 	end
 	function GreedyPolicy(x::Vehicle, ::FOV3, n::Int)
-		actions = make_action_list(x, n)
+        actions = make_action_list(x.max_step, n, [-10,0,10])
 		return new(n, actions)
 	end
-    GreedyPolicy() = new()
 end
 
-function make_action_list(x::Vehicle, n::Int)
-	angles = linspace(0.0, 360 - 360/n, n)
-	d_angle = 10.0
-
-	# create list of actions
-	actions = Array{Action}(3n+3)
-	for i = 1:n
-		ax = x.max_step * sind(angles[i])
-		ay = x.max_step * cosd(angles[i])
-
-		actions[i] = (ax, ay, -d_angle)
-		actions[i+n] = (ax, ay, 0.0)
-		actions[i+2n] = (ax, ay, d_angle)
-	end
-	actions[3n+1] = (0.0, 0.0, -d_angle)
-	actions[3n+2] = (0.0, 0.0, 0.0)
-	actions[3n+3] = (0.0, 0.0, d_angle)
-
-	return actions
-end
 
 
 # loop over all actions.
