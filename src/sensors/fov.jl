@@ -102,7 +102,7 @@ function O(s::FOV, theta::LocTuple, xp::Pose, o::ObsBin)
     end
 
 
-    ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+    ret_val = (o == 1) ? prob_in_view : (1.0 - prob_in_view)
     return ret_val
 end
 
