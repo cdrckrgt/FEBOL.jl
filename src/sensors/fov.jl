@@ -1,16 +1,16 @@
 ######################################################################
-# fovm.jl
+# fov.jl
 #
-# like FOV, but allow for more regions?
+# field of view sensor
 ######################################################################
 
 type FOV <: Sensor
     cone_width::Float64
     alpha::Float64          # mistake rate
 
-	# for discretized measurements
-	num_bins::Int
-	bin_range::UnitRange{Int64}
+    # for discretized measurements
+    num_bins::Int
+    bin_range::UnitRange{Int64}
 
     function FOV(cone_width::Real, alpha::Float64)
         return new(float(cone_width), alpha, 2, 0:1)
