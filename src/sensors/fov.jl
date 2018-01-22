@@ -25,11 +25,11 @@ end
 # 0 means it is not
 function observe(m::SearchDomain, s::FOV, p::Pose)
 
-	# ensure bearing is reflected across
-	rel_bearing = fit_180(p[3] - true_bearing(p, m.theta))
-	if rel_bearing < 0.0
-		rel_bearing = -1.0 * rel_bearing
-	end
+    # ensure bearing is reflected across
+    rel_bearing = fit_180(p[3] - true_bearing(p, m.theta))
+    if rel_bearing < 0.0
+        rel_bearing = -1.0 * rel_bearing
+    end
 
     a1 = s.cone_width / 2.0
     a2 = 180.0 - a1
@@ -43,8 +43,8 @@ function observe(m::SearchDomain, s::FOV, p::Pose)
         prob_in_view = s.alpha
     end
 
-	o = (rand() < prob_in_view) ? 1.0 : 0.0
-	return o
+    o = (rand() < prob_in_view) ? 1.0 : 0.0
+    return o
 end
 
 
@@ -53,11 +53,11 @@ end
 #  0 = not in field of view
 function O(s::FOV, theta::LocTuple, p::Pose, o::Float64)
 
-	# determine relative bearing and fix it in 0 to 180
-	rel_bearing = fit_180(p[3] - true_bearing(p, theta))
-	if rel_bearing < 0.0
-		rel_bearing = -1.0 * rel_bearing
-	end
+    # determine relative bearing and fix it in 0 to 180
+    rel_bearing = fit_180(p[3] - true_bearing(p, theta))
+    if rel_bearing < 0.0
+        rel_bearing = -1.0 * rel_bearing
+    end
 
     a1 = s.cone_width / 2.0
     a2 = 180.0 - a1
@@ -82,11 +82,11 @@ end
 # I don't really get why this is here...
 #function O(x::Vehicle,s::FOV, xp::Pose, theta::LocTuple, o::ObsBin, df::DF)
 function O(s::FOV, theta::LocTuple, xp::Pose, o::ObsBin)
-	# determine relative bearing and fix it in 0 to 180
-	rel_bearing = fit_180(xp[3] - true_bearing(xp, theta))
-	if rel_bearing < 0.0
-		rel_bearing = -1.0 * rel_bearing
-	end
+    # determine relative bearing and fix it in 0 to 180
+    rel_bearing = fit_180(xp[3] - true_bearing(xp, theta))
+    if rel_bearing < 0.0
+        rel_bearing = -1.0 * rel_bearing
+    end
 
     a1 = s.cone_width / 2.0
     a2 = 180.0 - a1
@@ -102,8 +102,8 @@ function O(s::FOV, theta::LocTuple, xp::Pose, o::ObsBin)
     end
 
 
-	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
-	return ret_val
+    ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+    return ret_val
 end
 
 obs2bin(o::Float64, s::FOV) = round(Int, o)
