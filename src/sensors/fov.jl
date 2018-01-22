@@ -73,9 +73,9 @@ function O(s::FOV, theta::LocTuple, p::Pose, o::Float64)
     end
 
     # prob that it's one (in view of front antenna)
-	ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+    ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
 
-	return ret_val
+    return ret_val
 end
 
 
