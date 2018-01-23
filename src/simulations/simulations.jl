@@ -40,69 +40,8 @@ function simulate(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, tc:
 	end
 end
 
-function steps!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int; video::Bool=true, delay::Real=0.5)
-	# Show current step first
-	if video
-		clf()
-		plot(m,f,x)
-	end
 
-	# Then go through steps
-	for i = 1:num_steps
-		if video; pause(delay); end
-		step!(m,x,f,p; video=video)
-		#title("e = $(round(entropy(f),2))")
-	end
-end
-
-function steps!(num_steps::Int64=10; video::Bool=true, delay::Real=0.5)
-	steps!(Main.m, Main.x, Main.f, Main.p, num_steps, video=video, delay=delay)
-end
-
-# Really, we want a vector of AbstractFilters
-# TODO: vector of abstract filters
-"""
-`batchsim(m,x,f,p,num_sims)`
-
-Currently:
-
-* starts vehicle at center of search domain
-* runs each simulation for 40 steps
-* results is num_sims by num_filters array
-
-"""
-function batchsim(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_sims::Int)
-	batchsim(m, x, [f], p, num_sims)
-end
-function batchsim{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int, num_steps::Int)
-	num_filters = length(farr)
-	results = zeros(num_sims, num_filters)
-	for i = 1:num_sims
-		println()
-		print("Starting sims ", i, ": ")
-		# Set new jammer location
-		jx = m.length * rand()
-		jy = m.length * rand()
-		theta!(m, jx, jy)
-
-		# run the simulation for all filters/policies
-		for fi = 1:num_filters 
-			print("f:", fi)
-			f = farr[fi]
-			x.x = m.length / 2.0
-			x.y = m.length / 2.0
-			steps!(m, x, f, p, num_steps; video=false)
-			print("d ")
-
-			# calculate the error
-			c = centroid(f)
-			results[i, fi] = norm2(c, m.theta)
-			reset!(f)
-		end
-	end
-	return results
-end
-
+# TODO: I think this needs to go
 # This is for testing with a dumb policy that we can apply to all filters
 function batchsim2{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector{TF}, p::Policy, num_sims::Int, num_steps::Int)
 	num_filters = length(farr)
@@ -147,6 +86,7 @@ function batchsim2{TF<:AbstractFilter}(m::SearchDomain, x::Vehicle, farr::Vector
 	return results, times ./ (num_steps*num_sims)
 end
 
+# TODO: I think this needs to go
 # This is for testing with a dumb policy that we can apply to all filters
 function batchsim2{TP<:Policy}(m::SearchDomain, x::Vehicle, f::AbstractFilter, parr::Vector{TP}, num_sims::Int, num_steps::Int)
 	num_policies = length(parr)
