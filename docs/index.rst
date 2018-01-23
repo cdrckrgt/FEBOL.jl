@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to FEBOL's documentation!
+Welcome to FEBOL's documentation.
 =================================
 
 .. toctree::
@@ -15,8 +15,8 @@ Welcome to FEBOL's documentation!
     Sensors <sensors.rst>
     Filters <filters.rst>
     Policies <policies.rst>
+    SimUnit <sim_unit.rst>
     Simulations <simulations.rst>
-    Batch Simulations <batchsim.rst>
     TODO <todo.rst>
 
 

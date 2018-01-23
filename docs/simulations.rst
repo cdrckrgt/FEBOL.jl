@@ -32,6 +32,19 @@ It assumes you have a model :code:`m`, a Vehicle :code:`x`, a filter :code:`f`, 
 If you've named your objects that way, you don't have to remember the arguments required for :code:`steps!`.
 Alternatively, you can specify a number of steps: :code:`steps!(30)`.
 
+Batch Simulations
+=======================
+Sometimes, we want to run a batch of simulations to evaluate the average performance of a sensor and policy.
+Sometimes we want to test multiple different sensors and policies at the same time.
+
+FEBOL's framework performing these batch simulations is the :code:`batchsim` function, which has the following signature:
+
+::
+
+    batchsim(m::SearchDomain, vsu::Vector{SimUnit}, num_sims::Int, tc::TerminationCondition)
+
+What this returns is
+
 
 Creating GIFs
 =================

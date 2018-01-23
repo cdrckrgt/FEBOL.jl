@@ -1,16 +1,6 @@
 ====================
-Batch Simulations
+Sim Unit
 ====================
-Sometimes, we want to run a batch of simulations to evaluate the average performance of a sensor and policy.
-Sometimes we want to test multiple different sensors and policies at the same time.
-
-FEBOL's framework performing these batch simulations is the :code:`batchsim` function, which has the following signature:
-
-::
-
-    batchsim(m::SearchDomain, vsu::Vector{SimUnit}, num_sims::Int, tc::TerminationCondition)
-
-What this returns is
 
 Simulation Unit
 ==================
