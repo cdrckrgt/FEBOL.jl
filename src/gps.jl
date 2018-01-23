@@ -66,10 +66,11 @@ end
 # TODO: handle different types of beliefs
 function parse_log(filename::String)
 
-	obs = Array(Float64, 0)
-	actions = Array(Pose, 0)
-	beliefs = Array(Matrix{Float64}, 0)
-	states = Array(Pose, 0)
+    obs = Float64[]
+    actions = Pose[]
+    beliefs = Array{Matrix{Float64}}(0)
+	#states = Array(Pose, 0)
+    states = Pose[]
 
 	logfile = open(filename, "r")
 
@@ -99,7 +100,7 @@ function parse_log(filename::String)
 			bline = readline(logfile)
 			arr = split(bline, ",")
 			n = length(arr)
-			b = Array(Float64, n, n)
+            b = zeros(n,n)
 			for i = 1:n
 				b[i,n] = parse(Float64, arr[i])
 			end
