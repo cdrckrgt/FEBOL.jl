@@ -28,6 +28,14 @@ Simulation Unit
         end
     end
 
+Below are the constructors for the :code:`SimUnit` type. At a minimum, it needs a vehicle, filter, and policy. If no cost model is provided, it defaults to :code:`ConstantCost(1.0)`. If no termination condition is provided, it defaults to :code:`StepThreshold(10)`.
+
+::
+    
+    SimUnit(x, f, p)            # default termination and cost
+    SimUnit(x, f, p, tc)        # default cost
+    SimUnit(x, f, p, tc, cm)    # fully defined
+
 
 Cost Model
 ==============
