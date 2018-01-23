@@ -7,13 +7,14 @@
 """
 `gif(m::SearchDomain, x::Vehicle, f::Filter, p::Policy, num_steps=10, filename=out.gif)`
 """
-function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_steps::Int=10, filename="out.gif"; seconds_per_step=0.5, show_mean=false, show_cov=false, show_path=false)
+function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, tc::TerminationCondition=StepThreshold(10), filename="out.gif"; seconds_per_step=0.5, show_mean=false, show_cov=false, show_path=false)
 	frames = Frames(MIME("image/png"), fps=20)
 	path_x = Float64[]
 	path_y = Float64[]
 
 	# Plot the original scene
 	plot(m, f, x)
+    title("\$t\$ = 0 s")
 	push!(frames, gcf())
 	push!(path_x, x.x)
 	push!(path_y, x.y)
@@ -22,7 +23,8 @@ function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_step
 	# 20 is the fps
 	frames_per_step = round(Int, seconds_per_step * 20)
 
-	for i = 1:num_steps
+    step_count = 0
+    while !is_complete(f, tc, step_count)
 		old_pose = (x.x, x.y, x.heading)
 		o = observe(m,x)
 		update!(f, x, o)
@@ -45,9 +47,11 @@ function gif(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, num_step
 			if show_path
 				plot(path_x, path_y)
 			end
+            title("\$t\$ = $step_count s")
 			push!(frames, gcf())
 			close()
 		end
+        step_count += 1
 	end
 	#write(filename, frames)
 	write("temp.mp4", frames)
