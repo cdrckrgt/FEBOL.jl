@@ -17,9 +17,10 @@ end
 # simulation code
 ######################################################################
 
-function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, num_sims::Int, tc::TerminationCondition)
-    costs = zeros(num_sims, length(uav_array))
-    for sim_ind = 1:num_sims
+function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
+
+    costs = zeros(n_sims, length(uav_array))
+    for sim_ind = 1:n_sims
         theta!(m)
         print("Simulation ", sim_ind, ": ")
         for (uav_ind, uav) in enumerate(uav_array)
@@ -42,7 +43,7 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, num_sims::Int, tc
             # What was the cost to getting this first observation?
             temp_cost = get_action_cost(uav.cm)
 
-            while !is_complete(uav.f, tc, step_count)
+            while !is_complete(uav.f, uav.tc, step_count)
                 # act
                 a = action(m, uav, o)
                 act!(m, uav.x, a)
