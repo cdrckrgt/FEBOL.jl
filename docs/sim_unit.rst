@@ -1,9 +1,11 @@
 ====================
-Sim Unit
+SimUnit
 ====================
 
-Simulation Unit
-==================
+The :code:`SimUnit` type stores most of the things needed to run a simulation. This includes the filter, policy, cost model, and termination condition. The cost model and termination condition are discussed in more detail later on this page.
+
+A :code:`SimUnit` has the following fields:
+
 ::
 
     type SimUnit
