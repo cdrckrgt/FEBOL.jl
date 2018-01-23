@@ -21,8 +21,9 @@ Simulation Unit
         f::AbstractFilter
         p::Policy
         cm::CostModel
+        tc::TerminationCondition
 
-        function SimUnit(x::Vehicle, f::AbstractFilter, p::Policy, cm::CostModel=ConstantCost(1.0))
+        function SimUnit(x::Vehicle, f::AbstractFilter, p::Policy, tc::TerminationCondition = StepThreshold(10), cm::CostModel=ConstantCost(1.0))
             return new(x,f,p,cm)
         end
     end
