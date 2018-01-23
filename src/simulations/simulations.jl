@@ -242,3 +242,53 @@ function sim2(j::LocTuple, states::Vector{Pose}, observations::Vector{Float64}, 
 		#act!(m, x, actions[oi])
 	end
 end
+
+# This was for AIAA GNC 2018 paper.
+# This probably shouldn't be here.
+export eval2
+function eval2(j::LocTuple, states::Vector{Pose}, observations::Vector{Float64}, b::Vector{Matrix{Float64}}, m::SearchDomain, x::Vehicle; show_mean=false, show_cov=false, show_path::Bool=true)
+	# always start the vehicle in the center
+	# NO, don't do that
+	#x.x = m.length / 2.0
+	#x.y = m.length / 2.0
+	theta!(m, j[1], j[2])
+
+    front_cone = Float64[]
+    rear_cone = Float64[]
+    sides = Float64[]
+
+
+	# loop through all observations...
+	for (oi,o) in enumerate(observations)
+        # get true bearing between x
+        xt = (x.x,x.y,x.heading)
+        rel_bearing = fit_180(xt[3] - true_bearing(xt, m.theta))
+        if rel_bearing < 0.0
+            rel_bearing = -1.0 * rel_bearing
+        end
+
+
+        cla()
+		plot(m, b[oi], x, show_mean=show_mean, show_cov=show_cov, obs=oi)
+        #title("o = $o")
+        #hold(false)
+        if rel_bearing < 60.0
+            # expect observation 1
+            title("expect 1, got $o")
+            push!(front_cone, o)
+        elseif rel_bearing < 120.0
+            title("expect either, got $o")
+            push!(sides, o)
+        else
+            title("expect 0, got $o")
+            push!(rear_cone,o)
+        end
+        pause(0.15)
+
+        # update vehicle position
+		x.x = states[oi][1]
+		x.y = states[oi][2]
+		x.heading = states[oi][3]
+	end
+    return front_cone, sides, rear_cone
+end
