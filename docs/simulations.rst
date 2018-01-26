@@ -42,8 +42,7 @@ FEBOL's framework performing these batch simulations is the :code:`batchsim` fun
 
     batchsim(m::SearchDomain, vsu::Vector{SimUnit}, num_sims::Int)
 
-What this returns is
-
+This returns a matrix with one row for each simulation and one column for each sim unit. In each simulation (a row), each simulation unit is tested with the same target location. The values in this matrix correspond to the total cost/reward accumulated druing the simulations.
 
 Creating GIFs
 =================
