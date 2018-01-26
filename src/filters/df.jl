@@ -143,19 +143,10 @@ end
 
 
 # Returns the entropy of the distribution.
-# Could just borrow this from Distributions.jl
-function entropy(df::DF)
-	ent = 0.0
-	for xj = 1:df.n
-		for yj = 1:df.n
-			prob = df.b[xj,yj]
-			if prob > 0.0
-				ent -= prob*log(prob)
-			end
-		end
-	end
-	return ent / log(df.n * df.n)
-end
+entropy(df::DF) = entropy(df.b)
+
+# I had this before... a normalized version?
+#entropy(df::DF) = entropy(df.b) / log(df.n * df.n)
 
 
 reset!(f::DF) = fill!(f.b, 1.0/(f.n*f.n))

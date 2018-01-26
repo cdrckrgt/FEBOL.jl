@@ -5,6 +5,7 @@ using PyCall
 using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib, rc, tick_params, clf, cla
 import PyPlot.plot
 using StatsBase: sample
+import StatsBase: entropy
 using Reel
 
 
