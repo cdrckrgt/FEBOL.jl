@@ -41,7 +41,7 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
             step_count = 1
 
             # What was the cost to getting this first observation?
-            temp_cost = get_action_cost(uav.cm)
+            temp_cost = get_cost(uav.cm, uav.f)
 
             while !is_complete(uav.f, uav.tc, step_count)
                 # act
@@ -49,7 +49,7 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
                 act!(m, uav.x, a)
 
                 # get cost and update step count
-                temp_cost += get_action_cost(a, uav.cm)
+                temp_cost += get_cost(uav.cm, uav.f, a)
                 step_count += 1
 
                 # observe and update
