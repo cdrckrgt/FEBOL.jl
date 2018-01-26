@@ -4,8 +4,8 @@
 # Defines a greedy, info-theoretic policy
 # Currently only considers a small set of the possible actions
 ######################################################################
-type GreedyPolicy <: Policy
-	actions::Vector{Action}
+struct GreedyPolicy <: Policy
+    actions::Vector{Action}
 
     GreedyPolicy() = new()
 
@@ -15,30 +15,30 @@ type GreedyPolicy <: Policy
 
 
     # Functions below are garbage and should be eliminated
-	function GreedyPolicy(x::Vehicle, n::Int)
-		return GreedyPolicy(x, x.sensor, n)
-	end
-	function GreedyPolicy(x::Vehicle, ::BearingOnly, n::Int)
+    function GreedyPolicy(x::Vehicle, n::Int)
+        return GreedyPolicy(x, x.sensor, n)
+    end
+    function GreedyPolicy(x::Vehicle, ::BearingOnly, n::Int)
         actions = make_action_list(x.max_step, n, 0)
-		return new(actions)
-	end
-	function GreedyPolicy(x::Vehicle, ::RangeOnly, n::Int)
+        return new(actions)
+    end
+    function GreedyPolicy(x::Vehicle, ::RangeOnly, n::Int)
         actions = make_action_list(x.max_step, n, 0)
-		return new(actions)
-	end
-	function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
+        return new(actions)
+    end
+    function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
         actions = make_action_list(x.max_step, n, [-10,0,10])
-		return new(actions)
-	end
+        return new(actions)
+    end
 
-	function GreedyPolicy(x::Vehicle, ::FOV, n::Int)
-		actions = make_action_list(x.max_step, n, [-10,0,10])
-		return new(actions)
-	end
-	function GreedyPolicy(x::Vehicle, ::FOV3, n::Int)
+    function GreedyPolicy(x::Vehicle, ::FOV, n::Int)
         actions = make_action_list(x.max_step, n, [-10,0,10])
-		return new(actions)
-	end
+        return new(actions)
+    end
+    function GreedyPolicy(x::Vehicle, ::FOV3, n::Int)
+        actions = make_action_list(x.max_step, n, [-10,0,10])
+        return new(actions)
+    end
 end
 
 
@@ -47,19 +47,19 @@ end
 # The one with smallest expected entropy is best
 # We know this depends on sensor
 function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::GreedyPolicy)
-	best_mi = -Inf
-	best_a = (0.0, 0.0, 0.0)
-	for a in p.actions
-		# find out where a will take you
-		xp = new_pose(m, x, a)
-		# compute best mutual information
-		mi = mutual_information(m, x, f, xp)
-		#println("a = ", a)
-		#println("\tmi = ", mi)
-		if mi > best_mi
-			best_mi = mi
-			best_a = a
-		end
-	end
-	return best_a
+    best_mi = -Inf
+    best_a = (0.0, 0.0, 0.0)
+    for a in p.actions
+        # find out where a will take you
+        xp = new_pose(m, x, a)
+        # compute best mutual information
+        mi = mutual_information(m, x, f, xp)
+        #println("a = ", a)
+        #println("\tmi = ", mi)
+        if mi > best_mi
+            best_mi = mi
+            best_a = a
+        end
+    end
+    return best_a
 end
