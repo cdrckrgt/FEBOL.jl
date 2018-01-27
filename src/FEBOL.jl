@@ -9,6 +9,7 @@ import StatsBase: entropy
 using Reel
 
 
+export new_pose
 export SearchDomain, theta!
 export Vehicle
 export Belief, Gaussian, ParticleSet, DiscreteBelief
