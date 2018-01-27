@@ -105,5 +105,7 @@ function O(s::FOV, theta::LocTuple, xp::Pose, o::ObsBin)
     ret_val = (o == 1) ? prob_in_view : (1.0 - prob_in_view)
     return ret_val
 end
+get_prob(s::FOV, theta::LocTuple, xp::Pose, o::ObsBin) = O(s, theta, xp, o)
+export get_prob
 
 obs2bin(o::Float64, s::FOV) = round(Int, o)
