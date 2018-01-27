@@ -29,6 +29,15 @@ function SimUnit(x::Vehicle,
     return SimUnit(x, f, p, cm, tc)
 end
 
+get_cost(su::SimUnit, m) = get_cost(su.cm, m, su.x, su.f)
+get_cost(su::SimUnit, m, a::Action) = get_cost(su.cm, m, su.x, su.f, a)
+
+function reset!(m::SearchDomain, su::SimUnit)
+    reset!(su.f)
+    reset!(m, su.x)
+    reset!(su.p)
+end
+
 
 function simulate(m::SearchDomain, uav::SimUnit;
                   video::Bool=true,
@@ -42,7 +51,7 @@ function simulate(m::SearchDomain, uav::SimUnit;
     #reset!(uav.p)
 
     # What was the cost to getting this first observation?
-    temp_cost = get_cost(uav.cm, uav.f)
+    temp_cost = get_cost(uav, m)
 
     # before doing anything else, we observe
     #  and update filter once
@@ -66,7 +75,7 @@ function simulate(m::SearchDomain, uav::SimUnit;
         act!(m, uav.x, a)
 
         # get cost and update step count
-        temp_cost += get_cost(uav.cm, uav.f, a)
+        temp_cost += get_cost(uav, m, a)
         step_count += 1
 
         # observe and update
