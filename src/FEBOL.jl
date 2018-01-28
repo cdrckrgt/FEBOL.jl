@@ -103,14 +103,8 @@ include("policies/policies.jl")
 # Simulation and Plotting
 include("simulations/termination.jl")
 include("simulations/costs.jl")
-
 include("simulations/simulate.jl")
-
 include("simulations/simunit.jl")
 include("simulations/batchsim.jl")
-
-# for some gps stuff...
-# TODO: let's talk about this gps stuff in README
-include("gps.jl")
 
 end # module
