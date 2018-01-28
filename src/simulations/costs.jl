@@ -2,7 +2,6 @@
 # costs.jl
 #
 ######################################################################
-export CostModel, ConstantCost, MoveCost, MoveCost2, MoveAndRotateCost
 
 abstract type CostModel end
 
