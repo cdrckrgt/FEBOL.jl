@@ -27,10 +27,7 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
             print(uav_ind, ",")
 
             # reset the filter, vehicle, and policy
-            reset!(uav.f)
-            reset!(m, uav.x)
-            reset!(uav.p)
-
+            reset!(m, uav)
 
             # before doing anything else, we observe
             #  and update filter once
