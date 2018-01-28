@@ -1,3 +1,5 @@
+__precompile__()
+
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
