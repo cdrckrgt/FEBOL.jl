@@ -5,7 +5,16 @@ using StatsBase: sample
 import StatsBase: entropy
 
 export
+    SearchDomain,
+    theta!
+
+export
+    Vehicle,
+    new_pose
+
+export
     Sensor,
+    observe,
     update!,
     centroid,
     covariance,
@@ -55,15 +64,9 @@ export
     MoveAndRotateCost
 
 
-export new_pose
-export SearchDomain, theta!
-export Vehicle
-export Belief, Gaussian, ParticleSet
-export observe
 export step!, batchsim, batchsim2, sim
 export act!
 export makenorm
-export gif
 export print_belief
 export LSInitializer, NaiveInitializer
 export my_pdf
@@ -99,9 +102,7 @@ include("policies/policies.jl")
 include("simulations/termination.jl")
 include("simulations/costs.jl")
 
-#include("simulations/simulations.jl")
-
-#include("simulations/gif.jl")
+include("simulations/simulate.jl")
 
 include("simulations/simunit.jl")
 include("simulations/batchsim.jl")
