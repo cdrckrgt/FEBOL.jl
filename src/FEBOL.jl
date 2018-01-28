@@ -1,20 +1,31 @@
 module FEBOL
 
 using Distributions: Normal, cdf, MvNormal, pdf
-#using PyCall
-#using PyPlot: imshow,xlabel,ylabel,contour,figure,pause,hold,axis, title, scatter, gcf, savefig, matplotlib, rc, tick_params, clf, cla
-#import PyPlot.plot
 using StatsBase: sample
 import StatsBase: entropy
 
 export
-    CostModel,
-    get_cost,
+    Sensor,
+    update!,
+    centroid,
+    covariance,
+    entropy,
+    reset!,
 
-    ConstantCost,
-    MoveCost,
-    MoveCost2,
-    MoveAndRotateCost
+    RangeOnly,
+    BearingOnly,
+    DirOmni,
+    FOV,
+    FOVn,
+    FOV3
+
+export
+    AbstractFilter,
+    DF,
+    EKF,
+    EIF,
+    UKF,
+    PF
 
 export 
     Policy,
@@ -29,23 +40,26 @@ export
     GreedyPolicy2
 
 export
-    Sensor,
-    RangeOnly,
-    BearingOnly,
-    DirOmni,
-    FOV,
-    FOVn,
-    FOV3
+    SimUnit,
+
+    TerminationCondition,
+    is_complete,
+    StepThreshold,
+    MaxNormThreshold,
+
+    CostModel,
+    get_cost,
+    ConstantCost,
+    MoveCost,
+    MoveCost2,
+    MoveAndRotateCost
 
 
 export new_pose
 export SearchDomain, theta!
 export Vehicle
-export Belief, Gaussian, ParticleSet, DiscreteBelief
-export DF, EKF, EIF, UKF, PF
-export update!, centroid, covariance, entropy, reset!
+export Belief, Gaussian, ParticleSet
 export observe
-#export plot, hold, plot_vehicle, title, pause
 export step!, batchsim, batchsim2, sim
 export act!
 export makenorm
@@ -54,8 +68,6 @@ export print_belief
 export LSInitializer, NaiveInitializer
 export my_pdf
 export true_bearing
-
-export TerminationCondition
 
 
 const Pose = NTuple{3, Float64}
@@ -82,16 +94,13 @@ include("filters/filters.jl")
 # policies
 include("infotheoretic.jl")
 include("policies/policies.jl")
-#include("policy.jl")
 
 # Simulation and Plotting
 include("simulations/termination.jl")
 include("simulations/costs.jl")
 
 #include("simulations/simulations.jl")
-#include("simulations/plotting.jl")
 
-#rc("font", family="serif")     # moving to FEBOLPlots
 #include("simulations/gif.jl")
 
 include("simulations/simunit.jl")

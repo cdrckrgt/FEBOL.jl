@@ -4,7 +4,6 @@
 ######################################################################
 
 abstract type AbstractFilter end
-export AbstractFilter
 
 """
 `update!(f::AbstractFilter, x::Vehicle, o::Real)`
@@ -15,15 +14,15 @@ If your filter requires this number to be binned into an integer, it must take c
 """
 update!(f::AbstractFilter, x::Vehicle, o::Int) = update!(f, x, float(o))
 function update!(f::AbstractFilter, x::Vehicle, o::Float64)
-	error(typeof(f), " does not yet implement update!(f,x,o).")
+    error(typeof(f), " does not yet implement update!(f,x,o).")
 end
 
 # multi vehile update
 function update!(f::AbstractFilter,vx::Vector{Vehicle}, vo::Vector{Float64})
-	num_vehicles = length(vx)
-	for i = 1:num_vehicles
-		update!(f, vx[i], vo[i])
-	end
+    num_vehicles = length(vx)
+    for i = 1:num_vehicles
+        update!(f, vx[i], vo[i])
+    end
 end
 
 
@@ -33,7 +32,7 @@ end
 Returns the centroid of the filter's belief. If the belief is a Gaussian, this will return the mean.
 """
 function centroid(f::AbstractFilter)
-	error(typeof(f), " does not yet implement centroid(f).")
+    error(typeof(f), " does not yet implement centroid(f).")
 end
 
 
@@ -43,7 +42,7 @@ end
 Returns the covariance of the filter's belief. If the belief is a Gaussian, this will return Sigma.
 """
 function covariance(f::AbstractFilter)
-	error(typeof(f), " does not yet implement centroid(f).")
+    error(typeof(f), " does not yet implement centroid(f).")
 end
 
 
@@ -53,7 +52,7 @@ end
 Returns the entropy of the filter's belief.
 """
 function entropy(f::AbstractFilter)
-	error(typeof(f), " does not yet implement entropy(f).")
+    error(typeof(f), " does not yet implement entropy(f).")
 end
 
 
@@ -63,7 +62,7 @@ end
 Resets the belief of filter `f`.
 """
 function reset!(f::AbstractFilter)
-	error(typeof(f), " does not yet implement reset!(f).")
+    error(typeof(f), " does not yet implement reset!(f).")
 end
 
 
