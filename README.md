@@ -1,6 +1,7 @@
 # FEBOL
 
 [![Build Status](https://travis-ci.org/dressel/FEBOL.jl.svg?branch=master)](https://travis-ci.org/dressel/FEBOL.jl)
+[![Coverage Status](https://coveralls.io/repos/github/dressel/FEBOL.jl/badge.svg?branch=master)](https://coveralls.io/github/dressel/FEBOL.jl?branch=master)
 
 This package allows the testing of various filters and belief representations for a single UAV performing bearing-only localization of a single, stationary jammer.
 The main question I want to answer is: what effects do the various filters and approximations have on localization time and computational time?
