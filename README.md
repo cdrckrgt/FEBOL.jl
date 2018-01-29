@@ -6,7 +6,7 @@
 This package allows the testing of various filters and belief representations for a single UAV performing bearing-only localization of a single, stationary jammer.
 The main question I want to answer is: what effects do the various filters and approximations have on localization time and computational time?
 
-This code is rapidly changing. I make no guarantees about its correctness or usability at any time.
+This code is rapidly changing. I make no guarantees about its correctness or usability at any time. 
 
 Check out the [complete documentation](http://feboljl.readthedocs.io/en/latest/index.html).
 
