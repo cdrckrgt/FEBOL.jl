@@ -6,16 +6,14 @@
 export mutual_information3
 export p_obs
 # sum over all possible jammer locations
-function p_obs(m::SearchDomain, x::Vehicle, df::DF, xp::Pose, o::ObsBin)
+function p_obs(df::DF, xp::Pose, o::ObsBin)
 	prob = 0.0
-	for txi = 1:df.n
-		for tyi = 1:df.n
-			if df.b[txi,tyi] > 0.0
-				tx = (txi-0.5) * df.cell_size
-				ty = (tyi-0.5) * df.cell_size
-				prob += df.b[txi, tyi] * O(df.sensor, (tx,ty), xp, o)
-			end
-		end
+	for txi = 1:df.n, tyi = 1:df.n
+        if df.b[txi,tyi] > 0.0
+            tx = (txi-0.5) * df.cell_size
+            ty = (tyi-0.5) * df.cell_size
+            prob += df.b[txi, tyi] * O(df.sensor, (tx,ty), xp, o)
+        end
 	end
 	return prob
 end
@@ -24,33 +22,46 @@ end
 # xp is a proposed pose
 # really need to loop over all possible observations
 export mutual_information
-function mutual_information(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
+function mutual_information(df::DF, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0
-	#for o = 0:df.num_bins
-	#for o = -20:20  # for DirOmni sensor
-	for o in x.sensor.bin_range
-		po = p_obs(m, x, df, xp, o)
+
+	for o in df.bin_range
+		po = p_obs(df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)
 		end
 
 		# sum over possible jammer locations
-		for txi = 1:df.n
-			for tyi = 1:df.n
-				tx = (txi - 0.5) * df.cell_size
-				ty = (tyi - 0.5) * df.cell_size
+		for txi = 1:df.n, tyi = 1:df.n
+            tx = (txi - 0.5) * df.cell_size
+            ty = (tyi - 0.5) * df.cell_size
 
-				if df.b[txi, tyi] > 0.0
-					pot = O(df.sensor, (tx,ty), xp, o)
-					if pot > 0.0
-						H_o_t -= pot * df.b[txi, tyi] * log(pot)
-					end
-				end
-			end
+            if df.b[txi, tyi] > 0.0
+                pot = O(df.sensor, (tx,ty), xp, o)
+                if pot > 0.0
+                    H_o_t -= pot * df.b[txi, tyi] * log(pot)
+                end
+            end
 		end
 	end
 	return H_o - H_o_t
+end
+
+
+# computes mutual information for all locations
+# the provided discrete filter gives the domain size and belief
+# I need a Vehicle or Sensor to pass into the observation function
+function mutual_information(df::DF)
+    mut_info = zeros(df.n, df.n)
+    for xv = 1:df.n, yv = 1:df.n
+        x = (xv - 0.5) * df.cell_size
+        y = (yv - 0.5) * df.cell_size
+        # TODO: really, should have some other heading
+        xp = (x, y, 0.0)
+        mut_info[xv,yv] = mutual_information(df, xp)
+    end
+    return mut_info
 end
 
 # this version is valid if the sensor noise is the same regardless
@@ -60,7 +71,7 @@ function mutual_information2(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 	H_o = 0.0
 
 	for o in x.sensor.bin_range
-		po = p_obs(m, x, df, xp, o)
+		po = p_obs(df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)
 		end
@@ -69,22 +80,6 @@ function mutual_information2(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
 	return H_o
 end
 
-# computes mutual information for all locations
-# the provided discrete filter gives the domain size and belief
-# I need a Vehicle or Sensor to pass into the observation function
-function mutual_information(m::SearchDomain, uav::Vehicle, df::DF)
-	mut_info = zeros(df.n, df.n)
-	for xv = 1:df.n
-		x = (xv - 0.5) * df.cell_size
-		for yv = 1:df.n
-			y = (yv - 0.5) * df.cell_size
-			# TODO: really, should have some other heading
-			xp = (x, y, 0.0)
-			mut_info[xv,yv] = mutual_information(m, uav, df, xp)
-		end
-	end
-	return mut_info
-end
 
 # for FOV stuff... this is ugly
 function mutual_information3(m::SearchDomain, uav::Vehicle, df::DF)

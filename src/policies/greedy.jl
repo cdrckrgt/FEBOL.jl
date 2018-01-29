@@ -53,7 +53,7 @@ function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::GreedyPolicy)
         # find out where a will take you
         xp = new_pose(m, x, a)
         # compute best mutual information
-        mi = mutual_information(m, x, f, xp)
+        mi = mutual_information(f, xp)
         #println("a = ", a)
         #println("\tmi = ", mi)
         if mi > best_mi
