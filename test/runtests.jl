@@ -1,5 +1,5 @@
 using FEBOL
 using Base.Test
 
-# write your own tests here
-@test 1 == 1
+m = SearchDomain(400, 170, 210)
+@test m.theta = (170.0, 210.0)
