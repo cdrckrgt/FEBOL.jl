@@ -14,10 +14,19 @@ s = BearingOnly()
 s = BearingOnly(5)
 @test s.noise_sigma == 5.0
 
-# a trial simulation
+# bearing only simulation
 m = SearchDomain(200)
 s = FOV()
 f = DF(m, 41, s, 0:1)
+x = Vehicle(100, 100, 0, 5, s)
+p = GreedyPolicy(x, 4)
+simulate(m, x, f, p)
+simulate(m, SimUnit(x,f,p))
+
+# fov simulation
+m = SearchDomain(200)
+s = FOV()
+f = DF(m, 41, s, 0:10:35)
 x = Vehicle(100, 100, 0, 5, s)
 p = GreedyPolicy(x, 4)
 simulate(m, x, f, p)
