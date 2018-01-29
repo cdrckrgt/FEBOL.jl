@@ -32,6 +32,14 @@ function reset!(m::SearchDomain, su::SimUnit)
     reset!(su.p)
 end
 
+# The following are just helper functions that simplify signatures
+function update!(su::SimUnit, o)
+    update!(su.f, su.x, o)
+end
+function action(m::SearchDomain, su::SimUnit, o)
+    return action(m, su.x, o, su.f, su.p)
+end
+
 
 function simulate(m::SearchDomain, uav::SimUnit)
 

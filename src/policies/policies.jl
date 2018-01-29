@@ -12,7 +12,7 @@ abstract type Policy end
 
 Returns an action given SearchDomain `m`, vehicle `x`, observation `o`, filter `f`, and policy `p`.
 """
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::Policy)
+function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter,p::Policy)
 	return error(typeof(p), " does not yet implement action.")
 end
 
@@ -50,7 +50,7 @@ include("waypoint.jl")
 ######################################################################
 type RandomPolicy <: Policy end
 
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::RandomPolicy)
+function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::RandomPolicy)
 	ax = rand() - 0.5
 	ay = rand() - 0.5
 	ah = 10.0
@@ -69,7 +69,7 @@ include("random2.jl")
 ######################################################################
 type SitPolicy <: Policy end
 
-action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SitPolicy) = (0.0,0.0,0.0)
+action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::SitPolicy) = (0.0,0.0,0.0)
 
 
 ######################################################################
@@ -77,7 +77,7 @@ action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SitPolicy)
 ######################################################################
 type SpinPolicy <: Policy end
 
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::SpinPolicy)
+function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::SpinPolicy)
 	return (0.0, 0.0, 10.0)
 end
 
@@ -96,7 +96,7 @@ end
 # Remembers last action to ensure we follow same direction around circle
 # Otherwise, it will "chatter" back and forth
 # TODO: take into account distance from edge
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::AbstractFilter, p::CirclePolicy)
+function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::CirclePolicy)
 	#ax = -1.0 / sind(o)
 	#ay = 1.0 / cosd(o)
 
@@ -141,7 +141,7 @@ end
 # Remembers last action to ensure we follow same direction around circle
 # Otherwise, it will "chatter" back and forth
 # TODO: take into account distance from edge
-function action(m::SearchDomain, x::Vehicle, o::Float64, f::DF, p::SpiralPolicy)
+function action(m::SearchDomain, x::Vehicle, o, f::DF, p::SpiralPolicy)
 	ax = -1.0 / sind(o)
 	ay = 1.0 / cosd(o)
 

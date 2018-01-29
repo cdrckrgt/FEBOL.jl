@@ -37,7 +37,7 @@ function observe(m::SearchDomain, s::FOV, p::Pose)
         prob_in_view = s.alpha
     end
 
-    o = (rand() < prob_in_view) ? 1.0 : 0.0
+    o = (rand() < prob_in_view) ? 1 : 0
     return o
 end
 
@@ -67,7 +67,7 @@ function O(s::FOV, theta::LocTuple, p::Pose, o)
     end
 
     # prob that it's one (in view of front antenna)
-    ret_val = (o == 1.0) ? prob_in_view : (1.0 - prob_in_view)
+    ret_val = (o == 1) ? prob_in_view : (1.0 - prob_in_view)
 
     return ret_val
 end

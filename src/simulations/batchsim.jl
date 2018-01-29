@@ -4,19 +4,6 @@
 # running many simulations
 ######################################################################
 
-# The following are just helper functions that simplify signatures
-function update!(su::SimUnit, o::Float64)
-    update!(su.f, su.x, o)
-end
-function action(m::SearchDomain, su::SimUnit, o::Float64)
-    return action(m, su.x, o, su.f, su.p)
-end
-
-
-######################################################################
-# simulation code
-######################################################################
-
 function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
 
     costs = zeros(n_sims, length(uav_array))
