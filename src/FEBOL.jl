@@ -73,6 +73,7 @@ export print_belief
 export LSInitializer, NaiveInitializer
 export my_pdf
 export true_bearing
+export simulate
 
 
 const Pose = NTuple{3, Float64}
