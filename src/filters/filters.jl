@@ -12,12 +12,11 @@ Updates the belief of filter `f` given a vehicle `x` and observation `o`.
 The observation `o` is a real number in [0,360).
 If your filter requires this number to be binned into an integer, it must take care of that internally.
 """
-update!(f::AbstractFilter, x::Vehicle, o::Int) = update!(f, x, float(o))
-function update!(f::AbstractFilter, x::Vehicle, o::Float64)
+function update!(f::AbstractFilter, x::Vehicle, o)
     error(typeof(f), " does not yet implement update!(f,x,o).")
 end
 
-# multi vehile update
+# multi vehicle update
 function update!(f::AbstractFilter,vx::Vector{Vehicle}, vo::Vector{Float64})
     num_vehicles = length(vx)
     for i = 1:num_vehicles

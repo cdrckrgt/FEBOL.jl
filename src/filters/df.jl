@@ -36,31 +36,25 @@ type DF <: AbstractFilter
 end
 
 # TODO: I think this can be made faster by checking that df.b[xj,yj] > 0
-function update!(df::DF, x::Vehicle, o::Float64)
-	ob = obs2bin(o, df.sensor)
-	num_cells = df.n
-	bp_sum = 0.0
+function update!(df::DF, x::Vehicle, o)
+    n = df.n
+    bp_sum = 0.0
 
-	p = (x.x, x.y, x.heading)
+    p = (x.x, x.y, x.heading)
 
-	for theta_x = 1:num_cells
-		for theta_y = 1:num_cells
-			# convert grid cell number to actual location
-			if df.b[theta_x, theta_y] > 0.0
-				tx = (theta_x-0.5) * df.cell_size
-				ty = (theta_y-0.5) * df.cell_size
-				df.b[theta_x, theta_y] *= O(df.sensor, (tx,ty), p, ob)
-				bp_sum += df.b[theta_x, theta_y]
-			end
-		end
-	end
+    for txi = 1:n, tyi = 1:n
+        if df.b[txi, tyi] > 0.0
+            tx = (txi-0.5) * df.cell_size
+            ty = (tyi-0.5) * df.cell_size
+            df.b[txi, tyi] *= O(df.sensor, (tx,ty), p, o)
+            bp_sum += df.b[txi, tyi]
+        end
+    end
 
-	# normalize
-	for theta_x = 1:num_cells
-		for theta_y = 1:num_cells
-			df.b[theta_x, theta_y] /= bp_sum
-		end
-	end
+    # normalize
+    for txi = 1:n, tyi = 1:n
+        df.b[txi, tyi] /= bp_sum
+    end
 end
 
 
