@@ -6,36 +6,24 @@
 
 # n is the number of cells per side
 # cell_size is size of a single cell
-type DF <: AbstractFilter
-	b::Matrix{Float64}
-	n::Int64
-	cell_size::Float64
-	num_bins::Int64
-	bin_range::UnitRange{Int64}
-	sensor::Sensor
-
-	function DF(m::SearchDomain, n::Int64, num_bins::Int64=36)
-		b = ones(n, n) / (n * n)
-		return new(b, n, m.length/n, num_bins, 0:(num_bins-1), BearingOnly(10))
-	end
-	function DF(m::SearchDomain, n::Int64, bin_range::UnitRange{Int64})
-		b = ones(n, n) / (n * n)
-		num_bins = length(bin_range)
-		return new(b, n, m.length/n, num_bins, bin_range, BearingOnly(10))
-	end
-
-	function DF(m::SearchDomain, n::Int64, sensor::Sensor, num_bins::Int64=36)
-		b = ones(n, n) / (n * n)
-		return new(b, n, m.length/n, num_bins, 0:(num_bins-1), sensor)
-	end
-	function DF(m::SearchDomain, n::Int64, sensor::Sensor, bin_range::UnitRange{Int64})
-		b = ones(n, n) / (n * n)
-		num_bins = length(bin_range)
-		return new(b, n, m.length/n, num_bins, bin_range, sensor)
-	end
+struct DF{OL, S<:Sensor} <: AbstractFilter
+    b::Matrix{Float64}
+    n::Int64
+    cell_size::Float64
+    obs_list::OL
+    sensor::S
+end
+function DF(m::SearchDomain, n::Int64, sensor::Sensor)
+    b = ones(n, n) / (n * n)
+    obs_list = 0:0
+    return DF(b, n, m.length/n, obs_list, sensor)
+end
+function DF(m::SearchDomain, n::Int64, sensor::Sensor, obs_list)
+    b = ones(n, n) / (n * n)
+    return DF(b, n, m.length/n, obs_list, sensor)
 end
 
-# TODO: I think this can be made faster by checking that df.b[xj,yj] > 0
+
 function update!(df::DF, x::Vehicle, o)
     n = df.n
     bp_sum = 0.0
@@ -61,51 +49,45 @@ end
 # returns x, y value
 # Assumes that the belief sums to one
 function centroid(df::DF)
-	x_val = 0.0; y_val = 0.0
-	for x = 1:df.n
-		for y = 1:df.n
-			x_val += (x-.5) * df.b[x,y]
-			y_val += (y-.5) * df.b[x,y]
-		end
-	end
-	return x_val*df.cell_size, y_val*df.cell_size
+    x_val = 0.0; y_val = 0.0
+    for x = 1:df.n, y = 1:df.n
+        x_val += (x-.5) * df.b[x,y]
+        y_val += (y-.5) * df.b[x,y]
+    end
+    return x_val*df.cell_size, y_val*df.cell_size
 end
 
 function centroid(d::Matrix{Float64}, L::Float64)
-	x_val = 0.0; y_val = 0.0
-	n = size(d,1)
-	cell_size = L / n
-	d_sum = 0.0
-	for x = 1:n
-		for y = 1:n
-			x_val += (x-.5) * d[x,y]
-			y_val += (y-.5) * d[x,y]
-			d_sum += d[x,y]
-		end
-	end
-	return x_val*cell_size/d_sum, y_val*cell_size/d_sum
+    x_val = 0.0; y_val = 0.0
+    n = size(d,1)
+    cell_size = L / n
+    d_sum = 0.0
+    for x = 1:n, y = 1:n
+        x_val += (x-.5) * d[x,y]
+        y_val += (y-.5) * d[x,y]
+        d_sum += d[x,y]
+    end
+    return x_val*cell_size/d_sum, y_val*cell_size/d_sum
 end
 
 function covariance(df::DF)
-	mu_x = mu_y = 0.0
-	c_xx = c_xy = c_yy = 0.0
-	for xi = 1:df.n
-		for yi = 1:df.n
-			x = (xi-0.5)*df.cell_size
-			y = (yi-0.5)*df.cell_size
+    mu_x = mu_y = 0.0
+    c_xx = c_xy = c_yy = 0.0
+    for xi = 1:df.n, yi = 1:df.n
+        x = (xi-0.5)*df.cell_size
+        y = (yi-0.5)*df.cell_size
 
-			mu_x += x * df.b[xi,yi]
-			mu_y += y * df.b[xi,yi]
+        mu_x += x * df.b[xi,yi]
+        mu_y += y * df.b[xi,yi]
 
-			c_xx += df.b[xi,yi] * x * x
-			c_yy += df.b[xi,yi] * y * y
-			c_xy += df.b[xi,yi] * x * y
-		end
-	end
-	c_xx -= (mu_x * mu_x)
-	c_yy -= (mu_y * mu_y)
-	c_xy -= (mu_x * mu_y)
-	return [c_xx+1e-4 c_xy; c_xy c_yy+1e-4]
+        c_xx += df.b[xi,yi] * x * x
+        c_yy += df.b[xi,yi] * y * y
+        c_xy += df.b[xi,yi] * x * y
+    end
+    c_xx -= (mu_x * mu_x)
+    c_yy -= (mu_y * mu_y)
+    c_xy -= (mu_x * mu_y)
+    return [c_xx+1e-4 c_xy; c_xy c_yy+1e-4]
 end
 
 

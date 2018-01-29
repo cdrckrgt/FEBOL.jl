@@ -6,16 +6,16 @@
 export mutual_information3
 export p_obs
 # sum over all possible jammer locations
-function p_obs(df::DF, xp::Pose, o::ObsBin)
-	prob = 0.0
-	for txi = 1:df.n, tyi = 1:df.n
+function p_obs(df::DF, xp::Pose, o)
+    prob = 0.0
+    for txi = 1:df.n, tyi = 1:df.n
         if df.b[txi,tyi] > 0.0
             tx = (txi-0.5) * df.cell_size
             ty = (tyi-0.5) * df.cell_size
             prob += df.b[txi, tyi] * O(df.sensor, (tx,ty), xp, o)
         end
-	end
-	return prob
+    end
+    return prob
 end
 
 # computes mutual information for a specific vehicle location
@@ -26,7 +26,7 @@ function mutual_information(df::DF, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0
 
-	for o in df.bin_range
+    for o in df.obs_list
 		po = p_obs(df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)
@@ -63,6 +63,14 @@ function mutual_information(df::DF)
     end
     return mut_info
 end
+
+
+
+
+
+# TODO: I have no idea if anything below is valid
+
+
 
 # this version is valid if the sensor noise is the same regardless
 #  of the vehicle and sensor locations
