@@ -13,18 +13,36 @@ Therefore, visualization code is kept in FEBOLPlots.jl.
 
 Check out the [complete documentation](http://feboljl.readthedocs.io/en/latest/index.html).
 
+## Installation
+
+
+```julia
+Pkg.clone("https://github.com/dressel/FEBOL.jl.git")
+```
+
+To get visualization functionality, you also need FEBOLPlots.jl.
+
+```julia
+Pkg.clone("https://github.com/dressel/FEBOLPlots.jl.git")
+```
+
 ## Quick Example
 
 
 ```julia
+using FEBOL
+
 m = SearchDomain(200, 140, 170)
 s = BearingOnly(5)
 f = DF(m, 41, s, 0:10:350)
 x = Vehicle(100, 100, 0, 5, s)
 p = GreedyPolicy(x, 4)
 
+using FEBOLPlots
 visualize(m, x, f, p)
 ```
+
+There is much more functionality; check out the [complete documentation](http://feboljl.readthedocs.io/en/latest/index.html) for more.
 
 ## TODO:
 
