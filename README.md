@@ -1,7 +1,6 @@
 # FEBOL
 
 [![Build Status](https://travis-ci.org/dressel/FEBOL.jl.svg?branch=master)](https://travis-ci.org/dressel/FEBOL.jl)
-[![Coverage Status](https://coveralls.io/repos/github/dressel/FEBOL.jl/badge.svg?branch=master)](https://coveralls.io/github/dressel/FEBOL.jl?branch=master)
 [![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://feboljl.readthedocs.io/en/latest/)
 
 This package was originally made to test various filters in the bearing-only localization problem (the name FEBOL comes from Filter Exploration for Bearing-Only Localization).
