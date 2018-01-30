@@ -4,6 +4,25 @@
 # running many simulations
 ######################################################################
 
+function simulate(m::SearchDomain, suv::Vector{SimUnit}, n_sims::Int)
+
+    costs = zeros(n_sims, length(suv))
+    for sim_ind = 1:n_sims
+        theta!(m)
+        print("Simulation ", sim_ind, ": ")
+        for (su_ind, su) in enumerate(suv)
+            print(su_ind, ",")
+
+            # reset the filter, vehicle, and policy
+            reset!(m, su)
+
+            costs[sim_ind, su_ind] = simulate(m, su)
+        end
+        println("complete.")
+    end
+    return costs
+end
+
 function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
 
     costs = zeros(n_sims, length(uav_array))
@@ -43,7 +62,7 @@ function batchsim(m::SearchDomain, uav_array::Vector{SimUnit}, n_sims::Int)
 
             costs[sim_ind, uav_ind] = temp_cost
         end
-    println("complete.")
+        println("complete.")
     end
     return costs
 end

@@ -106,8 +106,9 @@ include("policies/policies.jl")
 # Simulation and Plotting
 include("simulations/termination.jl")
 include("simulations/costs.jl")
-include("simulations/simulate.jl")
 include("simulations/simunit.jl")
+include("simulations/simulate.jl")
 include("simulations/batchsim.jl")
+include("simulations/parallel.jl")
 
 end # module

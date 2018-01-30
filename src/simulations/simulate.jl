@@ -23,3 +23,39 @@ function simulate(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, tc:
 		step_count += 1
 	end
 end
+
+function simulate(m::SearchDomain, su::SimUnit)
+
+    # reset the filter, vehicle, and policy
+    # TODO: I think I assume the SimUnit comes in clean and ready to go
+    #reset!(su.f)
+    #reset!(m, su.x)
+    #reset!(su.p)
+
+    # What was the cost to getting this first observation?
+    cost_sum = get_cost(su, m)
+
+    # before doing anything else, we observe
+    #  and update filter once
+    o = observe(m, su.x)
+    update!(su, o)
+
+    # This was our first step; steps count number of observations
+    step_count = 1
+
+    while !is_complete(su.f, su.tc, step_count)
+        # act
+        a = action(m, su, o)
+        act!(m, su.x, a)
+
+        # get cost and update step count
+        cost_sum += get_cost(su, m, a)
+        step_count += 1
+
+        # observe and update
+        o = observe(m, su.x)
+        update!(su, o)
+    end
+
+    return cost_sum
+end
