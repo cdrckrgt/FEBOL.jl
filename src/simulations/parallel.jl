@@ -1,5 +1,4 @@
-export parbatch
-function parbatch(m::SearchDomain, vsu, n_sims::Int)
+function parsim(m::SearchDomain, vsu, n_sims::Int)
     np = nprocs()       # number of processes available
     i = 1
     nextidx() = (idx=i; i+=1; idx)
@@ -11,7 +10,7 @@ function parbatch(m::SearchDomain, vsu, n_sims::Int)
                     while true
                         idx = nextidx()
                         idx > n_sims && break
-                        costs[idx,:]=remotecall_fetch(simulate,p,idx,m,vsu)
+                        costs[idx,:]=remotecall_fetch(psim, p, idx, m, vsu)
                     end
                 end
             end
@@ -20,15 +19,18 @@ function parbatch(m::SearchDomain, vsu, n_sims::Int)
     return costs
 end
 
-function simulate(idx::Int, m::SearchDomain, vsu::Vector{SimUnit}; dc=true)
+# like simulation, but special for parallel simulations
+# main change is deep-copying of arguments so as to not disturb them
+function psim(idx::Int, m::SearchDomain, vsu::Vector{SimUnit})
 
-    if dc
-        m = deepcopy(m)
-        vsu = deepcopy(vsu)
-    end
+    # copy these so they don't get messed up by other cores
+    m = deepcopy(m)
+    vsu = deepcopy(vsu)
+
+    # change the target location
+    theta!(m)
 
     costs = zeros(length(vsu))
-    theta!(m)
 
     print("Simulation ", idx, ": ")
     for (su_ind, su) in enumerate(vsu)

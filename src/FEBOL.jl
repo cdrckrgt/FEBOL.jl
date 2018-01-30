@@ -65,17 +65,19 @@ export
     ConstantCost,
     MoveCost,
     MoveCost2,
-    MoveAndRotateCost
+    MoveAndRotateCost,
+
+    step!,
+    simulate,
+    parsim
 
 
-export step!, batchsim, batchsim2, sim
 export act!
 export makenorm
 export print_belief
 export LSInitializer, NaiveInitializer
 export my_pdf
 export true_bearing
-export simulate
 
 
 const Pose = NTuple{3, Float64}
@@ -108,7 +110,6 @@ include("simulations/termination.jl")
 include("simulations/costs.jl")
 include("simulations/simunit.jl")
 include("simulations/simulate.jl")
-include("simulations/batchsim.jl")
 include("simulations/parallel.jl")
 
 end # module

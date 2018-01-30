@@ -59,3 +59,24 @@ function simulate(m::SearchDomain, su::SimUnit)
 
     return cost_sum
 end
+
+
+# for running batches of simulations
+function simulate(m::SearchDomain, suv::Vector{SimUnit}, n_sims::Int)
+
+    costs = zeros(n_sims, length(suv))
+    for sim_ind = 1:n_sims
+        theta!(m)
+        print("Simulation ", sim_ind, ": ")
+        for (su_ind, su) in enumerate(suv)
+            print(su_ind, ",")
+
+            # reset the filter, vehicle, and policy
+            reset!(m, su)
+
+            costs[sim_ind, su_ind] = simulate(m, su)
+        end
+        println("complete.")
+    end
+    return costs
+end
