@@ -4,13 +4,14 @@
 # like diromni but discretized
 ######################################################################
 
-mutable struct DirOmni <: Sensor
+export BinnedDirOmni
+mutable struct BinnedDirOmni <: Sensor
     means::Vector{Float64}
     stds::Vector{Float64}
 
     bin_range::UnitRange{Int64}
 
-    function DirOmni(file::AbstractString)
+    function BinnedDirOmni(file::AbstractString)
         means = vec(readcsv(file)[:,2])
         stds = 2*ones(360)
         bin_range = -30:30
@@ -19,7 +20,7 @@ mutable struct DirOmni <: Sensor
 end
 
 
-function observe(m::SearchDomain, s::DirOmni, p::Pose)
+function observe(m::SearchDomain, s::BinnedDirOmni, p::Pose)
     # determine the relative bearing
     rel_bearing = p[3] - true_bearing(p, m.theta)
     if rel_bearing < 0.0
@@ -32,7 +33,7 @@ function observe(m::SearchDomain, s::DirOmni, p::Pose)
 end
 
 
-function O(s::DirOmni, theta::LocTuple, xp::Pose, o::Int)
+function O(s::BinnedDirOmni, theta::LocTuple, xp::Pose, o::Int)
     #rel_bearing = x.heading - true_bearing(xp, theta)
     rel_bearing = xp[3] - true_bearing(xp, theta)
     #println("rel_bearing = ", rel_bearing)
@@ -54,4 +55,4 @@ function O(s::DirOmni, theta::LocTuple, xp::Pose, o::Int)
 end
 
 # here, num_bins isn't too important; we just bin to nearest integer
-obs2bin(o::Float64, s::DirOmni) = round(Int, o, RoundDown)
+obs2bin(o::Float64, s::BinnedDirOmni) = round(Int, o, RoundDown)
