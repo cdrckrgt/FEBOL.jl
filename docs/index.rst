@@ -17,6 +17,7 @@ Welcome to FEBOL's documentation.
     Policies <policies.rst>
     SimUnit <sim_unit.rst>
     Simulations <simulations.rst>
+    Visualizations <visualizations.rst>
     TODO <todo.rst>
 
 
