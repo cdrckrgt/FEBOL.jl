@@ -9,14 +9,11 @@ struct GreedyPolicy <: Policy
 
     GreedyPolicy() = new()
 
-    function GreedyPolicy(max_step::Real, n::Int; stay=true)
-        return new( make_action_list(max_step, n, 0) )
+    function GreedyPolicy(max_step::Real, n::Int, headings=0; stay=true)
+        return new( make_action_list(max_step, n, headings, stay=stay) )
     end
-    function GreedyPolicy(max_step::Real, n::Int, headings; stay=true)
-        return new( make_action_list(max_step, n, headings) )
-    end
-    function GreedyPolicy(x::Vehicle, n::Int, headings; stay=true)
-        return new( make_action_list(x.max_step, n, headings) )
+    function GreedyPolicy(x::Vehicle, n::Int, headings=0; stay=true)
+        return new( make_action_list(x.max_step, n, headings, stay=stay) )
     end
 end
 
