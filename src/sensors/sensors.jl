@@ -17,6 +17,7 @@ function O(s::Sensor, theta::LocTuple, p::Pose, o)
 end
 
 include("bearing.jl")
+include("binned_bearing.jl")
 include("range.jl")
 include("diromni.jl")
 include("fov.jl")

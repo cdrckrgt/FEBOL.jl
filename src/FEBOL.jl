@@ -48,7 +48,9 @@ export
     CirclePolicy,
     SpinPolicy,
     GaussianMPC,
-    GreedyPolicy2
+    GreedyPolicy2,
+
+    make_action_list
 
 export
     SimUnit,

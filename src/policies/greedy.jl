@@ -9,35 +9,14 @@ struct GreedyPolicy <: Policy
 
     GreedyPolicy() = new()
 
-    function GreedyPolicy(max_step, n, headings; stay=true)
+    function GreedyPolicy(max_step::Real, n::Int; stay=true)
+        return new( make_action_list(max_step, n, 0) )
+    end
+    function GreedyPolicy(max_step::Real, n::Int, headings; stay=true)
         return new( make_action_list(max_step, n, headings) )
     end
-
-
-    # Functions below are garbage and should be eliminated
-    function GreedyPolicy(x::Vehicle, n::Int)
-        return GreedyPolicy(x, x.sensor, n)
-    end
-    function GreedyPolicy(x::Vehicle, ::BearingOnly, n::Int)
-        actions = make_action_list(x.max_step, n, 0)
-        return new(actions)
-    end
-    function GreedyPolicy(x::Vehicle, ::RangeOnly, n::Int)
-        actions = make_action_list(x.max_step, n, 0)
-        return new(actions)
-    end
-    function GreedyPolicy(x::Vehicle, ::DirOmni, n::Int)
-        actions = make_action_list(x.max_step, n, [-10,0,10])
-        return new(actions)
-    end
-
-    function GreedyPolicy(x::Vehicle, ::FOV, n::Int)
-        actions = make_action_list(x.max_step, n, [-10,0,10])
-        return new(actions)
-    end
-    function GreedyPolicy(x::Vehicle, ::FOV3, n::Int)
-        actions = make_action_list(x.max_step, n, [-10,0,10])
-        return new(actions)
+    function GreedyPolicy(x::Vehicle, n::Int, headings; stay=true)
+        return new( make_action_list(x.max_step, n, headings) )
     end
 end
 
