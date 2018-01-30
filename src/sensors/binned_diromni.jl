@@ -5,7 +5,7 @@
 ######################################################################
 
 export BinnedDirOmni
-mutable struct BinnedDirOmni <: Sensor
+struct BinnedDirOmni <: Sensor
     means::Vector{Float64}
     stds::Vector{Float64}
 
@@ -33,7 +33,7 @@ function observe(m::SearchDomain, s::BinnedDirOmni, p::Pose)
 end
 
 
-function O(s::BinnedDirOmni, theta::LocTuple, xp::Pose, o::Int)
+function O(s::BinnedDirOmni, theta::LocTuple, xp::Pose, o)
     #rel_bearing = x.heading - true_bearing(xp, theta)
     rel_bearing = xp[3] - true_bearing(xp, theta)
     #println("rel_bearing = ", rel_bearing)

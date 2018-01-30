@@ -27,7 +27,7 @@ function observe(m::SearchDomain, s::DirOmni, p::Pose)
 end
 
 
-function O(s::DirOmni, theta::LocTuple, p::Pose, o::Float64)
+function O(s::DirOmni, theta::LocTuple, p::Pose, o)
 
     # calculate the relative int
     rel_bearing = p[3] - true_bearing(p, theta)
