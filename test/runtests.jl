@@ -34,3 +34,7 @@ simulate(m, x, f, p)
 # simunit way
 tc = StepThreshold(10)
 su = SimUnit(x, f, p, tc)
+simulate(m, su)
+
+# batch sims
+simulate(m, su, 10)
