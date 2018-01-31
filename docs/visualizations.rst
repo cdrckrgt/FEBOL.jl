@@ -19,7 +19,7 @@ A simple version can be called with
 
 ::
     
-    visualize(m, x, f, p; n_steps=10, pause_time=0.3)
+    visualize(m, x, f, p, n_steps=10; pause_time=0.3)
 
 where :code:`m` is a SearchDomain, :code:`x` is a Vehicle, :code:`f` is a filter, and :code:`p` is a policy.
 
