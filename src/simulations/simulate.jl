@@ -60,8 +60,12 @@ function simulate(m::SearchDomain, su::SimUnit)
     return cost_sum
 end
 
-# for running batches of simulations
-simulate(m::SearchDomain, su::SimUnit, ns::Int) = simulate(m, [su], ns)
+# for running batches of simulations on a single sim unit
+function simulate(m::SearchDomain, su::SimUnit, ns::Int)
+    return vec( simulate(m, [su], ns) )
+end
+
+# for running batches of simulations on a vector of sim units
 function simulate(m::SearchDomain, suv::Vector{SimUnit}, n_sims::Int)
 
     costs = zeros(n_sims, length(suv))
