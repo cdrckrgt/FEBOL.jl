@@ -2,33 +2,24 @@
 Simulations
 ===============
 
-Simulating a Single Step
-==========================
-Suppose :code:`m` is a search domain, :code:`x` is a vehicle, :code:`f` is a filter, and :code:`p` is a policy.
-You can simulate a step with the following code:
+Quick Simulations
+=====================
+If you've just implemented a sensor, filter, or policy, you might want to run it through a quick simulation to make sure everything works.
+You can simply call
+
 ::
 
-    o = observe(m, x)
-    update!(f, x, o)
-    a = action(m, x, o, f, p)
-    act!(m,x,a)
+    simulate(m, x, f, p, n_steps=10)
 
+where :code:`m` is a SearchDomain, :code:`x` is a Vehicle, :code:`f` is a filter, and :code:`p` is a policy.
+If everything works, no error will be thrown.
 
-The :code:`step!` function performs this code and also plots if the optional :code:`video` argument is set to true.
-::
-
-    step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy; video::Bool=true)
-
-
-Simulating Multiple Steps
+Simulations with SimUnit
 ===========================
-::
-
-    simulate(m, x, f, p, 10)
 
 ::
     
-    simulate(m, su)
+    simulate(m::SearchDomain, su::SimUnit)
 
 
 Batch Simulations
@@ -58,3 +49,9 @@ To run simulations in parallel, use the :code:`parsim` function, which takes the
 ::
     
     parsim(m::SearchDomain, vsu::Vector{SimUnit}, n_sims::Int)
+
+
+Under the Hood
+=================
+
+
