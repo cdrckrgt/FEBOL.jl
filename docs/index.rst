@@ -15,8 +15,8 @@ Welcome to FEBOL's documentation.
     Sensors <sensors.rst>
     Filters <filters.rst>
     Policies <policies.rst>
-    SimUnit <sim_unit.rst>
     Simulations <simulations.rst>
+    SimUnit <sim_unit.rst>
     Visualizations <visualizations.rst>
     TODO <todo.rst>
 
