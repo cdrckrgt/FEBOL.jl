@@ -1,5 +1,7 @@
 #####################################################################
 # simulate.jl
+#
+# TODO: eliminate steps and make simulate with a simunit (maybe)
 ######################################################################
 
 # sample an observation
@@ -15,7 +17,15 @@ function step!(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy)
 	act!(m,x,a)
 end
 
-function simulate(m::SearchDomain, x::Vehicle, f::AbstractFilter, p::Policy, tc::TerminationCondition=StepThreshold(10))
+function simulate(m::SearchDomain,
+                  x::Vehicle,
+                  f::AbstractFilter,
+                  p::Policy,
+                  n_steps::Int=10
+                 )
+
+    tc = StepThreshold(n_steps)
+
 	# Then go through steps
 	step_count = 0
 	while !is_complete(f, tc, step_count)
