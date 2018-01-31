@@ -1,4 +1,4 @@
-function parsim(m::SearchDomain, vsu, n_sims::Int)
+function parsim(m::SearchDomain, vsu::Vector{SimUnit}, n_sims::Int)
     np = nprocs()       # number of processes available
     i = 1
     nextidx() = (idx=i; i+=1; idx)
@@ -17,6 +17,9 @@ function parsim(m::SearchDomain, vsu, n_sims::Int)
         end
     end
     return costs
+end
+function parsim(m::SearchDomain, su::SimUnit, n_sims::Int)
+    return vec( parsim(m, [su], n_sims) )
 end
 
 # like simulation, but special for parallel simulations
