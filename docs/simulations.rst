@@ -34,13 +34,27 @@ Simulating Multiple Steps
 Batch Simulations
 =======================
 Sometimes, we want to run a batch of simulations to evaluate the average performance of a sensor and policy.
-Sometimes we want to test multiple different sensors and policies at the same time.
+We might even want to test different sensors and policies at the same time.
 
-FEBOL's framework performing these batch simulations is the :code:`batchsim` function, which has the following signature:
+You can pass in a vector SimUnits to :code:`simulate` and provide the number of simulations you want to execute per SimUnit.
+For each simulation, the target is initialized to a random location.
+Then each SimUnit is run on this target location.
 
 ::
 
-    batchsim(m::SearchDomain, vsu::Vector{SimUnit}, num_sims::Int)
+    simulate(m::SearchDomain, vsu::Vector{SimUnit}, n_sims::Int)
 
 This returns a matrix with one row for each simulation and one column for each sim unit. In each simulation (a row), each simulation unit is tested with the same target location. The values in this matrix correspond to the total cost/reward accumulated druing the simulations.
 
+
+Parallel Simulations
+=========================
+To devote :code:`n` cores to running simulations, you must start Julia with the following command
+::
+    
+    julia -p n
+
+To run simulations in parallel, use the :code:`parsim` function, which takes the same arguments as the :code:`simulate` function for batch simulations:
+::
+    
+    parsim(m::SearchDomain, vsu::Vector{SimUnit}, n_sims::Int)
