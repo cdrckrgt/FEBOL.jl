@@ -18,7 +18,7 @@ end
 struct StepThreshold <: TerminationCondition
     value::Int
 end
-function is_complete(f::DF, st::StepThreshold, step_count::Int)
+function is_complete(f::AbstractFilter, st::StepThreshold, step_count::Int)
     ret_val = false
     if step_count >= st.value
         ret_val = true
