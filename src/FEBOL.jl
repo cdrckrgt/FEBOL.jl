@@ -5,6 +5,7 @@ module FEBOL
 using Distributions: Normal, cdf, MvNormal, pdf
 using StatsBase: sample
 import StatsBase: entropy
+using ParticleFilters
 
 export
     SearchDomain,
