@@ -18,10 +18,69 @@ function p_obs(df::DF, xp::Pose, o)
     return prob
 end
 
+function p_obs(pf::PF, xp::Pose, o)
+    pr = 0.0
+    ws = weight_sum(pf.b)
+    for i = 1:pf.n
+        pr += O(pf.sensor, pf.b.particles[i], xp, o) * weight(pf.b, i) / ws
+    end
+    return pr
+end
+
+#function mutual_information(pf::PF, xp::Pose)
+#    H_o = 0.0
+#    H_o_t = 0.0
+#
+#    # computing H_o
+#    for o in pf.obs_list
+#        po = p_obs(pf, xp, o)
+#        if po != 0
+#            H_o -= po * log(po)
+#        end
+#    end
+#
+#    # computing H_o_t
+#    ws = weight_sum(pf.b)
+#    for i in pf.n
+#        weight(pf.b, i) / ws
+#        for o in pf.obs_list
+#            po = 
+#            O(pf.sensor, pf.b.particles[i], xp, o)
+#        end
+#    end
+#
+#    return H_o - H_o_t
+#end
+
+# This is just a copy (and modification) of df's version
+# The commented out version above is an attempt from scratch
+function mutual_information(pf::PF, xp::Pose)
+	H_o = 0.0
+	H_o_t = 0.0
+
+    for o in pf.obs_list
+		po = p_obs(pf, xp, o)
+		if po > 0.0
+			H_o -= po * log(po)
+		end
+
+		# sum over possible jammer locations
+        ws = weight_sum(pf.b)
+        for i = 1:pf.n
+            pot = O(pf.sensor, pf.b.particles[i], xp, o)
+            if pot > 0.0
+                H_o_t -= pot * weight(pf.b, i) * log(pot) / ws
+            end
+        end
+	end
+	return H_o - H_o_t
+end
+
 # computes mutual information for a specific vehicle location
 # xp is a proposed pose
 # really need to loop over all possible observations
 export mutual_information
+# this is the one that currently gets called with fov and greedy policy
 function mutual_information(df::DF, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0

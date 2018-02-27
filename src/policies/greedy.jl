@@ -22,7 +22,7 @@ end
 # loop over all actions.
 # The one with smallest expected entropy is best
 # We know this depends on sensor
-function action(m::SearchDomain, x::Vehicle, o, f::DF, p::GreedyPolicy)
+function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::GreedyPolicy)
     best_mi = -Inf
     best_a = (0.0, 0.0, 0.0)
     for a in p.actions
