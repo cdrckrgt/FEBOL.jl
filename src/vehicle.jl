@@ -28,6 +28,10 @@ type Vehicle
 
 end
 
+function get_pose(x::Vehicle)
+    return (x.x, x.y, x.heading)
+end
+
 function reset!(m::SearchDomain, x::Vehicle)
 	x.x = m.length/2.0
 	x.y = m.length/2.0
