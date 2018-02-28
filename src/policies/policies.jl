@@ -32,6 +32,7 @@ include("action_list.jl")
 # greedy policies
 ######################################################################
 include("greedy.jl")
+include("greedyp.jl")
 include("greedy2.jl")
 
 ######################################################################

@@ -19,6 +19,7 @@ end
 # 0 means it is not
 function observe(m::SearchDomain, s::FOV, p::Pose)
 
+
     # ensure bearing is reflected across
     rel_bearing = fit_180(p[3] - true_bearing(p, m.theta))
     if rel_bearing < 0.0
@@ -35,6 +36,14 @@ function observe(m::SearchDomain, s::FOV, p::Pose)
         prob_in_view = 0.5
     else
         prob_in_view = s.alpha
+    end
+
+
+    # if we are too close, then prob_in_view = 0.5
+    dx = p[1] - m.theta[1]
+    dy = p[2] - m.theta[2]
+    if (dx*dx + dy*dy) < 150.0
+        prob_in_view = 0.5
     end
 
     o = (rand() < prob_in_view) ? 1 : 0
@@ -64,6 +73,13 @@ function O(s::FOV, theta::LocTuple, p::Pose, o)
         prob_in_view = 0.5
     else
         prob_in_view = s.alpha
+    end
+
+    # if we are too close, then prob_in_view = 0.5
+    dx = p[1] - theta[1]
+    dy = p[2] - theta[2]
+    if (dx*dx + dy*dy) < 150.0
+        prob_in_view = 0.5
     end
 
     # prob that it's one (in view of front antenna)

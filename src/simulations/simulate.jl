@@ -58,6 +58,8 @@ function simulate(m::SearchDomain, su::SimUnit)
         a = action(m, su, o)
         act!(m, su.x, a)
 
+        move_target!(m)
+
         # get cost and update step count
         cost_sum += get_cost(su, m, a)
         step_count += 1

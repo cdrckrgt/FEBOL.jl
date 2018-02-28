@@ -43,7 +43,7 @@ end
 #  theta - location of jammer
 #
 # Returns true angle, measured from north, in degrees.
-function true_bearing(xp::LocTuple, theta::LocTuple)
+function true_bearing(xp::NTuple{2,Float64}, theta::LocTuple)
 	xr = theta[1] - xp[1]
 	yr = theta[2] - xp[2]
 	return mod(rad2deg(atan2(xr,yr)), 360)

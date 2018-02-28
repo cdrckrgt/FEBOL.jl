@@ -38,7 +38,9 @@ export
     EKF,
     EIF,
     UKF,
-    PF
+
+    PF,
+    particle
 
 export 
     Policy,
@@ -47,6 +49,7 @@ export
     RandomPolicy,
     SitPolicy,
     GreedyPolicy,
+    GreedyP,
     CirclePolicy,
     SpinPolicy,
     GaussianMPC,
@@ -73,6 +76,15 @@ export
     simulate,
     parsim
 
+export
+    Model,
+    MotionModel,
+    StationaryMotion,
+    RandomMotion,
+    ConstantMotion,
+    move_target!,
+    move_target
+
 
 export act!
 export makenorm
@@ -84,7 +96,8 @@ export true_bearing
 
 const Pose = NTuple{3, Float64}
 const Action = NTuple{3, Float64}
-const LocTuple = NTuple{2, Float64}
+const LocTuple = NTuple{4, Float64}
+const TargetTuple = NTuple{4, Float64}
 const ObsBin = Int64
 
 export Pose
@@ -93,6 +106,7 @@ export Pose
 include("math.jl")
 
 # search domain
+include("motion_model.jl")
 include("searchdomain.jl")
 
 # Sensing models

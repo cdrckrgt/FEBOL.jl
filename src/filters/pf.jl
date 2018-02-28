@@ -3,79 +3,69 @@
 #
 # starting to migrate over to ParticleFilters.jl
 ######################################################################
-"""
-    BoolDistribution
-A distribution that provides the probabilities of true or false. 
-Can construct with `BoolDistribution(p_true)`.
-"""
-struct BoolDistribution
-    p::Float64 # probability of true
-end
-
-import Base: ==
-ParticleFilters.pdf(d::BoolDistribution, s::Bool) = s ? d.p : 1.0-d.p
-
-Base.rand(rng::AbstractRNG, d::BoolDistribution) = rand(rng) <= d.p
-
-ParticleFilters.iterator(d::BoolDistribution) = [true, false]
-
-==(d1::BoolDistribution, d2::BoolDistribution) = d1.p == d2.p
-
-Base.hash(d::BoolDistribution) = hash(d.p)
-
-Base.length(d::BoolDistribution) = 2
-
-# assumes target is stationary
-struct StationaryModel
-    x::Vehicle
-end
-
-# s and sp will be LocTuple's
 
 # generate new target position
-ParticleFilters.generate_s(sm::Vehicle, s, a, rng::AbstractRNG) = s
+#ParticleFilters.generate_s(sm::Vehicle, s, a, rng::AbstractRNG) = s
 
-#function ParticleFilters.observation(x::Vehicle, a, sp)
-#    xp = (x.x, x.y, x.heading)
-#    p_true = O(x.sensor, sp, xp, true)
-#    return BoolDistribution(p_true)
-#end
+# random
+#function ParticleFilters.generate_s(sm::Vehicle, s, a, rng::AbstractRNG)
+#    ang = rand() * 2.0 * pi
+#    return s[1] + 5.0 * cos(ang), s[2] + 5*sin(ang)
+#enk
 
-function ParticleFilters.obs_weight(sm::Vehicle, a, sp, o)
-    xp = (sm.x, sm.y, sm.heading)
-    return O(sm.sensor, sp, xp, o)
+const LVR = LowVarianceResampler
+
+struct Model{S <: Sensor, M <: MotionModel, V <: Vehicle}
+    sensor::S
+    motion_model::M
+    x::V
 end
 
+function ParticleFilters.generate_s(m::Model, s, a, rng::AbstractRNG)
+    return move_target(m.motion_model, s, 0.0)
+end
+function ParticleFilters.obs_weight(m::Model, a, sp, o)
+    return O(m.sensor, sp, get_pose(m.x), o)
+end
+
+
 mutable struct PF{OL} <: AbstractFilter
+    model::Model
+
     x::Vehicle
-    n::Int
     sensor::Sensor
+
+    n::Int
+
     obs_list::OL
-    sirpf::SimpleParticleFilter{Tuple{Float64,Float64}, LowVarianceResampler, MersenneTwister}
-    b::ParticleCollection{Tuple{Float64,Float64}}       # particle set
+
+
+    # User should never see this
+    _pf::SimpleParticleFilter{TargetTuple, LVR, MersenneTwister}
+    _b::ParticleCollection{TargetTuple}       # particle set
 end
 
 function PF(x::Vehicle, n::Int, L::Real)
-    sirpf = SimpleParticleFilter{NTuple{2,Float64}, LowVarianceResampler, MersenneTwister}(x, LowVarianceResampler(n), Base.GLOBAL_RNG)
-    bv = NTuple{2,Float64}[]
+    model = Model(x.sensor, ConstantMotion(), x)
+    pf = SimpleParticleFilter{TargetTuple, LVR, MersenneTwister}(model, LVR(n), Base.GLOBAL_RNG)
+
+    # generate initial source of particles
+    bv = TargetTuple[]
     for i = 1:n
-        push!(bv, (L*rand(), L*rand()))
+        push!(bv, (L*rand(), L*rand(), 2.0*rand(), 2.0*rand()))
     end
-    b = ParticleCollection{NTuple{2,Float64}}(bv)
-    return PF(x, n, x.sensor, 0:1, sirpf, b)
+    b = ParticleCollection(bv)
+    return PF(model, x, x.sensor, n, 0:1, pf, b)
 end
 
-function update!(df::PF, x::Vehicle, o)
+ParticleFilters.particles(pf::PF) = pf._b.particles
+ParticleFilters.particle(pf::PF, i::Int) = particle(pf._b, i)
+ParticleFilters.weight(pf::PF, i::Int) = weight(pf._b, i)
+ParticleFilters.weight_sum(pf::PF) = weight_sum(pf._b)
+
+function update!(pf::PF, x::Vehicle, o)
     a = (0,0,0)
-    b = update(df.sirpf, df.b, a, o)
-    #for i = 1:length(b.particles)
-    #    if typeof(b.particles[i]) != NTuple{2,Float64}
-    #        println("yelp!")
-    #        println("typeof = ", typeof(b.particles[i]))
-    #    end
-    #end
-    #println("typeof b = ", typeof(b))
-    df.b = b
+    pf._b = update(pf._pf, pf._b, a, o)
 end
 #
 #function centroid(f::PF)
