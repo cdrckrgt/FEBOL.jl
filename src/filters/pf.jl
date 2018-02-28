@@ -7,19 +7,18 @@
 # generate new target position
 #ParticleFilters.generate_s(sm::Vehicle, s, a, rng::AbstractRNG) = s
 
-# random
-#function ParticleFilters.generate_s(sm::Vehicle, s, a, rng::AbstractRNG)
-#    ang = rand() * 2.0 * pi
-#    return s[1] + 5.0 * cos(ang), s[2] + 5*sin(ang)
-#enk
-
+# To shorten some of these names
 const LVR = LowVarianceResampler
+const MerTwist = MersenneTwister
+const SPF = SimpleParticleFilter{TargetTuple, LVR, MerTwist}
 
-struct Model{S <: Sensor, M <: MotionModel, V <: Vehicle}
+struct Model{V <: Vehicle, S <: Sensor, M <: MotionModel}
+    x::V
     sensor::S
     motion_model::M
-    x::V
 end
+Model(x::Vehicle) = Model(x, x.sensor)
+Model(x::Vehicle, s::Sensor) = Model(x, s, NoMotion())
 
 function ParticleFilters.generate_s(m::Model, s, a, rng::AbstractRNG)
     return move_target(m.motion_model, s, 0.0)
@@ -29,35 +28,34 @@ function ParticleFilters.obs_weight(m::Model, a, sp, o)
 end
 
 
-mutable struct PF{OL} <: AbstractFilter
-    model::Model
-
-    x::Vehicle
-    sensor::Sensor
-
-    n::Int
-
-    obs_list::OL
-
+mutable struct PF{M <: Model, OL} <: AbstractFilter
+    model::M        # contains vehicle, sensor, target models
+    n::Int          # number of particles
+    obs_list::OL    # list of possible observations:
 
     # User should never see this
-    _pf::SimpleParticleFilter{TargetTuple, LVR, MersenneTwister}
+    _pf::SimpleParticleFilter{TargetTuple, LVR, MerTwist}
     _b::ParticleCollection{TargetTuple}       # particle set
 end
 
-function PF(x::Vehicle, n::Int, L::Real)
-    model = Model(x.sensor, ConstantMotion(), x)
-    pf = SimpleParticleFilter{TargetTuple, LVR, MersenneTwister}(model, LVR(n), Base.GLOBAL_RNG)
+function PF(model::Model, n::Int, obs_list=0:0; L::Real=100.0)
+    pf = SPF(model, LVR(n), Base.GLOBAL_RNG)
+    b = initialize_particles(n, L)
 
-    # generate initial source of particles
+    return PF(model, n, obs_list, pf, b)
+end
+
+
+# TODO: allow user to dictate original spread of velocities
+function initialize_particles(n::Int, L::Real)
     bv = TargetTuple[]
     for i = 1:n
         push!(bv, (L*rand(), L*rand(), 2.0*rand(), 2.0*rand()))
     end
-    b = ParticleCollection(bv)
-    return PF(model, x, x.sensor, n, 0:1, pf, b)
+    return ParticleCollection(bv)
 end
 
+# convenience functions
 ParticleFilters.particles(pf::PF) = pf._b.particles
 ParticleFilters.particle(pf::PF, i::Int) = particle(pf._b, i)
 ParticleFilters.weight(pf::PF, i::Int) = weight(pf._b, i)
