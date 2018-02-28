@@ -28,6 +28,7 @@ export
     BearingOnly,
     DirOmni,
     FOV,
+    FOVb,
     FOVn,
     FOV3
 
