@@ -107,7 +107,7 @@ include("math.jl")
 
 # search domain
 include("motion_model.jl")
-include("searchdomain.jl")
+include("search_domain.jl")
 
 # Sensing models
 include("sensors/sensors.jl")
