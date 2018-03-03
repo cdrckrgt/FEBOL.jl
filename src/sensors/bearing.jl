@@ -17,7 +17,7 @@ function observe(m::SearchDomain, s::BearingOnly, p::Pose)
     return mod(truth + noise, 360.0)
 end
 
-function O(bo::BearingOnly, theta::LocTuple, p::Pose, o)
+function O(bo::BearingOnly, theta::TargetTuple, p::Pose, o)
 
     # Calculate true bearing, and find distance to bin edges
     ang_deg = true_bearing(p, theta)

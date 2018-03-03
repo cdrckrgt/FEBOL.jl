@@ -12,7 +12,7 @@ function p_obs(df::DF, xp::Pose, o)
         if df.b[txi,tyi] > 0.0
             tx = (txi-0.5) * df.cell_size
             ty = (tyi-0.5) * df.cell_size
-            prob += df.b[txi, tyi] * O(df.sensor, (tx,ty), xp, o)
+            prob += df.b[txi, tyi] * O(df.sensor, (tx,ty,0.,0.), xp, o)
         end
     end
     return prob
@@ -96,7 +96,7 @@ function mutual_information(df::DF, xp::Pose)
             ty = (tyi - 0.5) * df.cell_size
 
             if df.b[txi, tyi] > 0.0
-                pot = O(df.sensor, (tx,ty), xp, o)
+                pot = O(df.sensor, (tx,ty,0.,0.), xp, o)
                 if pot > 0.0
                     H_o_t -= pot * df.b[txi, tyi] * log(pot)
                 end

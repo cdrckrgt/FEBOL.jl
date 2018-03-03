@@ -34,7 +34,7 @@ function update!(df::DF, x::Vehicle, o)
         if df.b[txi, tyi] > 0.0
             tx = (txi-0.5) * df.cell_size
             ty = (tyi-0.5) * df.cell_size
-            df.b[txi, tyi] *= O(df.sensor, (tx,ty), p, o)
+            df.b[txi, tyi] *= O(df.sensor, (tx,ty,0.0,0.0), p, o)
             bp_sum += df.b[txi, tyi]
         end
     end
