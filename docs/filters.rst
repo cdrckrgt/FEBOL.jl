@@ -9,27 +9,36 @@ In reality, a belief is something separate, fed into a filter to be updated.
 However, the belief representation (discrete, Gaussian, etc) depends heavily on the filtering being applied.
 In short, it just seems easier to maintain a single filter type rather than worry about a separate belief.
 
+Note that each filter has its own sensor, even though the vehicle also has a sensor.
+The filtering updates use the filter's sensor, and the observations actually received come from the vehicle's sensor.
+This distinction allows you to test the effect of unmodeled sensor noise.
+In this case, the vehicle's sensor might have noise that is not accounted for in the filter's model, which can affect localization.
+
 Discrete Filter
 =====================
 The discrete filter type, :code:`DF`, has the following fields
 ::
 
-	b::Matrix{Float64}      # probability over jammer locations
-	n::Int64                # number of cells per side
-	cell_size::Float64      # side length of each cell
-	num_bins::Int64         # related to number of observations
-	bin_range::UnitRange{Int64}
+    b::Matrix{Float64}      # the actual discrete belief
+    n::Int64                # number of cells per side
+    cell_size::Float64      # width of each cell, in meters
+    sensor<:Sensor          # sensor model used in filtering
+    obs_list                # list of observations
+
+The matrix :code:`b` is the probability distribution over possible target locations.
+The weight in a cell is the probability that the target is in that cell.
+
+The :code:`obs_list` field exists for greedy control based on mutual information.
+Computing mutual information requires integrating over possible observations.
+However, if you are using a different controller you can ignore this field.
 
 The constructor for a discrete filter is
 ::
 
-    DF(m::SearchDomain, n::Int)
+    DF(m::SearchDomain, n::Int, s::Sensor, obs_list=0:0)
 
 where :code:`n` is the number of cells per side.
 
-The function :code:`obs2bin` converts the continuous domain observation :code:`o` into a discrete value, using the :code:`num_bins` property of the discrete filter.
-The binned observation :code:`ob` is fed into :code:`O`, which provides the probability of receiving :code:`ob`.
-I've implicitly assumed that the observations are discrete in the discrete filter, but I think only the search domain needs to be discretized, technically.
 
 Extended Kalman Fiter
 ===========================
@@ -65,17 +74,10 @@ Another initializer is the :code:`LSInitializer`, or least squares initializer. 
 
 Particle Filter
 =====================
-To create a particle filter, you must provide the search domain :code:`m` and desired number of particles :code:`n`:
+The particle filter is based on ParticleFilters.jl.
+
 ::
-
-    PF(m::SearchDomain, n::Int)
-
-If you create a new :code:`Sensor` subtype called :code:`NewSensor`, you must implement the following function:
-::
-
-    O(x::Vehicle, s::NewSensor, theta::LocTuple, o::Float64)
-
-Currently, it is only required that this return a probability density, rather than a true probability.
+    PF(m::Model, n::Int, obs_list)
 
 Custom Filters
 =====================

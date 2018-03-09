@@ -4,23 +4,16 @@
 # Discrete filter
 ######################################################################
 
-# n is the number of cells per side
-# cell_size is size of a single cell
 struct DF{OL, S<:Sensor} <: AbstractFilter
-    b::Matrix{Float64}
-    n::Int64
-    cell_size::Float64
-    obs_list::OL
-    sensor::S
+    b::Matrix{Float64}      # the actual discrete belief
+    n::Int64                # number of cells per side
+    cell_size::Float64      # width of each cell, in meters
+    sensor::S               # sensor model used in filtering
+    obs_list::OL            # list of observations
 end
-function DF(m::SearchDomain, n::Int64, sensor::Sensor)
+function DF(m::SearchDomain, n::Int64, sensor::Sensor, obs_list=0:0)
     b = ones(n, n) / (n * n)
-    obs_list = 0:0
-    return DF(b, n, m.length/n, obs_list, sensor)
-end
-function DF(m::SearchDomain, n::Int64, sensor::Sensor, obs_list)
-    b = ones(n, n) / (n * n)
-    return DF(b, n, m.length/n, obs_list, sensor)
+    return DF(b, n, m.length/n, sensor, obs_list)
 end
 
 
