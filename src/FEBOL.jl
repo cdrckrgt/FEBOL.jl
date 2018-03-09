@@ -117,8 +117,12 @@ include("vehicle.jl")
 # Filters
 include("filters/filters.jl")
 
+# information theory
+include("information_theory/mutual_information.jl")
+include("information_theory/fisher.jl")
+include("information_theory/cached.jl")
+
 # policies
-include("infotheoretic.jl")
 include("policies/policies.jl")
 
 # Simulation and Plotting
