@@ -120,7 +120,7 @@ include("filters/filters.jl")
 # information theory
 include("information_theory/mutual_information.jl")
 include("information_theory/fisher.jl")
-include("information_theory/cached.jl")
+include("information_theory/cache.jl")
 
 # policies
 include("policies/policies.jl")

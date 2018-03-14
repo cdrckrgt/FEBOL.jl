@@ -1,7 +1,9 @@
 ######################################################################
-# cached.jl
+# old_cache.jl
 #
 # like infotheoretic.jl, but allows caching
+#
+# how this used to be implemented
 ######################################################################
 
 
@@ -39,7 +41,6 @@ function mutual_information(df::DF, xp::NTuple{3,Int}, cache::Array{Float64,5})
 	H_o = 0.0
 	H_o_t = 0.0
 
-    oi = 1
     for (oi,o) in enumerate(df.obs_list)
 		po = p_obs(df, xp, oi, cache)
 		if po > 0.0
@@ -55,7 +56,6 @@ function mutual_information(df::DF, xp::NTuple{3,Int}, cache::Array{Float64,5})
                 end
             end
 		end
-        oi += 1
 	end
 	return H_o - H_o_t
 end
