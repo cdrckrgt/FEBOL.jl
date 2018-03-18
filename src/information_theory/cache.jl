@@ -93,7 +93,7 @@ function make_cache2(df::DF)
 
         for hi = 1:36
 
-            h = (hi - 1) * 10.0
+            h = (hi - 0.5) * 10.0
             # generate a theta, xp that fit this
             # just put vehicle at zero?
             xp = (0.0,0.0,h)
@@ -113,6 +113,7 @@ end
 function mutual_information(df::DF, cache::Array{Float64,4})
     mut_info = zeros(df.n, df.n, 36)
     for xi = 1:df.n, yi = 1:df.n, hi = 1:36
+    #for hi = 1:36, yi = 1:df.n, xi = 1:df.n
         xp = (xi, yi, hi)
         mut_info[xi,yi, hi] = mutual_information(df, xp, cache)
     end

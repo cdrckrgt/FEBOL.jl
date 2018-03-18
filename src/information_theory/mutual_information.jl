@@ -112,9 +112,9 @@ end
 # I need a Vehicle or Sensor to pass into the observation function
 function mutual_information(df::DF)
     mut_info = zeros(df.n, df.n)
-    for xv = 1:df.n, yv = 1:df.n
-        x = (xv - 0.5) * df.cell_size
-        y = (yv - 0.5) * df.cell_size
+    for xi = 1:df.n, yi = 1:df.n
+        x = (xi - 0.5) * df.cell_size
+        y = (yi - 0.5) * df.cell_size
         # TODO: really, should have some other heading
         xp = (x, y, 0.0)
         mut_info[xv,yv] = mutual_information(df, xp)
@@ -132,11 +132,12 @@ end
 
 # this version is valid if the sensor noise is the same regardless
 #  of the vehicle and sensor locations
+# TODO: is this remotely valid
 export mutual_information2
-function mutual_information2(m::SearchDomain, x::Vehicle, df::DF, xp::Pose)
+function mutual_information2(df::DF, xp::Pose)
 	H_o = 0.0
 
-	for o in x.sensor.bin_range
+	for o in df.obs_list
 		po = p_obs(df, xp, o)
 		if po > 0.0
 			H_o -= po * log(po)
