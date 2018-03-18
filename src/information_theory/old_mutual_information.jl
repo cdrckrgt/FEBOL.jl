@@ -85,7 +85,10 @@ function mutual_information(df::DF, xp::Pose)
 	H_o_t = 0.0
 
     for o in df.obs_list
-        po = 0.0        # probability of observation o
+		po = p_obs(df, xp, o)
+		if po > 0.0
+			H_o -= po * log(po)
+		end
 
 		# sum over possible jammer locations
 		for txi = 1:df.n, tyi = 1:df.n
@@ -93,15 +96,11 @@ function mutual_information(df::DF, xp::Pose)
             ty = (tyi - 0.5) * df.cell_size
 
             if df.b[txi, tyi] > 0.0
-                pot = O(df.sensor, (tx,ty,0.,0.), xp, o)    # p(o | theta)
-                po += df.b[txi, tyi] * pot
+                pot = O(df.sensor, (tx,ty,0.,0.), xp, o)
                 if pot > 0.0
                     H_o_t -= pot * df.b[txi, tyi] * log(pot)
                 end
             end
-		end
-		if po > 0.0
-			H_o -= po * log(po)
 		end
 	end
 	return H_o - H_o_t
