@@ -121,6 +121,7 @@ include("filters/filters.jl")
 include("information_theory/mutual_information.jl")
 include("information_theory/fisher.jl")
 include("information_theory/cache.jl")
+include("information_theory/kl.jl")
 
 # policies
 include("policies/policies.jl")
