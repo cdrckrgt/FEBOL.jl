@@ -49,20 +49,18 @@ function mutual_information(df::DF, xp::NTuple{3,Int}, cache::Array{Float64,3})
 	H_o_t = 0.0
 
     for (oi,o) in enumerate(df.obs_list)
-		po = p_obs(df, xp, oi, cache)
-		if po > 0.0
-			H_o -= po * log(po)
-		end
-
-		# sum over possible jammer locations
+        po = 0.0
 		for txi = 1:df.n, tyi = 1:df.n
             if df.b[txi, tyi] > 0.0
-                #pot = cache[ xp[1], xp[2], txi, tyi, oi ]
                 pot = cache[txi-xp[1]+df.n, tyi-xp[2]+df.n, oi]
+                po += df.b[txi, tyi] * pot
                 if pot > 0.0
                     H_o_t -= pot * df.b[txi, tyi] * log(pot)
                 end
             end
+		end
+		if po > 0.0
+			H_o -= po * log(po)
 		end
 	end
 	return H_o - H_o_t
