@@ -8,11 +8,12 @@ struct FOV <: Sensor
     cone_width::Float64
     alpha::Float64          # mistake rate
 
-    function FOV(cone_width::Real, alpha::Float64)
-        return new(float(cone_width), alpha)
-    end
-    FOV() = FOV(120.0, 0.1)
+    blind_distance::Float64     # distance in which any obs is equal likely
 end
+function FOV(cone_width::Real, alpha::Float64)
+    return FOV(float(cone_width), alpha, 0.0)
+end
+FOV() = FOV(120.0, 0.1, 0.0)
 
 
 # 1 means it is in the field of view of front antenna
@@ -42,7 +43,7 @@ function observe(m::SearchDomain, s::FOV, p::Pose)
     # if we are too close, then prob_in_view = 0.5
     dx = p[1] - m.theta[1]
     dy = p[2] - m.theta[2]
-    if (dx*dx + dy*dy) < 150.0
+    if (dx*dx + dy*dy) < s.blind_distance*s.blind_distance
         prob_in_view = 0.5
     end
 
@@ -78,7 +79,7 @@ function O(s::FOV, theta::LocTuple, p::Pose, o)
     # if we are too close, then prob_in_view = 0.5
     dx = p[1] - theta[1]
     dy = p[2] - theta[2]
-    if (dx*dx + dy*dy) < 150.0
+    if (dx*dx + dy*dy) < s.blind_distance*s.blind_distance
         prob_in_view = 0.5
     end
 
