@@ -58,7 +58,7 @@ Gaussian Fiter
 ====================
 The :code:`GaussianFilter` abstract type is a child of :code:`AbstractFilter` and a parent of :code:`EKF` and :code:`UKF`. I've thought about calling this :code:`KalmanFilter` instead, but that could be ambiguous---someone could think this refers to a specific KF, rather than an abstract type. 
 
-The `GaussianFilter` abstract type covers utilities that both `EKF` and `UKF` use.
+The :code:`GaussianFilter` abstract type covers utilities that both :code:`EKF` and :code:`UKF` use.
 The most important of these is the :code:`Initializer` abstract type.
 Each :code:`EKF` and :code:`UKF` instance contains an :code:`Initializer` subtype that determines how the filter estimate should be initialized.
 
@@ -77,6 +77,7 @@ Particle Filter
 The particle filter is based on ParticleFilters.jl.
 
 ::
+
     PF(m::Model, n::Int, obs_list)
 
 Custom Filters
