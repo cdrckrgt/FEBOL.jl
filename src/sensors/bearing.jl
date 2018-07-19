@@ -11,8 +11,8 @@ struct BearingOnly <: Sensor
     BearingOnly() = new(10.0)
 end
 
-function observe(m::SearchDomain, s::BearingOnly, p::Pose)
-    truth = true_bearing(p, m.theta)
+function observe(theta::LocTuple, s::BearingOnly, p::Pose)
+    truth = true_bearing(p, theta)
     noise = s.noise_sigma * randn()
     return mod(truth + noise, 360.0)
 end

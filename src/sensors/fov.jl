@@ -18,11 +18,11 @@ FOV() = FOV(120.0, 0.1, 0.0)
 
 # 1 means it is in the field of view of front antenna
 # 0 means it is not
-function observe(m::SearchDomain, s::FOV, p::Pose)
+function observe(theta::LocTuple, s::FOV, p::Pose)
 
 
     # ensure bearing is reflected across
-    rel_bearing = fit_180(p[3] - true_bearing(p, m.theta))
+    rel_bearing = fit_180(p[3] - true_bearing(p, theta))
     if rel_bearing < 0.0
         rel_bearing = -1.0 * rel_bearing
     end
@@ -41,8 +41,8 @@ function observe(m::SearchDomain, s::FOV, p::Pose)
 
 
     # if we are too close, then prob_in_view = 0.5
-    dx = p[1] - m.theta[1]
-    dy = p[2] - m.theta[2]
+    dx = p[1] - theta[1]
+    dy = p[2] - theta[2]
     if (dx*dx + dy*dy) < s.blind_distance*s.blind_distance
         prob_in_view = 0.5
     end
