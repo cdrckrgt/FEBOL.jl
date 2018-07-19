@@ -6,6 +6,8 @@
 abstract type AbstractFilter end
 
 """
+`update!(f::AbstractFilter, p::Pose, o::Real)`
+
 `update!(f::AbstractFilter, x::Vehicle, o::Real)`
 
 Updates the belief of filter `f` given a vehicle `x` and observation `o`.
@@ -13,6 +15,10 @@ The observation `o` is a real number in [0,360).
 If your filter requires this number to be binned into an integer, it must take care of that internally.
 """
 function update!(f::AbstractFilter, x::Vehicle, o)
+    update!(f, get_pose(x), o)
+end
+
+function update!(f::AbstractFilter, p::Pose, o)
     error(typeof(f), " does not yet implement update!(f,x,o).")
 end
 

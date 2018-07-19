@@ -23,8 +23,9 @@ Model(x::Vehicle, s::Sensor) = Model(x, s, NoMotion())
 function ParticleFilters.generate_s(m::Model, s, a, rng::AbstractRNG)
     return move_target(m.motion_model, s, 0.0)
 end
-function ParticleFilters.obs_weight(m::Model, a, sp, o)
-    return O(m.sensor, sp, get_pose(m.x), o)
+# recall that a here is the state of the drone
+function ParticleFilters.obs_weight(m::Model, a::Pose, sp, o)
+    return O(m.sensor, sp, a, o)
 end
 
 
@@ -61,9 +62,17 @@ ParticleFilters.particle(pf::PF, i::Int) = particle(pf._b, i)
 ParticleFilters.weight(pf::PF, i::Int) = weight(pf._b, i)
 ParticleFilters.weight_sum(pf::PF) = weight_sum(pf._b)
 
-function update!(pf::PF, x::Vehicle, o)
-    a = (0,0,0)
-    pf._b = update(pf._pf, pf._b, a, o)
+# vehicle is included in model 
+# normally update(filter, belief, a, o), but action not needed
+# so I pass in the UAV pose instead
+function update!(pf::PF, p::Pose, o)
+    pf._b = update(pf._pf, pf._b, p, o)
+end
+
+# TODO: should I pass in something other than Base.GLOBAL_RNG) ?
+export sample_state
+function sample_state(pf::PF)
+    return rand(Base.GLOBAL_RNG, pf._b)
 end
 #
 #function centroid(f::PF)

@@ -17,11 +17,9 @@ function DF(m::SearchDomain, n::Int64, sensor::Sensor, obs_list=0:0)
 end
 
 
-function update!(df::DF, x::Vehicle, o)
+function update!(df::DF, p::Pose, o)
     n = df.n
     bp_sum = 0.0
-
-    p = (x.x, x.y, x.heading)
 
     for txi = 1:n, tyi = 1:n
         if df.b[txi, tyi] > 0.0
