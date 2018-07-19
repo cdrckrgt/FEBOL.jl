@@ -40,6 +40,27 @@ The constructor for a discrete filter is
 where :code:`n` is the number of cells per side.
 
 
+Particle Filter
+=====================
+The particle filter is based on ParticleFilters.jl.
+Its constructor is
+::
+
+    PF(m::Model, n::Int, obs_list)
+
+The :code:`Model` type contains information that is used in the particle filter update.
+The type and constructors are
+::
+
+    struct Model{V <: Vehicle, S <: Sensor, M <: MotionModel}
+        x::V
+        sensor::S
+        motion_model::M
+    end
+    Model(x::Vehicle) = Model(x, x.sensor)
+    Model(x::Vehicle, s::Sensor) = Model(x, s, NoMotion())
+
+
 Extended Kalman Fiter
 ===========================
 ::
@@ -72,12 +93,7 @@ Another initializer is the :code:`LSInitializer`, or least squares initializer. 
     lsi.min_obs_num = 5
 
 
-Particle Filter
-=====================
-The particle filter is based on ParticleFilters.jl.
-::
-
-    PF(m::Model, n::Int, obs_list)
+    
 
 Custom Filters
 =====================
