@@ -75,7 +75,6 @@ Another initializer is the :code:`LSInitializer`, or least squares initializer. 
 Particle Filter
 =====================
 The particle filter is based on ParticleFilters.jl.
-
 ::
 
     PF(m::Model, n::Int, obs_list)
@@ -89,7 +88,7 @@ You must extend the :code:`AbstractFilter` type and implement the following func
     type CustomFilter <: AbstractFilter
     end
 
-    function update!(f::CustomFilter, x::Vehicle, o::Float64)
+    function update!(f::CustomFilter, p::Pose, o::Float64)
         # update the belief in the filter.
     end
 
