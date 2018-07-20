@@ -97,3 +97,53 @@ end
 #    end
 #    fill!(f.W, 0.0)
 #end
+
+function centroid(pf::PF)
+    mx = 0.0
+    my = 0.0
+    w_sum = 0.0
+    for i = 1:pf.n
+        tp = particle(pf, i)
+        w = weight(pf, i)
+        mx += w * tp[1]
+        my += w * tp[2]
+        w_sum += w
+    end
+    mx /= w_sum
+    my /= w_sum
+
+    return (mx, my)
+end
+function covariance(pf::PF)
+    xx = 0.0
+    xy = 0.0
+    yy = 0.0
+
+    mx = 0.0
+    my = 0.0
+    w_sum = 0.0
+    for i = 1:pf.n
+        tp = particle(pf, i)
+        w = weight(pf, i)
+
+        xx += w * tp[1] * tp[1]
+        xy += w * tp[1] * tp[2]
+        yy += w * tp[2] * tp[2]
+
+        mx += w * tp[1]
+        my += w * tp[2]
+
+        w_sum += w
+    end
+    xx /= w_sum
+    xy /= w_sum
+    yy /= w_sum
+    mx /= w_sum
+    my /= w_sum
+
+    a = xx - mx * mx
+    bc = xy - mx * my
+    d = yy - my * my
+
+    return [a bc; bc d]
+end
