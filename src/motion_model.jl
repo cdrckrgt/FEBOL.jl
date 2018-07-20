@@ -20,11 +20,17 @@ function move_target(rm::RandomMotion, theta, L::Float64)
 end
 
 struct ConstantMotion <: MotionModel
+    noise_vals::NTuple{4,Float64}   # std deviations for each dimension
 end
+ConstantMotion() = ConstantMotion((1.0,1.0,0.0,0.0))
+#ConstantMotion(a::Float64, b::Float = ConstantMotion((a,b,c,d))
 
 function move_target(cm::ConstantMotion, theta, L::Float64)
-    new_x = theta[1] + theta[3]
-    new_y = theta[2] + theta[4]
+    new_x = theta[1] + theta[3] + cm.noise_vals[1] * randn()
+    new_y = theta[2] + theta[4] + cm.noise_vals[2] * randn()
+    new_xdot = theta[3] + cm.noise_vals[3] * randn()
+    new_ydot = theta[4] + cm.noise_vals[4] * randn()
 
-    return theta[1] + theta[3] + randn(), theta[2] + theta[4] + randn(), theta[3], theta[4]
+    #return theta[1] + theta[3] + randn(), theta[2] + theta[4] + randn(), theta[3], theta[4]
+    return new_x, new_y, new_xdot, new_ydot
 end
