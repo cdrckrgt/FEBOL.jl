@@ -10,7 +10,6 @@
 # To shorten some of these names
 const LVR = LowVarianceResampler
 const MerTwist = MersenneTwister
-const SPF = SimpleParticleFilter{TargetTuple, LVR, MerTwist}
 
 struct Model{V <: Vehicle, S <: Sensor, M <: MotionModel}
     x::V
@@ -30,21 +29,23 @@ end
 
 
 mutable struct PF{M <: Model, OL} <: AbstractFilter
-    model::M        # contains vehicle, sensor, target models
+    model::M        # contains vehicle, sensor, target motion models
     n::Int          # number of particles
     obs_list::OL    # list of possible observations:
 
     # User should never see this
-    _pf::SimpleParticleFilter{TargetTuple, LVR, MerTwist}
+    _pf::SimpleParticleFilter{TargetTuple, M, LVR, MerTwist}
     _b::ParticleCollection{TargetTuple}       # particle set
 end
 
 function PF(model::Model, n::Int, obs_list=0:0; L::Real=100.0)
-    pf = SPF(model, LVR(n), Base.GLOBAL_RNG)
+    pf = SimpleParticleFilter(model, LVR(n), Base.GLOBAL_RNG)
     b = initialize_particles(n, L)
 
     return PF(model, n, obs_list, pf, b)
 end
+
+ParticleFilters.state_type(m::Model) = TargetTuple
 
 
 # TODO: allow user to dictate original spread of velocities
@@ -69,11 +70,17 @@ function update!(pf::PF, p::Pose, o)
     pf._b = update(pf._pf, pf._b, p, o)
 end
 
+function update_b(pf::PF, b::ParticleCollection, p, o)
+    return update(pf._pf, b, p, o)
+end
+export update_b
+
 # TODO: should I pass in something other than Base.GLOBAL_RNG) ?
 export sample_state
 function sample_state(pf::PF)
     return rand(Base.GLOBAL_RNG, pf._b)
 end
+export ParticleCollection
 #
 #function centroid(f::PF)
 #    wsum = 0.0
@@ -104,13 +111,11 @@ function centroid(pf::PF)
     w_sum = 0.0
     for i = 1:pf.n
         tp = particle(pf, i)
-        w = weight(pf, i)
-        mx += w * tp[1]
-        my += w * tp[2]
-        w_sum += w
+        mx += tp[1]
+        my += tp[2]
     end
-    mx /= w_sum
-    my /= w_sum
+    mx /= pf.n
+    my /= pf.n
 
     return (mx, my)
 end
@@ -121,29 +126,64 @@ function covariance(pf::PF)
 
     mx = 0.0
     my = 0.0
-    w_sum = 0.0
     for i = 1:pf.n
         tp = particle(pf, i)
-        w = weight(pf, i)
 
-        xx += w * tp[1] * tp[1]
-        xy += w * tp[1] * tp[2]
-        yy += w * tp[2] * tp[2]
+        xx += tp[1] * tp[1]
+        xy += tp[1] * tp[2]
+        yy += tp[2] * tp[2]
 
-        mx += w * tp[1]
-        my += w * tp[2]
-
-        w_sum += w
+        mx += tp[1]
+        my += tp[2]
     end
-    xx /= w_sum
-    xy /= w_sum
-    yy /= w_sum
-    mx /= w_sum
-    my /= w_sum
+    xx /= pf.n
+    xy /= pf.n
+    yy /= pf.n
+
+    mx /= pf.n
+    my /= pf.n
 
     a = xx - mx * mx
     bc = xy - mx * my
     d = yy - my * my
 
     return [a bc; bc d]
+end
+
+export cheap_entropy
+function cheap_entropy(pf::PF, L::Float64, n_cells::Int)
+    cheap_entropy(pf._b, L, n_cells)
+end
+function cheap_entropy(b::ParticleCollection, L::Float64, n_cells::Int)
+
+    cell_size = L / n_cells
+    discrete_b = zeros(n_cells, n_cells)
+    w_sum = 0.0
+
+    # loop over particles and determine where they belong
+    n = length(b.particles)
+    for i = 1:n
+        tp = particle(b, i)
+        w = weight(b, i)
+
+        xi = round(Int, tp[1] / cell_size, RoundUp)
+        yi = round(Int, tp[2] / cell_size, RoundUp)
+
+        # ensure that cells are legal
+        xi = min(max(xi, 1), n_cells)
+        yi = min(max(yi, 1), n_cells)
+
+        discrete_b[xi, yi] += w
+        w_sum += w
+    end
+
+    # now compute entropy
+    ce = 0.0
+    for xi = 1:n_cells, yi = 1:n_cells
+        p = discrete_b[xi,yi] / w_sum
+        if p > 0.0
+            ce -= p * log(p)
+        end
+    end
+    return ce
 end
