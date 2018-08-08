@@ -35,3 +35,13 @@ end
 # The following are just helper functions that simplify signatures
 update!(su::SimUnit, o) = update!(su.f, su.x, o)
 action(m::SearchDomain, su::SimUnit, o) = action(m, su.x, o, su.f, su.p)
+
+function is_complete(vsu::Vector{SimUnit}, step_count::Int)
+    ret_val = false
+    for uav in vsu
+        if is_complete(uav.f, uav.tc, step_count)
+            ret_val = true
+        end
+    end
+    return ret_val
+end
