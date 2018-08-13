@@ -56,7 +56,7 @@ theta!(m::SearchDomain) = theta!(m, m.length * rand(), m.length * rand())
 function theta!(m::SearchDomain, xj::Real, yj::Real)
     theta!( m, (float(xj), float(yj), 0.0, 0.0) )
 end
-function theta!(m::SearchDomain, theta::LocTuple)
+function theta!(m::SearchDomain, theta::TargetTuple)
     @assert theta[1] <= m.length
     @assert theta[2] <= m.length
     m.theta = theta

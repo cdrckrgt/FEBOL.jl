@@ -22,6 +22,9 @@ type Vehicle
 	function Vehicle(x::Real, y::Real)
 		return new( float(x), float(y), 0.0, 2.0, BearingOnly(10.0) )
 	end
+	function Vehicle(x::Real, y::Real, h::Real)
+        return new( float(x), float(y), float(h), 2.0, BearingOnly(10.0) )
+	end
 	function Vehicle(x::Real, y::Real, s::Sensor)
 		return new( float(x), float(y), 0.0, 2.0, s)
 	end
@@ -37,6 +40,14 @@ function reset!(m::SearchDomain, x::Vehicle)
 	x.y = m.length/2.0
 	x.heading = 0.0
 end
+
+function new_pose(p::Pose, a::Action)
+	new_x = p[1] + a[1]
+	new_y = p[2] + a[2]
+	new_h = mod(p[3] + a[3], 360.0)
+    return new_x, new_y, new_h
+end
+
 
 # Does the bounds checking on the action, to see if stays in search domain
 # Ensures heading is within [0,360) (other parts of code assume this)
@@ -68,7 +79,7 @@ Sample an observation. Returns a float between 0 and 360.
 """
 function observe(m::SearchDomain, x::Vehicle)
 	p = (x.x, x.y, x.heading)
-	observe(m, x.sensor, p)
+	observe(m.theta, x.sensor, p)
 end
 
 # version for array of vehicles

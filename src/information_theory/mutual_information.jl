@@ -26,6 +26,16 @@ function p_obs(pf::PF, xp::Pose, o)
     return prob / weight_sum(pf)
 end
 
+# TODO: I don't think I have to do it like this
+function p_obs(s::Sensor, b::ParticleCollection, xp::Pose, o)
+    prob = 0.0
+    n = length(b.particles)
+    for i = 1:n
+        prob += O(s, particle(b,i), xp, o) * weight(b, i)
+    end
+    return prob / weight_sum(b)
+end
+
 #function mutual_information(pf::PF, xp::Pose)
 #    H_o = 0.0
 #    H_o_t = 0.0
@@ -69,6 +79,31 @@ function mutual_information(pf::PF, xp::Pose)
             pot = O(pf.model.sensor, particle(pf,i), xp, o)
             if pot > 0.0
                 H_o_t -= pot * weight(pf,i) * log(pot) / ws
+            end
+        end
+	end
+	return H_o - H_o_t
+end
+
+
+# This is just a copy (and modification) of df's version
+# The commented out version above is an attempt from scratch
+function mutual_information(s::Sensor, b::ParticleCollection, xp::Pose, ol)
+	H_o = 0.0
+	H_o_t = 0.0
+
+    for o in ol
+		po = p_obs(s, b, xp, o)
+		if po > 0.0
+			H_o -= po * log(po)
+		end
+
+		# sum over possible jammer locations
+        ws = weight_sum(b)
+        for i = 1:length(b.particles)
+            pot = O(s, particle(b,i), xp, o)
+            if pot > 0.0
+                H_o_t -= pot * weight(b,i) * log(pot) / ws
             end
         end
 	end

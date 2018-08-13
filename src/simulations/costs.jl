@@ -68,3 +68,19 @@ function get_cost(marc::MoveAndRotateCost, x::Vehicle, f::AbstractFilter, a)
     return (dist / marc.speed) + marc.time_per_rotation
 end
 get_cost(marc::MoveAndRotateCost, f::AbstractFilter) = marc.time_per_rotation
+
+export EntropyCost
+struct EntropyCost <: CostModel
+    L::Float64
+    n_cells::Int
+end
+
+function get_cost(ec::EntropyCost, m::SearchDomain, x::Vehicle, f::PF, a)
+    get_cost(ec, m, x, f)
+end
+function get_cost(ec::EntropyCost, m::SearchDomain, x::Vehicle, f::PF)
+    cheap_entropy(f, ec.L, ec.n_cells)
+    #c = covariance(f)
+    #earr = eigvals(c)
+    #return maximum(eigvals(c))
+end

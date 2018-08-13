@@ -10,7 +10,7 @@ function observe(m::SearchDomain, s::Sensor, p::Pose)
     observe(m.theta, s, p)
 end
 
-function observe(tx::LocTuple, s::Sensor, p::Pose)
+function observe(tx::TargetTuple, s::Sensor, p::Pose)
     error("`observe` not defined for this sensor.")
 end
 
@@ -27,6 +27,7 @@ include("range.jl")
 include("diromni.jl")
 include("binned_diromni.jl")
 include("fov.jl")
+#include("fov2.jl")
 include("fovb.jl")
 include("fovn.jl")
 include("fov3.jl")

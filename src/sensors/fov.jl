@@ -18,8 +18,7 @@ FOV() = FOV(120.0, 0.1, 0.0)
 
 # 1 means it is in the field of view of front antenna
 # 0 means it is not
-function observe(theta::LocTuple, s::FOV, p::Pose)
-
+function observe(theta::TargetTuple, s::FOV, p::Pose)
 
     # ensure bearing is reflected across
     rel_bearing = fit_180(p[3] - true_bearing(p, theta))

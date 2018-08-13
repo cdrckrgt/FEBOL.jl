@@ -36,11 +36,8 @@ end
 
 function simulate(m::SearchDomain, su::SimUnit)
 
-    # reset the filter, vehicle, and policy
-    # TODO: I think I assume the SimUnit comes in clean and ready to go
-    #reset!(su.f)
-    #reset!(m, su.x)
-    #reset!(su.p)
+    # Don't reset the filter, vehicle, and policy
+    # I think I assume the SimUnit comes in clean and ready to go
 
     # What was the cost to getting this first observation?
     cost_sum = get_cost(su, m)
@@ -78,11 +75,21 @@ function simulate(m::SearchDomain, su::SimUnit, ns::Int)
 end
 
 # for running batches of simulations on a vector of sim units
-function simulate(m::SearchDomain, suv::Vector{SimUnit}, n_sims::Int)
+function simulate(m::SearchDomain, suv::Vector{SimUnit}, n_sims::Int; 
+                  random_theta::Bool=true
+                )
+
+    theta_start = m.theta
 
     costs = zeros(n_sims, length(suv))
     for sim_ind = 1:n_sims
-        theta!(m)
+
+        # reset jammer to random location
+        m.theta = theta_start
+        if random_theta
+            theta!(m)
+        end
+
         print("Simulation ", sim_ind, ": ")
         for (su_ind, su) in enumerate(suv)
             print(su_ind, ",")

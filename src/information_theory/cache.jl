@@ -108,6 +108,35 @@ function make_cache2(df::DF)
     return cache
 end
 
+function make_cache2(df::DF, n_thetas)
+    n  = 2*df.n - 1
+    cache = zeros(n, n, n_thetas, length(df.obs_list))
+
+    d_theta = 360.0 / n_thetas
+
+    for dxi = 1:n, dyi = 1:n
+        dx = dxi - df.n
+        dy = dyi - df.n
+
+        for hi = 1:36
+
+            h = (hi - 0.5) * n_thetas
+            # generate a theta, xp that fit this
+            # just put vehicle at zero?
+            xp = (0.0,0.0,h)
+            tx = dx * df.cell_size
+            ty = dy * df.cell_size
+            theta = (tx, ty, 0.0, 0.0)
+
+            for (oi,o) in enumerate(df.obs_list)
+                cache[dxi, dyi, hi, oi] = O(df.sensor, theta, xp, o)
+            end
+        end
+    end
+
+    return cache
+end
+
 function mutual_information(df::DF, cache::Array{Float64,4})
     mut_info = zeros(df.n, df.n, 36)
     for xi = 1:df.n, yi = 1:df.n, hi = 1:36

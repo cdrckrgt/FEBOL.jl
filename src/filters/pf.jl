@@ -22,37 +22,60 @@ Model(x::Vehicle, s::Sensor) = Model(x, s, NoMotion())
 function ParticleFilters.generate_s(m::Model, s, a, rng::AbstractRNG)
     return move_target(m.motion_model, s, 0.0)
 end
-# recall that a here is the state of the drone
-function ParticleFilters.obs_weight(m::Model, a::Pose, sp, o)
-    return O(m.sensor, sp, a, o)
+# recall that "a" here is the state of the drone
+ParticleFilters.obs_weight(m::Model, a::Pose, sp, o) = O(m.sensor, sp, a, o)
+
+# TODO: should this type of thing go in model subtype?
+export CircularRange
+struct CircularRange
+    h_min::Float64      # minimum heading, in degrees
+    h_max::Float64      # maximum heading, in degrees
+    v_max::Float64      # maximum velocity
+end
+function Base.rand(c::CircularRange)
+    heading = rand()*(c.h_max - c.h_min) + c.h_min
+    velocity = rand()*c.v_max
+
+    vx = velocity * sind(heading)
+    vy = velocity * cosd(heading)
+
+    return vx, vy
 end
 
 
 mutable struct PF{M <: Model, OL} <: AbstractFilter
-    model::M        # contains vehicle, sensor, target motion models
-    n::Int          # number of particles
-    obs_list::OL    # list of possible observations:
+    model::M            # contains vehicle, sensor, target motion models
+    n::Int              # number of particles
+    obs_list::OL        # list of possible observations
+    L::Float64          # length of square domain
+    vr::CircularRange   # range of possible velocities
 
     # User should never see this
     _pf::SimpleParticleFilter{TargetTuple, M, LVR, MerTwist}
     _b::ParticleCollection{TargetTuple}       # particle set
 end
 
-function PF(model::Model, n::Int, obs_list=0:0; L::Real=100.0)
+function PF(model::Model, n::Int, obs_list=0:0;
+            L::Real=100.0,
+            vr::CircularRange=CircularRange(0,360,3)
+           )
     pf = SimpleParticleFilter(model, LVR(n), Base.GLOBAL_RNG)
-    b = initialize_particles(n, L)
+    b = initialize_particles(n, L, vr)
 
-    return PF(model, n, obs_list, pf, b)
+    return PF(model, n, obs_list, L, vr, pf, b)
 end
 
 ParticleFilters.state_type(m::Model) = TargetTuple
 
 
 # TODO: allow user to dictate original spread of velocities
-function initialize_particles(n::Int, L::Real)
+function initialize_particles(n::Int, L::Real, vr::CircularRange)
     bv = TargetTuple[]
     for i = 1:n
-        push!(bv, (L*rand(), L*rand(), 2.0*rand(), 2.0*rand()))
+        # it was done like the below first
+        #push!(bv, (L*rand(), L*rand(), 2.0*rand(), 2.0*rand()))
+        vx, vy = rand(vr)
+        push!(bv, (L*rand(), L*rand(), vx, vy) )
     end
     return ParticleCollection(bv)
 end
@@ -81,44 +104,46 @@ function sample_state(pf::PF)
     return rand(Base.GLOBAL_RNG, pf._b)
 end
 export ParticleCollection
-#
-#function centroid(f::PF)
-#    wsum = 0.0
-#    xmean = 0.0
-#    ymean = 0.0
-#    for i = 1:f.n
-#        wval = f.W[i]
-#        xmean += f.X[i][1] * wval
-#        ymean += f.X[i][2] * wval
-#        wsum += wval
-#    end
-#    return xmean/wsum, ymean/wsum
-#end
-#
-#function reset!(f::PF)
-#    for i = 1:f.n
-#        xi = f.length*rand()
-#        yi = f.length*rand()
-#        f.X[i] = (xi, yi)
-#        f.Xnew[i] = (xi, yi)
-#    end
-#    fill!(f.W, 0.0)
-#end
+
+# n is the number of states you want to sample
+function sample_states(pf::PF, n::Int)
+    N = n_particles(pf._b)
+    bv = Array{TargetTuple}(n)
+    for i = 1:n
+        bv[i] = particle(pf, rand(1:N))
+    end
+    return ParticleCollection(bv)
+end
+export sample_states
+
+function reset!(f::PF)
+    f._b = initialize_particles(f.n, f.L, f.vr)
+end
 
 function centroid(pf::PF)
     mx = 0.0
     my = 0.0
-    w_sum = 0.0
     for i = 1:pf.n
         tp = particle(pf, i)
         mx += tp[1]
         my += tp[2]
     end
-    mx /= pf.n
-    my /= pf.n
 
-    return (mx, my)
+    return mx/pf.n, my/pf.n
 end
+function centroid(b::ParticleCollection)
+    mx = 0.0
+    my = 0.0
+    n = length(b.particles)
+    for i = 1:n
+        tp = particle(b, i)
+        mx += tp[1]
+        my += tp[2]
+    end
+
+    return mx/n, my/n
+end
+
 function covariance(pf::PF)
     xx = 0.0
     xy = 0.0
@@ -148,6 +173,50 @@ function covariance(pf::PF)
     d = yy - my * my
 
     return [a bc; bc d]
+end
+
+
+export bin_pf
+function bin_pf(b::ParticleCollection, discrete_b::Matrix{Float64}, L::Float64)
+
+    # determine the size of each cell
+    n_cells = size(discrete_b, 1)        # assuming symmetric matrix
+    cell_size = L / n_cells
+
+    # ensure the matrix is filled with zeros
+    fill!(discrete_b, 0.0)
+
+    # loop over particles and determine where they belong
+    n = n_particles(b)
+    w = 1.0 / n
+    for i = 1:n
+        tp = particle(b, i)
+
+        xi = round(Int, tp[1] / cell_size, RoundUp)
+        yi = round(Int, tp[2] / cell_size, RoundUp)
+
+        # ensure that cells are legal
+        xi = min(max(xi, 1), n_cells)
+        yi = min(max(yi, 1), n_cells)
+
+        discrete_b[xi, yi] += w
+    end
+end
+
+function cheap_entropy(b::ParticleCollection,m::Matrix{Float64},L::Float64)
+
+    # bin the particle collection into a matrix
+    bin_pf(b, m, L)
+
+    # now compute entropy from the matrix
+    ent = 0.0
+    for p in m
+        if p > 0.0
+            ent -= p * log(p)
+        end
+    end
+
+    return ent
 end
 
 export cheap_entropy

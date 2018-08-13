@@ -100,6 +100,8 @@ const LocTuple = NTuple{4, Float64}
 const TargetTuple = NTuple{4, Float64}
 const ObsBin = Int64
 
+export TargetTuple
+
 export Pose
 
 # math functions
