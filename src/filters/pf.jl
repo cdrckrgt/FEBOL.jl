@@ -86,6 +86,11 @@ ParticleFilters.particle(pf::PF, i::Int) = particle(pf._b, i)
 ParticleFilters.weight(pf::PF, i::Int) = weight(pf._b, i)
 ParticleFilters.weight_sum(pf::PF) = weight_sum(pf._b)
 
+function predict(pf::PF)
+    m = pf.model.motion_model
+    return collect( move_target(m , s, 0.0) for s in particles(pf) )
+end
+
 # vehicle is included in model 
 # normally update(filter, belief, a, o), but action not needed
 # so I pass in the UAV pose instead
@@ -99,11 +104,9 @@ end
 export update_b
 
 # TODO: should I pass in something other than Base.GLOBAL_RNG) ?
-export sample_state
 function sample_state(pf::PF)
     return rand(Base.GLOBAL_RNG, pf._b)
 end
-export ParticleCollection
 
 # n is the number of states you want to sample
 function sample_states(pf::PF, n::Int)
@@ -114,7 +117,6 @@ function sample_states(pf::PF, n::Int)
     end
     return ParticleCollection(bv)
 end
-export sample_states
 
 function reset!(f::PF)
     f._b = initialize_particles(f.n, f.L, f.vr)

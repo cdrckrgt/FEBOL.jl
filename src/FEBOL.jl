@@ -40,7 +40,12 @@ export
     UKF,
 
     PF,
-    particle
+    particle,
+    particles,
+    predict,
+    ParticleCollection,
+    sample_state,
+    sample_states
 
 export 
     Policy,
