@@ -25,14 +25,19 @@ function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::GreedyP)
     best_a = (0.0, 0.0, 0.0)
     best_mi = 0.0
     best_p = 0.0
+
+    # propagate target dynamics forward
+    f2 = deepcopy(f)
+    predict!(f2)
+
     for a in p.actions
         # find out where a will take you
         xp = new_pose(m, x, a)
         # compute best mutual information
-        mi = mutual_information(f, xp)
+        mi = mutual_information(f2, xp)
 
         # compute penalty for being too close
-        penalty = p.lambda * nmac_penalty(f, xp, p.d)
+        penalty = p.lambda * nmac_penalty(f2, xp, p.d)
 
         score = mi - penalty
 
@@ -43,11 +48,12 @@ function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::GreedyP)
             best_a = a
         end
     end
+
     #println("best_mi = ", best_mi, ", best_p = ", best_p)
-    c = covariance(f)
-    ev = eigvals(c)
-    e1 = ev[1]
-    e2 = ev[2]
+    #c = covariance(f2)
+    #ev = eigvals(c)
+    #e1 = ev[1]
+    #e2 = ev[2]
     #println("c = ", covariance(f))
     #println("e1 = ", e1, ", e2 = ", e2)
     #println("ce = ", cheap_entropy(f, 200.0, 40))

@@ -91,6 +91,12 @@ function predict(pf::PF)
     return collect( move_target(m , s, 0.0) for s in particles(pf) )
 end
 
+function predict!(pf::PF)
+    m = pf.model.motion_model
+    particle_vec = collect( move_target(m , s, 0.0) for s in particles(pf) )
+    pf._b = ParticleCollection(particle_vec)
+end
+
 # vehicle is included in model 
 # normally update(filter, belief, a, o), but action not needed
 # so I pass in the UAV pose instead
