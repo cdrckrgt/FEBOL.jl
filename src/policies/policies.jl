@@ -33,6 +33,7 @@ include("action_list.jl")
 ######################################################################
 include("greedy.jl")
 include("greedyp.jl")
+include("greedyp2.jl")
 include("greedy2.jl")
 
 ######################################################################

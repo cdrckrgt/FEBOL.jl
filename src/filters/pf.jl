@@ -90,6 +90,10 @@ function predict(pf::PF)
     m = pf.model.motion_model
     return collect( move_target(m , s, 0.0) for s in particles(pf) )
 end
+function predict(pf::PF, b)
+    m = pf.model.motion_model
+    return collect( move_target(m , s, 0.0) for s in b.particles )
+end
 
 function predict!(pf::PF)
     m = pf.model.motion_model
@@ -108,6 +112,24 @@ function update_b(pf::PF, b::ParticleCollection, p, o)
     return update(pf._pf, b, p, o)
 end
 export update_b
+
+function update_bp{S}(up::SimpleParticleFilter{S}, b::ParticleCollection, a, o)
+    ps = particles(b)
+    pm = up._particle_memory
+    wm = up._weight_memory
+    resize!(pm, 0)
+    resize!(wm, 0)
+    sizehint!(pm, n_particles(b))
+    sizehint!(wm, n_particles(b))
+    for i in 1:n_particles(b)
+        s = ps[i]
+        push!(pm, s)
+        push!(wm, obs_weight(up.model, s, a, s, o))
+    end
+
+    return resample(up.resample, WeightedParticleBelief{S}(pm, wm, sum(wm), nothing), up.rng)
+end
+export update_bp
 
 # TODO: should I pass in something other than Base.GLOBAL_RNG) ?
 function sample_state(pf::PF)
@@ -211,6 +233,10 @@ function bin_pf(b::ParticleCollection, discrete_b::Matrix{Float64}, L::Float64)
     end
 end
 
+#function cheap_entropy(pf::PF, m::Matrix{Float64}, L::Float64)
+#    cheap_entropy(pf._b, m, L)
+#end
+
 function cheap_entropy(b::ParticleCollection,m::Matrix{Float64},L::Float64)
 
     # bin the particle collection into a matrix
@@ -228,6 +254,8 @@ function cheap_entropy(b::ParticleCollection,m::Matrix{Float64},L::Float64)
 end
 
 export cheap_entropy
+
+# I don't think I ever use these...
 function cheap_entropy(pf::PF, L::Float64, n_cells::Int)
     cheap_entropy(pf._b, L, n_cells)
 end
