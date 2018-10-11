@@ -56,6 +56,7 @@ function true_bearing(xp::Pose, theta::Vector{Float64})
 	return true_bearing((xp[1], xp[2]), (theta[1], theta[2]))
 end
 
+export get_distance
 function get_distance(p1, p2)
     dx = p1[1] - p2[1]
     dy = p1[2] - p2[2]

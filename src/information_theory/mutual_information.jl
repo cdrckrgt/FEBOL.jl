@@ -64,6 +64,9 @@ end
 # This is just a copy (and modification) of df's version
 # The commented out version above is an attempt from scratch
 function mutual_information(pf::PF, xp::Pose)
+    return mutual_information(pf, pf._b, xp)
+end
+function mutual_information(pf::PF, b, xp::Pose)
 	H_o = 0.0
 	H_o_t = 0.0
 

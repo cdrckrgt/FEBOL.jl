@@ -35,8 +35,6 @@ function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::GreedyP2)
         # find out where a will take you
         xp = new_pose(m, x, a)
 
-        # TODO: should technically propagate dynamics forward
-
         # TODO: this only works for FOV
         score = 0.0
         for o = 0:1
