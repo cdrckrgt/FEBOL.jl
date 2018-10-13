@@ -233,9 +233,6 @@ function bin_pf(b::ParticleCollection, discrete_b::Matrix{Float64}, L::Float64)
     end
 end
 
-#function cheap_entropy(pf::PF, m::Matrix{Float64}, L::Float64)
-#    cheap_entropy(pf._b, m, L)
-#end
 
 function cheap_entropy(b::ParticleCollection,m::Matrix{Float64},L::Float64)
 
@@ -255,40 +252,10 @@ end
 
 export cheap_entropy
 
-# I don't think I ever use these...
 function cheap_entropy(pf::PF, L::Float64, n_cells::Int)
     cheap_entropy(pf._b, L, n_cells)
 end
 function cheap_entropy(b::ParticleCollection, L::Float64, n_cells::Int)
-
-    cell_size = L / n_cells
     discrete_b = zeros(n_cells, n_cells)
-    w_sum = 0.0
-
-    # loop over particles and determine where they belong
-    n = length(b.particles)
-    for i = 1:n
-        tp = particle(b, i)
-        w = weight(b, i)
-
-        xi = round(Int, tp[1] / cell_size, RoundUp)
-        yi = round(Int, tp[2] / cell_size, RoundUp)
-
-        # ensure that cells are legal
-        xi = min(max(xi, 1), n_cells)
-        yi = min(max(yi, 1), n_cells)
-
-        discrete_b[xi, yi] += w
-        w_sum += w
-    end
-
-    # now compute entropy
-    ce = 0.0
-    for xi = 1:n_cells, yi = 1:n_cells
-        p = discrete_b[xi,yi] / w_sum
-        if p > 0.0
-            ce -= p * log(p)
-        end
-    end
-    return ce
+    return cheap_entropy(b, discrete_b, L)
 end
