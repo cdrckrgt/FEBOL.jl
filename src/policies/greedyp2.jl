@@ -40,7 +40,8 @@ function action(m::SearchDomain, x::Vehicle, o, f::AbstractFilter, p::GreedyP2)
         for o = 0:1
             f2 = deepcopy(f)
             update!(f2, xp, o)
-            ce = cheap_entropy(f2._b, db, m.length)
+            #ce = cheap_entropy2(f2._b, db, m.length)
+            ce = cheap_entropy2(f2, m.length, 50)
 
             penalty = p.lambda * nmac_penalty(f2, xp, p.d)
 

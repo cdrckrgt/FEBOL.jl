@@ -259,3 +259,33 @@ function cheap_entropy(b::ParticleCollection, L::Float64, n_cells::Int)
     discrete_b = zeros(n_cells, n_cells)
     return cheap_entropy(b, discrete_b, L)
 end
+export cheap_entropy2
+function cheap_entropy2(pf::PF, L::Float64, n_cells::Int)
+    d = Dict{Tuple{Int64,Int64}, Float64}()
+    cell_size = L / n_cells
+
+    b = pf._b
+
+    # loop over particles and determine where they belong
+    n = n_particles(b)
+    w = 1.0 / n
+    for i = 1:n
+        tp = particle(b, i)
+
+        xi = round(Int, tp[1] / cell_size, RoundUp)
+        yi = round(Int, tp[2] / cell_size, RoundUp)
+
+        if !haskey(d, (xi,yi))
+            d[(xi,yi)] = 0.0
+        end
+        d[(xi,yi)] += w
+    end
+
+    # loop over entries in dictionary
+    ent = 0.0
+    for k in keys(d)
+        p = d[k]
+        ent -= p * log(p)
+    end
+    return ent
+end
