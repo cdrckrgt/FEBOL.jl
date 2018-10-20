@@ -42,3 +42,18 @@ end
 struct EntropyThreshold <: TerminationCondition
     value::Float64
 end
+
+
+export OrTC
+struct OrTC <: TerminationCondition
+    conditions::Vector{TerminationCondition}
+end
+function is_complete(f::AbstractFilter, st::OrTC, step_count::Int)
+    true_sum = 0
+    for tc in st.conditions
+        if is_complete(f, tc, step_count)
+            return true
+        end
+    end
+    return false
+end
