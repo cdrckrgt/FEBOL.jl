@@ -79,8 +79,26 @@ function get_cost(ec::EntropyCost, m::SearchDomain, x::Vehicle, f::PF, a)
     get_cost(ec, m, x, f)
 end
 function get_cost(ec::EntropyCost, m::SearchDomain, x::Vehicle, f::PF)
-    cheap_entropy(f, ec.L, ec.n_cells)
+    cheap_entropy2(f, ec.L, ec.n_cells)
     #c = covariance(f)
     #earr = eigvals(c)
     #return maximum(eigvals(c))
+end
+
+
+export MaxEigCost
+struct MaxEigCost <: CostModel
+    take_sqrt::Bool
+end
+MaxEigCost() = MaxEigCost(true)
+
+function get_cost(mec::MaxEigCost, m::SearchDomain, x::Vehicle, f::PF, a)
+    get_cost(mec, m, x, f)
+end
+function get_cost(mec::MaxEigCost, m::SearchDomain, x::Vehicle, f::PF)
+    me = maximum(eigvals(covariance(f)))
+    if mec.take_sqrt
+        me = sqrt(me)
+    end
+    return me
 end
