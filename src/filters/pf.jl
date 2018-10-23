@@ -175,14 +175,18 @@ function centroid(b::ParticleCollection)
 end
 
 function covariance(pf::PF)
+    covariance(pf._b)
+end
+function covariance(b::ParticleCollection)
     xx = 0.0
     xy = 0.0
     yy = 0.0
 
     mx = 0.0
     my = 0.0
-    for i = 1:pf.n
-        tp = particle(pf, i)
+    n = n_particles(b)
+    for i = 1:n
+        tp = particle(b, i)
 
         xx += tp[1] * tp[1]
         xy += tp[1] * tp[2]
@@ -191,12 +195,12 @@ function covariance(pf::PF)
         mx += tp[1]
         my += tp[2]
     end
-    xx /= pf.n
-    xy /= pf.n
-    yy /= pf.n
+    xx /= n
+    xy /= n
+    yy /= n
 
-    mx /= pf.n
-    my /= pf.n
+    mx /= n
+    my /= n
 
     a = xx - mx * mx
     bc = xy - mx * my
@@ -261,10 +265,11 @@ function cheap_entropy(b::ParticleCollection, L::Float64, n_cells::Int)
 end
 export cheap_entropy2
 function cheap_entropy2(pf::PF, L::Float64, n_cells::Int)
+    cheap_entropy2(pf._b, L, n_cells::Int)
+end
+function cheap_entropy2(b::ParticleCollection, L::Float64, n_cells::Int)
     d = Dict{Tuple{Int64,Int64}, Float64}()
     cell_size = L / n_cells
-
-    b = pf._b
 
     # loop over particles and determine where they belong
     n = n_particles(b)
