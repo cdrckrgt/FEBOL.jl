@@ -2,7 +2,7 @@
 # diromni.jl
 ######################################################################
 
-struct DirOmni <: Sensor
+mutable struct DirOmni <: Sensor
     means::Vector{Float64}
     stds::Vector{Float64}
 
@@ -15,9 +15,10 @@ end
 
 
 # returns a density
-function observe(m::SearchDomain, s::DirOmni, p::Pose)
+#function observe(m::SearchDomain, s::DirOmni, p::Pose)
+function observe(theta::TargetTuple, s::DirOmni, p::Pose)
 # determine the relative bearing
-    rel_bearing = p[3] - true_bearing(p, m.theta)
+    rel_bearing = p[3] - true_bearing(p, theta)
     if rel_bearing < 0.0
         rel_bearing += 360.0
     end
